@@ -19,11 +19,13 @@ SDClass SD;
 #include "../LogFile.h"
 #include "../LogFile.cpp"
 
+// #ifdef MOCK_METHOD
 class MockLogFile : public LogFile {
 	public:
-		...
+		// ...
 		MOCK_METHOD(bool, re_init_sd, (), (override));
 };
+// #endif
 
 using ::testing::AtLeast;
 
