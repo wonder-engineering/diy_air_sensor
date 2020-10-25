@@ -51,6 +51,8 @@ message(STATUS "AR_AVR_INC: ${AR_AVR_INC}")
 message(STATUS "PIN_VARIANT: ${ARDUINO_PATH}/hardware/arduino/ave/variants/${PIN_VARIANT}")
 
 # Include directories
+# todo: move all of these Arduino-IDE installed libs and sources to
+#         submodules
 include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}
 	${ARDUINO_PATH}/hardware/arduino/cores/arduino
