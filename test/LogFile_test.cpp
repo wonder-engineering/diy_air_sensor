@@ -4,8 +4,8 @@
 
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
-#include "arduino-mock/Arduino.h"
-#include "arduino-mock/Serial.h"
+#include "Stub_Arduino.h"
+#include "Stub_Serial.h"
 //#include "arduino-mock/SD.h"
 //#include "arduino-mock/SPI.h"
 //#include "arduino-mock/EEPROM.h"
@@ -51,11 +51,12 @@ using ::testing::Return;
 TEST(testsuite, testname) {
 //  ArduinoMock* arduinoMock = arduinoMockInstance();
 //  SerialMock* serialMock = serialMockInstance();
-//	MockLogFile * logfile;
+	MockLogFile * logfile;
 
-//	logfile = new MockLogFile();
-//	EXPECT_CALL(logfile, re_init_sd()).Times(AtLeast(1));
+	logfile = new MockLogFile();
 
+	EXPECT_CALL(*logfile, re_init_sd()).Times(AtLeast(1));
+  logfile->re_init_sd();
 //	logfile->open_line(1, 1);
 //	logfile->close_line();
 	// EXPECT_CALL(*arduinoMock, digitalRead(2))
@@ -64,6 +65,7 @@ TEST(testsuite, testname) {
   // EXPECT_CALL(, delay(1));
   //releaseSerialMock();
   //releaseArduinoMock();
+	delete logfile;
 }
 
 
