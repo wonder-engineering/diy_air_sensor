@@ -1,17 +1,10 @@
-// Copyright 2014 http://switchdevice.com
-// This example code is in the public domain.
-
+// Copyright 2020 Brett M Leedy
 
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "Stub_Arduino.h"
 #include "Stub_Serial.h"
-//#include "arduino-mock/SD.h"
-//#include "arduino-mock/SPI.h"
-//#include "arduino-mock/EEPROM.h"
-//#include "arduino-mock/Wire.h"
 
-//#define File file
 #include "File_mock.h"
 
 SDClass SD;
@@ -19,13 +12,10 @@ SDClass SD;
 #include "../LogFile.h"
 #include "../LogFile.cpp"
 
-// #ifdef MOCK_METHOD
 class MockLogFile : public LogFile {
 	public:
-		// ...
 		MOCK_METHOD(bool, re_init_sd, (), (override));
 };
-// #endif
 
 using ::testing::AtLeast;
 
@@ -49,22 +39,12 @@ using ::testing::AtLeast;
 // https://github.com/google/googletest/blob/master/googlemock/docs/cheat_sheet.md
 using ::testing::Return;
 TEST(testsuite, testname) {
-//  ArduinoMock* arduinoMock = arduinoMockInstance();
-//  SerialMock* serialMock = serialMockInstance();
 	MockLogFile * logfile;
 
 	logfile = new MockLogFile();
 
 	EXPECT_CALL(*logfile, re_init_sd()).Times(AtLeast(1));
   logfile->re_init_sd();
-//	logfile->open_line(1, 1);
-//	logfile->close_line();
-	// EXPECT_CALL(*arduinoMock, digitalRead(2))
-  //  .WillOnce(Return(1));
-  // EXPECT_CALL(*serialMock, println(1, 10));
-  // EXPECT_CALL(, delay(1));
-  //releaseSerialMock();
-  //releaseArduinoMock();
 	delete logfile;
 }
 
