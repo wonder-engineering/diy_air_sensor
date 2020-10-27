@@ -4,16 +4,13 @@ project(arduino-mock-test-all
 				DESCRIPTION "test for the air sensor"
 				LANGUAGES C CXX)
 
-
-
 # Add googletest directly to our build. This defines
 # the gtest and gtest_main targets.
 add_subdirectory(googletest
 				EXCLUDE_FROM_ALL)
 
-file(GLOB SRCS "*.cpp" "../Sd_i.cpp")
+file(GLOB SRCS "*.cpp" "../Sd_i.cpp" "../LogFile.cpp")
 add_executable(test-all ${SRCS})
-
 
 target_link_libraries(test-all
 		gtest_main

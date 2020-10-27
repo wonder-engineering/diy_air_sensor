@@ -8,6 +8,12 @@
   #include <SPI.h>
   #include <SD.h>
   #include <EEPROM.h>
+#else
+  #include "gmock/gmock.h"
+  #include "gtest/gtest.h"
+  #include "test/Stub_Arduino.h"
+  #include "test/Stub_Serial.h"
+  #include "test/File_mock.h"
 #endif
 
 #define MAX_FILENAME_LEN 12  // filenames can be a
@@ -33,6 +39,7 @@ class LogFile{
   uint16_t file_failure_count = 0;
   uint16_t sd_failure_count = 0;
   uint16_t cooldown_start_millis = 0;
+	bool first_run=true;
   File file;  // todo: make not public
 	Sd_i * sd;
 
@@ -49,6 +56,7 @@ class LogFile{
 
 	void replace_sd_interface(Sd_i * sd);
 	bool get_sd_failure(){return this->sd_failure;};
+	virtual bool is_first_run(){bool rv = this->first_run; this->first_run = false; return rv;};
  private:
   virtual uint16_t get_highest_used_id();
   virtual void override_file_number(uint16_t new_id);

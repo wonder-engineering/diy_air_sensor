@@ -43,85 +43,36 @@ extern "C" {
 typedef uint8_t boolean;
 typedef uint8_t byte;
 
-void init(void){};
+void init(void);
 
-void pinMode(uint8_t, uint8_t){};
-void digitalWrite(uint8_t, uint8_t){};
-int digitalRead(uint8_t){return 0;};
-int analogRead(uint8_t){return 0;};
-void analogReference(uint8_t mode){};
-void analogWrite(uint8_t, int){};
+void pinMode(uint8_t, uint8_t);
+void digitalWrite(uint8_t, uint8_t);
+int digitalRead(uint8_t);
+int analogRead(uint8_t);
+void analogReference(uint8_t mode);
+void analogWrite(uint8_t, int);
 
-unsigned long millis(void){return 0;};
-unsigned long micros(void){return 0;};
-void delay(unsigned long){};
-void delayMicroseconds(unsigned int us){};
-unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout){return 0;};
+unsigned long millis(void);
+unsigned long micros(void);
+void delay(unsigned long);
+void delayMicroseconds(unsigned int us);
+unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout);
 
-void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val){};
-uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder){return 0;};
+void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val);
+uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder);
 
-void attachInterrupt(uint8_t, void (*)(void), int mode){};
-void detachInterrupt(uint8_t){};
+void attachInterrupt(uint8_t, void (*)(void), int mode);
+void detachInterrupt(uint8_t);
 
-void setup(void){};
-void loop(void){};
+void setup(void);
+void loop(void);
+
+#define F(x) (x)
+#define UNUSED(expr) do { (void)(expr); } while (0)
+
 
 #ifdef __cplusplus
 } // extern "C"
 #endif
-
-#include <gmock/gmock.h>
-
-#define UNUSED(expr) do { (void)(expr); } while (0)
-#define F(x) (x)
-
-class ArduinoMock {
-  private:
-    unsigned long  currentMillis;
-
-  public:
-    ArduinoMock(){};
-
-    unsigned long getMillis() {
-      return currentMillis;
-    };
-
-    void setMillisRaw (unsigned long milliseconds) {
-      currentMillis = milliseconds;
-    };
-    void setMillisSecs(unsigned long seconds) {
-      setMillisRaw(seconds *      1000);
-    };
-    void setMillisMins(unsigned long minutes) {
-      setMillisRaw(minutes *   60 * 1000);
-    };
-    void setMillisHrs (float         hours)   {
-      setMillisRaw(hours  * 60 * 60 * 1000);
-    };
-
-    void addMillisRaw (unsigned long milliseconds) {
-      currentMillis += milliseconds;
-    };
-    void addMillisSecs(unsigned long seconds) {
-      addMillisRaw(seconds *      1000);
-    };
-    void addMillisMins(unsigned long minutes) {
-      addMillisRaw(minutes *   60 * 1000);
-    };
-    void addMillisHrs (float         hours)   {
-      addMillisRaw(hours  * 60 * 60 * 1000);
-    };
-
-    MOCK_METHOD2(pinMode, void (uint8_t, uint8_t));
-    MOCK_METHOD2(analogWrite, void (uint8_t, int));
-    MOCK_METHOD2(digitalWrite, void (uint8_t, uint8_t));
-    MOCK_METHOD1(digitalRead, int (int));
-    MOCK_METHOD1(analogRead, int (int));
-    MOCK_METHOD1(delay, void (int));
-    MOCK_METHOD0(millis, unsigned long ());
-};
-ArduinoMock* arduinoMockInstance(){return 0;};
-void releaseArduinoMock(){};
 
 #endif // ARDUINO_H

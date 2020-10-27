@@ -1,12 +1,3 @@
-
-#ifdef IN_TESTING
-#include "gtest/gtest.h"
-#include "gmock/gmock.h"
-//#include "test/Stub_Arduino.h"
-//#include "test/Stub_Serial.h"
-#include "test/File_mock.h"
-#endif
-
 #include "LogFile.h"
 
 Sd_i::Sd_i(){}

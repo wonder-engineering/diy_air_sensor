@@ -1,3 +1,6 @@
+#ifndef FILE_MOCK_H
+#define FILE_MOCK_H
+
 #define FILE_WRITE 0
 #define FILE_READ 1
 
@@ -27,4 +30,4 @@ class SDClass {
   bool begin(uint8_t csPin){return true;}
 	File open(char * name, int mode){return File();} //todo: make not broken
 };
-
+#endif

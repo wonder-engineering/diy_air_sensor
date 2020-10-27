@@ -14,7 +14,7 @@ bool LogFile::re_init_sd() {
   if ((millis() > this->cooldown_start_millis) &&  // millis hasn't wrapped
       (millis() - this->cooldown_start_millis <
                           SD_COOLDOWN_LENGTH) &&   // waited for the cooldn
-      (this->cooldown_start_millis != 0)           // we've run this once
+      (!this->is_first_run())           // we've run this once
     ) {
     return this->sd_failure;
   } else {
