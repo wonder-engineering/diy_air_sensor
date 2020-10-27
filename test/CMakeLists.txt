@@ -11,7 +11,7 @@ project(arduino-mock-test-all
 add_subdirectory(googletest
 				EXCLUDE_FROM_ALL)
 
-file(GLOB SRCS "*.cpp")
+file(GLOB SRCS "*.cpp" "../Sd_i.cpp")
 add_executable(test-all ${SRCS})
 
 

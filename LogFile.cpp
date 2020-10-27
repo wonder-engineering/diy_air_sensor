@@ -5,11 +5,12 @@
 // todo: create unit tests, especially for string manipulation, which scares me.
 
 LogFile::LogFile() {
+	this->sd = new Sd_i();
   this->re_init_sd();
 }
 
 bool LogFile::re_init_sd() {
-  // don't try to re-init if cooldown has not expired
+	// don't try to re-init if cooldown has not expired
   if ((millis() > this->cooldown_start_millis) &&  // millis hasn't wrapped
       (millis() - this->cooldown_start_millis <
                           SD_COOLDOWN_LENGTH) &&   // waited for the cooldn
@@ -19,12 +20,11 @@ bool LogFile::re_init_sd() {
   } else {
     this->cooldown_start_millis = millis();  // we  ran, so reset
   }
-
   // Init the SD card
+	this->set_pinmode(10, OUTPUT);
   pinMode(10, OUTPUT);
   Serial.println(F("LogFile: Init SD card..."));
-  this->sd_failure = !SD.begin(10);  // begin returns false on failure
-
+  this->sd_failure = !this->begin_sd();  // begin returns false on failure
   if (!sd_failure) {
     // Init the file name
     current_id = this->get_highest_used_id();
@@ -37,6 +37,10 @@ bool LogFile::re_init_sd() {
     Serial.println(F("LogFile: ERROR - Failed to init SD card!"));
   }
   return this->sd_failure;
+}
+
+bool LogFile::begin_sd(){
+				return this->sd->begin(10);
 }
 
 void LogFile::get_file_name(char * buffer, uint8_t max_size) {
@@ -63,7 +67,7 @@ void LogFile::open_line(uint16_t id, uint16_t timestamp) {
   if (is_sd_failed())
     return;
   this->file.close();
-  this->file = SD.open(this->current_name, FILE_WRITE);
+  this->file = this->sd->open(this->current_name, FILE_WRITE);
   if (this->file) {
     // success
   } else {
@@ -85,7 +89,7 @@ uint16_t LogFile::get_highest_used_id() {
 
   uint16_t highest_number_found = 0;
   File dir;
-  dir = SD.open("/", FILE_READ);
+  dir = this->sd->open("/", FILE_READ);
   // check that it opened and is a directory
   if (!dir) {
     // could not open directory
@@ -157,4 +161,14 @@ void LogFile::override_file_number(uint16_t new_id) {
 File * LogFile::get_file_ptr() {
   // todo: make this safer
   return &this->file;
+}
+
+
+void LogFile::replace_sd_interface(Sd_i * new_sd){
+  // delete this->sd;
+	this->sd = new_sd;
+}
+
+void LogFile::set_pinmode(uint8_t pin, uint8_t flags){
+				pinMode(pin, flags);  // just set pinmode
 }

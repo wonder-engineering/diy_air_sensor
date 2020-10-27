@@ -16,6 +16,16 @@ const char log_file_name_base[] = "LOG";
 #define LOGFILE_EXTENSION "CSV"
 #define SD_COOLDOWN_LENGTH 5000  // milliseconds
 
+// SD interface to abstract external library for testing
+class Sd_i{
+				public:
+				Sd_i();
+				virtual bool begin(uint8_t csPin);
+				virtual File open(const char *filename, uint8_t mode);
+				virtual void end();
+};
+
+
 class LogFile{
   char current_name[MAX_FILENAME_LEN];
   uint16_t current_id = 0;
@@ -24,22 +34,27 @@ class LogFile{
   uint16_t sd_failure_count = 0;
   uint16_t cooldown_start_millis = 0;
   File file;  // todo: make not public
+	Sd_i * sd;
 
  public:
   LogFile();
-  void rotate_file();
-  void open_line(uint16_t id, uint16_t timestamp);
-  void close_line();
-  void get_file_name(char * buffer, uint8_t max_size);
-  char * get_file_name_ptr();
+  virtual void rotate_file();
+  virtual void open_line(uint16_t id, uint16_t timestamp);
+  virtual void close_line();
+  virtual void get_file_name(char * buffer, uint8_t max_size);
+  virtual char * get_file_name_ptr();
   virtual bool re_init_sd();
-  bool is_sd_failed();
-  File * get_file_ptr();
+  virtual bool is_sd_failed();
+  virtual File * get_file_ptr();
 
+	void replace_sd_interface(Sd_i * sd);
+	bool get_sd_failure(){return this->sd_failure;};
  private:
-  uint16_t get_highest_used_id();
-  void override_file_number(uint16_t new_id);
-  void handle_failures();
+  virtual uint16_t get_highest_used_id();
+  virtual void override_file_number(uint16_t new_id);
+  //virtual void handle_failures();
+	virtual bool begin_sd();
+	virtual void set_pinmode(uint8_t pin, uint8_t flags);
 };
 
 #endif  // GAS_SENSOR_LOGFILE_H_
