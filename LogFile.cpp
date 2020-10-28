@@ -17,10 +17,8 @@ bool LogFile::re_init_sd() {
                           SD_COOLDOWN_LENGTH) &&             // waited for the cooldn
       (!this->is_first_run())                                // we've run this once
     ) {
-					printf("here %d %d\n", nowtime, this->cooldown_start_millis);
     return this->sd_failure;
   } else {
-					printf("there %d %d\n", nowtime, this->cooldown_start_millis);
     this->cooldown_start_millis = nowtime;  // we  ran, so reset
   }
   // Init the SD card
