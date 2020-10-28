@@ -11,14 +11,17 @@ LogFile::LogFile() {
 
 bool LogFile::re_init_sd() {
 	// don't try to re-init if cooldown has not expired
-  if ((millis() > this->cooldown_start_millis) &&  // millis hasn't wrapped
-      (millis() - this->cooldown_start_millis <
-                          SD_COOLDOWN_LENGTH) &&   // waited for the cooldn
-      (!this->is_first_run())           // we've run this once
+	uint16_t nowtime = this->get_millis();
+  if ((nowtime >= this->cooldown_start_millis) &&  // millis hasn't wrapped
+      (nowtime < this->cooldown_start_millis +
+                          SD_COOLDOWN_LENGTH) &&             // waited for the cooldn
+      (!this->is_first_run())                                // we've run this once
     ) {
+					printf("here %d %d\n", nowtime, this->cooldown_start_millis);
     return this->sd_failure;
   } else {
-    this->cooldown_start_millis = millis();  // we  ran, so reset
+					printf("there %d %d\n", nowtime, this->cooldown_start_millis);
+    this->cooldown_start_millis = nowtime;  // we  ran, so reset
   }
   // Init the SD card
 	this->set_pinmode(10, OUTPUT);

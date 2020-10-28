@@ -37,6 +37,7 @@ set(SRC_FILES ${PROJECT_NAME}.cpp
 				LogFile.cpp
 				SensorMenu.h # note: this is a header with all source
 				AnalogSensor.cpp
+				Sd_I.cpp
 				)
 
 # Get cmake to recognize *.ino files as C++

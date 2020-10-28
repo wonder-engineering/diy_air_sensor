@@ -102,7 +102,7 @@ TEST(LogFile, Happy_initialization_works) {
 // 5         20000     no              20000   // cooldown complete
 // 6         123       no              123     // wrapped, so run
 //
-/*
+
 TEST(LogFile, re_init_behaviors) {
 	//// Mock Classes that need mocking
 	// Mock LogFile methods we want to assert/manipulate			
@@ -110,6 +110,7 @@ TEST(LogFile, re_init_behaviors) {
 	  public:
 		  MOCK_METHOD(void, set_pinmode, (uint8_t pin, uint8_t flags), (override));
 		  MOCK_METHOD(uint16_t, get_highest_used_id, (), (override));
+		  MOCK_METHOD(uint16_t, get_millis, (), (override));
   };
 
 	//// Instantiate mocked classes
@@ -119,33 +120,74 @@ TEST(LogFile, re_init_behaviors) {
 	///// Override any mocked methods as needed
 	// Calling mocked SD begin() will return success
   ON_CALL(mock_sd, begin(_)).WillByDefault([this](uint8_t n){return true;});
-	// Will always treat as first run
-  ON_CALL(logfile, is_first_run).WillByDefault([this](){return true;});
 
 	//// Call any setup methods needed here
 	// construct the mock logfile
 	logfile.replace_sd_interface(&mock_sd);
 
+	using ::testing::Mock;
+	Mock::VerifyAndClearExpectations(&logfile);
+	Mock::VerifyAndClearExpectations(&mock_sd);
+
 	//// Set expectations for mocks here
-  // at construct, we:
-	// Didn't drop into cooldown, so the following happens
-	// Did set pinmode for pin 10 to output
-	EXPECT_CALL(logfile, set_pinmode(10, OUTPUT));
-	// Init the SD card with CS pin 10 (part of elec. design)
-	EXPECT_CALL(mock_sd, begin(10));
-	// * Did call get_highest_used_id
-  EXPECT_CALL(logfile, get_highest_used_id());
+	// Run 1:  Expect no calls to init methods if we're in cooldown
+	EXPECT_CALL(logfile, get_millis()).Times(1).WillRepeatedly(Return(500));
+	EXPECT_CALL(logfile, set_pinmode(10, OUTPUT)).Times(0);
+	EXPECT_CALL(mock_sd, begin(10)).Times(0);
+  EXPECT_CALL(logfile, get_highest_used_id()).Times(0);
 
-	//// Call actions and make assertions
-	// * return false
-  bool init_error = logfile.re_init_sd();
-	// * Assemble the correct logfile name from that ID
-	ASSERT_STREQ("LOG-1.CSV",logfile.get_file_name_ptr());
-	// no init error flagged
-	ASSERT_FALSE(init_error);
-  bool sd_failure = logfile.get_sd_failure();
-	// no sd failure flagge
-  ASSERT_FALSE(sd_failure);
+	ASSERT_FALSE(logfile.re_init_sd());
 
+	// Run 2:  Expect no calls to init methods after 1.5 seconds of cooldown
+	Mock::VerifyAndClearExpectations(&logfile);
+	Mock::VerifyAndClearExpectations(&mock_sd);
+	EXPECT_CALL(logfile, get_millis()).Times(1).WillRepeatedly(Return(1500));
+	EXPECT_CALL(logfile, set_pinmode(10, OUTPUT)).Times(0);
+	EXPECT_CALL(mock_sd, begin(10)).Times(0);
+  EXPECT_CALL(logfile, get_highest_used_id()).Times(0);
+
+	ASSERT_FALSE(logfile.re_init_sd());
+	
+	// Run 3:  Expect calls to init methods after 6 seconds of cooldown
+	Mock::VerifyAndClearExpectations(&logfile);
+	Mock::VerifyAndClearExpectations(&mock_sd);
+	EXPECT_CALL(logfile, get_millis()).Times(1).WillRepeatedly(Return(6000));
+	EXPECT_CALL(logfile, set_pinmode(10, OUTPUT)).Times(1);
+	EXPECT_CALL(mock_sd, begin(10)).Times(1);
+  EXPECT_CALL(logfile, get_highest_used_id()).Times(1);
+
+	ASSERT_FALSE(logfile.re_init_sd());
+	
+
+	// Run 5:  Expect no calls to init methods after 6.5 seconds of cooldown
+	Mock::VerifyAndClearExpectations(&logfile);
+	Mock::VerifyAndClearExpectations(&mock_sd);
+	EXPECT_CALL(logfile, get_millis()).Times(1).WillRepeatedly(Return(6500));
+	EXPECT_CALL(logfile, set_pinmode(10, OUTPUT)).Times(0);
+	EXPECT_CALL(mock_sd, begin(10)).Times(0);
+  EXPECT_CALL(logfile, get_highest_used_id()).Times(0);
+
+	ASSERT_FALSE(logfile.re_init_sd());
+	
+
+	// Run 6:  Expect calls to init methods after 20 seconds of cooldown
+	Mock::VerifyAndClearExpectations(&logfile);
+	Mock::VerifyAndClearExpectations(&mock_sd);
+	EXPECT_CALL(logfile, get_millis()).Times(1).WillRepeatedly(Return(20000));
+	EXPECT_CALL(logfile, set_pinmode(10, OUTPUT)).Times(1);
+	EXPECT_CALL(mock_sd, begin(10)).Times(1);
+  EXPECT_CALL(logfile, get_highest_used_id()).Times(1);
+
+	ASSERT_FALSE(logfile.re_init_sd());
+	
+	// Run 7:  Expect calls to init methods when wrapping
+	Mock::VerifyAndClearExpectations(&logfile);
+	Mock::VerifyAndClearExpectations(&mock_sd);
+	EXPECT_CALL(logfile, get_millis()).Times(1).WillRepeatedly(Return(150));
+	EXPECT_CALL(logfile, set_pinmode(10, OUTPUT)).Times(1);
+	EXPECT_CALL(mock_sd, begin(10)).Times(1);
+  EXPECT_CALL(logfile, get_highest_used_id()).Times(1);
+
+	ASSERT_FALSE(logfile.re_init_sd());
 }
-*/
+
