@@ -58,6 +58,7 @@ class LogFile{
 	bool get_sd_failure(){return this->sd_failure;};
 	virtual bool is_first_run(){bool rv = this->first_run; this->first_run = false; return rv;};
 	virtual uint16_t get_millis(){return millis();};
+	void reset_first_run(){this->first_run=true;}; // for testing
  private:
   virtual uint16_t get_highest_used_id();
   virtual void override_file_number(uint16_t new_id);

@@ -12,12 +12,11 @@ class MockSd_i : public Sd_i {
 };
 
 using ::testing::AtLeast;
+using ::testing::Return;
+using ::testing::_;
+using ::testing::Mock;
 
 // Tests I would like to run:
-//   * If SD fails on start, will any of my methods try to call it?
-//   * Do I mark SD failed correctly
-//   * Do I try to heal upon SD failure
-//   * Am I honoring the cooldown period?
 //   * Do my filenames comply with SD library naming conventions?
 //   * Does open line open the correct file name?
 //   * Do I discover the latest file name?
@@ -35,10 +34,50 @@ using ::testing::AtLeast;
 // each config update works as expected, and loading it from EEPROM works as expected.
 //
 
+//   * Do I try to heal upon SD failure
+//
+//   Test whether SD init failures are handled correctly
+TEST(LogFile, SD_init_Failure_Handling) {
+	//// Mock Classes that need mocking
+	// Mock LogFile methods we want to assert/manipulate			
+  class MockLogFile : public LogFile {
+	  public:
+     MOCK_METHOD(uint16_t, get_highest_used_id, (), (override));
+  };
+
+	//// Instantiate mocked classes
+	MockLogFile logfile;
+  MockSd_i mock_sd;
+
+	///// Override any mocked methods as needed
+	// Calling mocked SD begin() will always return failure
+  ON_CALL(mock_sd, begin(_)).WillByDefault([this](uint8_t n){return false;});
+
+	//// Call any setup methods needed here
+	logfile.replace_sd_interface(&mock_sd);
+	logfile.reset_first_run();  //make the class think it's the first run again
+
+  //// Reset any counters that might have been triggered in setup here
+	Mock::VerifyAndClearExpectations(&logfile);
+	Mock::VerifyAndClearExpectations(&mock_sd);
+
+	//// Set expectations for mocks here
+  // at construct, we:
+	// Call the sd begin method, which will fail
+	EXPECT_CALL(mock_sd, begin(_));
+	// we will not call get_highest_used_id, because it will always
+	// fail and give us wrong results.
+  EXPECT_CALL(logfile, get_highest_used_id()).Times(0);
 
 
-using ::testing::Return;
-using ::testing::_;
+	// re_init_sd() should return true (signaling an error)
+	ASSERT_TRUE(logfile.re_init_sd());
+	
+	// our failure state should be marked true
+	ASSERT_TRUE(logfile.is_sd_failed());
+
+}
+
 TEST(LogFile, Happy_initialization_works) {
 	//// Mock Classes that need mocking
 	// Mock LogFile methods we want to assert/manipulate			
@@ -125,7 +164,6 @@ TEST(LogFile, re_init_behaviors) {
 	// construct the mock logfile
 	logfile.replace_sd_interface(&mock_sd);
 
-	using ::testing::Mock;
 	Mock::VerifyAndClearExpectations(&logfile);
 	Mock::VerifyAndClearExpectations(&mock_sd);
 
