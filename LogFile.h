@@ -18,7 +18,7 @@
 
 #define MAX_FILENAME_LEN 12  // filenames can be a
                              // maximum of 8 characters for FAT
-const char log_file_name_base[] = "LOG";
+const char log_file_name_base[] = "L";
 #define LOGFILE_EXTENSION "CSV"
 #define SD_COOLDOWN_LENGTH 5000  // milliseconds
 

@@ -18,24 +18,32 @@ using ::testing::Return;
 using ::testing::_;
 using ::testing::Mock;
 
-// Tests I would like to run:
-//   * Do my filenames comply with SD library naming conventions?
-//   * Does open line open the correct file name?
-//   * Do I discover the latest file name?
-//   * Does File rotation work?
-//   * Do I build proper CSV Files?
-//   * Do I prevent closing a line before opening one?
-//   * Do I prevent writing to an unopened line?
-//   * Is my max filename length variable set too high?
-//   * If my number of files grows to 10000, will I violate the naming conventions?
-//   * Do I call delay anywhere?
-//   * Do I call Serial.print() anywhere unnecessarily?
-// https://github.com/google/googletest/blob/master/googlemock/docs/cheat_sheet.md
-// * we handle un-initiated EEPROM correctly
-// checksum works as expected
-// each config update works as expected, and loading it from EEPROM works as expected.
-//
+TEST(LogFile, File_Names_comply){
+  LogFile logfile;
 
+  for (int i = 0; i<= 50000; i++) {
+	  logfile.rotate_file();
+		int overall_string_length=strlen(logfile.get_file_name_ptr());
+		// filename is less than 12 characters total (8.3 convention)
+		ASSERT_LT(overall_string_length, 13);
+		int period_pos = 0;
+		int num_periods = 0;
+		for (int pp = 0; pp < overall_string_length; pp++){
+		  if (logfile.get_file_name_ptr()[pp] == '.') {
+        num_periods++;
+				period_pos=pp;
+			}
+		}
+		// before extension should be 8 or less characters
+		ASSERT_LT( period_pos, 8);
+		// extension should be 3 or less characters long to meet the standard
+		ASSERT_LT( (overall_string_length - period_pos), 5);
+		// should only have one period
+		ASSERT_LT(num_periods, 2);
+		// extension should be exactly ".CSV"
+		ASSERT_STREQ(logfile.get_file_name_ptr()+period_pos, ".CSV");
+	}
+}
 //   Test whether SD init failures are handled correctly
 TEST(LogFile, SD_init_Failure_Handling) {
 	//// Mock Classes that need mocking
@@ -153,7 +161,7 @@ TEST(LogFile, Happy_initialization_works) {
 	// * return false
   bool init_error = logfile.re_init_sd();
 	// * Assemble the correct logfile name from that ID
-	ASSERT_STREQ("LOG-1.CSV",logfile.get_file_name_ptr());
+	ASSERT_STREQ("L-1.CSV",logfile.get_file_name_ptr());
 	// no init error flagged
 	ASSERT_FALSE(init_error);
   bool sd_failure = logfile.get_sd_failure();
