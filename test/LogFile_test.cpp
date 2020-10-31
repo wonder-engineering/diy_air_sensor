@@ -9,6 +9,8 @@
 class MockSd_i : public Sd_i {
 				public:
 							MOCK_METHOD(bool, begin, (uint8_t csPin), (override));
+							MOCK_METHOD(File, open, (const char * name, uint8_t mode), (override));
+							MOCK_METHOD(void, end, (),(override));
 };
 
 using ::testing::AtLeast;
@@ -34,8 +36,6 @@ using ::testing::Mock;
 // each config update works as expected, and loading it from EEPROM works as expected.
 //
 
-//   * Do I try to heal upon SD failure
-//
 //   Test whether SD init failures are handled correctly
 TEST(LogFile, SD_init_Failure_Handling) {
 	//// Mock Classes that need mocking
@@ -75,6 +75,43 @@ TEST(LogFile, SD_init_Failure_Handling) {
 	
 	// our failure state should be marked true
 	ASSERT_TRUE(logfile.is_sd_failed());
+
+}
+
+//   Test whether SD failures cause re-init
+TEST(LogFile, SD_heal_after_failure) {
+	//// Mock Classes that need mocking
+	// Mock LogFile methods we want to assert/manipulate			
+  class MockLogFile : public LogFile {
+	  public:
+  };
+
+	//// Instantiate mocked classes
+	MockLogFile logfile;
+  MockSd_i mock_sd;
+
+	///// Override any mocked methods as needed
+	// Calling mocked SD begin() will always return success (true)
+  ON_CALL(mock_sd, begin(_)).WillByDefault([this](uint8_t n){return true;});
+	int file_value = 0;
+	File * file_ptr = (File *)&file_value; // failure to open evaluates to FALSE
+	ON_CALL(mock_sd, open(_,_)).WillByDefault(Return(*file_ptr));
+
+	//// Call any setup methods needed here
+	logfile.replace_sd_interface(&mock_sd);
+
+  //// Reset any counters that might have been triggered in setup here
+	Mock::VerifyAndClearExpectations(&logfile);
+	Mock::VerifyAndClearExpectations(&mock_sd);
+
+	//// Set expectations for mocks here
+  // at construct, we:
+	// Call the sd begin method, which will fail
+	EXPECT_CALL(mock_sd, open(_,_)).Times(1);
+
+	//// Try to open a Line and should fail
+	logfile.open_line(0,0);
+  ASSERT_TRUE(logfile.is_sd_failed());
 
 }
 
