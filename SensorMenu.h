@@ -260,7 +260,7 @@ class SensorMenu {
 
   virtual void commit_config() {
     this->config.store_checksum();
-    EEPROM.update(0, this->config);
+    EEPROM.put(0, this->config);
   }
 
   uint16_t get_log_every_n_loops() {

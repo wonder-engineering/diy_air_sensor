@@ -104,7 +104,6 @@ uint16_t LogFile::get_highest_used_id() {
 
   // check that it is a dir
   char temp_filename[MAX_FILENAME_LEN];
-  uint16_t temp_filename_len = MAX_FILENAME_LEN;
   while (true) {
     File entry =  dir.openNextFile();
     if (entry == 0)
@@ -112,14 +111,13 @@ uint16_t LogFile::get_highest_used_id() {
 
     // if entry.name() matches our file prefix, check the highest number
     // copy the string to tokenize
-    uint16_t temp_filename_len = MAX_FILENAME_LEN;
     char * token;
     strncpy(temp_filename, entry.name(), MAX_FILENAME_LEN);
     // string is of the format "LOGFILE_NAME_BASE.number.csv"
     token = strtok(temp_filename, "-");
 
     // compare the first token to the filename
-    if (strncmp(token, log_file_name_base, temp_filename_len) != 0) {
+    if (strncmp(token, log_file_name_base, MAX_FILENAME_LEN) != 0) {
       continue;  // different base name - ignore
     }
 
