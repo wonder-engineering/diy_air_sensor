@@ -175,12 +175,13 @@ class SensorMenu {
   }
 
   void wait_for_button_up() {
-    while (digitalRead(MENU_SELECT_BUTTON) ==LOW ||
+    while (digitalRead(MENU_SELECT_BUTTON) == LOW ||
            digitalRead(MENU_UP_BUTTON) == LOW ||
            digitalRead(MENU_DN_BUTTON) == LOW) {
             // do nothing until all buttons released for at least one cycle
             delay(1);
           }
+    // todo: add a long timeout
   }
 
   bool display_sensor_setting(const char * name, uint16_t * setting) {
@@ -428,7 +429,7 @@ class SensorMenu {
   }
 
 
-  // Render the menue, starting with a specific line
+  // Render the menu, starting with a specific line
   void render_menu(uint8_t line) {
     lcd->clear();
     for (int d_row=line; d_row < line + 4 && d_row < MENU_LENGTH; d_row++) {
@@ -510,9 +511,9 @@ class SensorMenu {
         render_menu(menu_pos);
         wait_for_button_up();
       } else if (digitalRead(MENU_SELECT_BUTTON) == LOW) {
-        if (enter_menu_item(menu_pos)) {
+        if (enter_menu_item(menu_pos) == EXIT_FROM_MENU) {
           break;
-        } else {
+        } else {  // remain in menu
           lcd->clear();
           render_menu(menu_pos);
         }
