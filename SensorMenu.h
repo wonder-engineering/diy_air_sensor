@@ -3,7 +3,22 @@
 #ifndef GAS_SENSOR_SENSORMENU_H_
 #define GAS_SENSOR_SENSORMENU_H_
 
+#define EXIT_FROM_MENU true
+#define REMAIN_IN_MENU false
 
+#ifdef IN_TESTING
+// just skip progmem macro for test builds
+#define PROGMEM
+#include "test/Stub_Arduino.h"
+#include "test/Stub_Serial.h"
+#include "test/Stub_LiquidCrystal_I2C.hh"
+#include "test/Stub_EEPROM.hh"
+#include "test/Stub_SmokeSensor.hh"
+#include "test/Stub_AnalogSensor.hh"
+#endif
+
+#include "LogFile.h"
+#include <stdint.h>
 
 // Menu Buttons
 #define MENU_SELECT_BUTTON 8
@@ -177,6 +192,8 @@ class SensorMenu {
     lcd->print(*setting);
     lcd->setCursor(0, 3);
     lcd->print(F("Blue to exit."));
+
+    return REMAIN_IN_MENU;
   }
 
 
@@ -190,7 +207,7 @@ class SensorMenu {
       if (digitalRead(MENU_SELECT_BUTTON) == LOW) {
         commit_config();  // write to EEPROM before exiting
         wait_for_button_up();
-        return false;
+        return REMAIN_IN_MENU;
       } else if (digitalRead(MENU_UP_BUTTON) == LOW) {
         *setting += 20;
         this->display_sensor_setting(name, setting);
@@ -205,7 +222,7 @@ class SensorMenu {
   }
 
   bool exit_callback() {
-    return true;
+    return EXIT_FROM_MENU;
   }
 
   void commit_config() {
@@ -224,7 +241,7 @@ class SensorMenu {
   bool backlight_callback() {
     this->config.backlight = !this->config.backlight;
     commit_config();
-    return true;  // exit back out to main display
+    return EXIT_FROM_MENU;  // exit back out to main display
   }
 
   bool get_logon_config() {
@@ -234,7 +251,7 @@ class SensorMenu {
   bool logon_callback() {
     this->config.logging = !this->config.logging;
     commit_config();
-    return true;  // exit back out to main display
+    return EXIT_FROM_MENU;  // exit back out to main display
   }
 
   bool sensor_t_callback() {
@@ -255,6 +272,7 @@ class SensorMenu {
     // plus restart logging.
     void(* resetFunc) (void) = 0;
     resetFunc();
+    return REMAIN_IN_MENU;
   }
 
   bool is_alternate_config() {
@@ -282,7 +300,7 @@ class SensorMenu {
         if (digitalRead(MENU_SELECT_BUTTON) == LOW) {
           commit_config();  // write to EEPROM before exiting
           wait_for_button_up();
-          return false;
+          return REMAIN_IN_MENU;
         } else if (digitalRead(MENU_UP_BUTTON) == LOW) {
           this->config.log_every_n_loops++;
           this->display_lograte_menu();
@@ -318,7 +336,7 @@ class SensorMenu {
         if (digitalRead(MENU_SELECT_BUTTON) == LOW) {
           commit_config();  // write to EEPROM before exiting
           wait_for_button_up();
-          return false;
+          return REMAIN_IN_MENU;
         } else if (digitalRead(MENU_UP_BUTTON) == LOW) {
           this->config.sampling_period_ms += 500;
           this->display_sampling_menu();
@@ -356,7 +374,7 @@ class SensorMenu {
 
   bool file_callback() {
     if (logfile == NULL)
-      return false;  // just leave if there's no file attached
+      return REMAIN_IN_MENU;  // just leave if there's no file attached
 
     display_file_menu();
     wait_for_button_up();
@@ -364,7 +382,7 @@ class SensorMenu {
       if (digitalRead(MENU_SELECT_BUTTON) == LOW) {
         commit_config();  // write to EEPROM before exiting
         wait_for_button_up();
-        return false;
+        return REMAIN_IN_MENU;
       } else if (digitalRead(MENU_UP_BUTTON) == LOW ||
                   digitalRead(MENU_DN_BUTTON) == LOW) {
         logfile->rotate_file();
@@ -395,7 +413,7 @@ class SensorMenu {
         if (dust    != NULL) {dust->set_display_raw(display_raw);}
         if (sensors != NULL) {sensors->set_display_raw(display_raw);}
         wait_for_button_up();
-        return false;
+        return REMAIN_IN_MENU;
       } else if (digitalRead(MENU_UP_BUTTON) == LOW ||
                   digitalRead(MENU_DN_BUTTON) == LOW) {
         display_raw = !display_raw;
@@ -416,7 +434,7 @@ class SensorMenu {
     for (int d_row=line; d_row < line + 4 && d_row < MENU_LENGTH; d_row++) {
       char buffer[21];  // make sure this is large enough for the largest string
       strcpy_P(buffer,
-        reinterpret_cast<char *>pgm_read_word(&(menu_line[d_row])));
+        reinterpret_cast<char *>(pgm_read_word(&(menu_line[d_row]))));
       lcd->setCursor(col1, d_row-line);
       lcd->print(buffer);
       Serial.print("render line "); Serial.println(d_row);
@@ -427,7 +445,7 @@ class SensorMenu {
 
   bool enter_menu_item(uint8_t id) {
     Serial.print(F("entering menu item ")); Serial.println(id);
-    bool rv = false;
+    bool rv = REMAIN_IN_MENU;
     switch (id) {
       case 0:
         rv = exit_callback(); break;
@@ -471,7 +489,6 @@ class SensorMenu {
         break;  // 13: toggle the set of sensors I'll use on next restart
       default:
         Serial.println(F("No function exists for this menu item"));
-        return false;
     }
     return rv;
   }

@@ -1,5 +1,5 @@
 /**
- * Arduino mock 
+ * Arduino mock
  *    functions
  */
 #include "Stub_Arduino.h"
@@ -21,4 +21,4 @@ uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder){return 0;};
 
 void attachInterrupt(uint8_t, void (*)(void), int mode){};
 void detachInterrupt(uint8_t){};
-
+uint16_t pgm_read_word(const char *const *){return 0;}

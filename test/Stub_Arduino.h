@@ -67,9 +67,13 @@ void detachInterrupt(uint8_t);
 void setup(void);
 void loop(void);
 
+uint16_t pgm_read_word(const char *const *);
+#define strcpy_P strcpy
+
 #define F(x) (x)
 #define UNUSED(expr) do { (void)(expr); } while (0)
 
+//typedef uint16_t size_t;
 
 #ifdef __cplusplus
 } // extern "C"
