@@ -134,6 +134,12 @@ class SensorMenu {
   SensorMenu(LiquidCrystal_I2C * lcd,
              uint8_t col1_idx,
              uint8_t col2_idx) {
+    init(lcd, col1_idx, col2_idx);
+  }
+
+  void init(LiquidCrystal_I2C * lcd,
+             uint8_t col1_idx,
+             uint8_t col2_idx) {
     this->lcd = lcd;
     this->col1 = col1_idx;
     this->col2 = col2_idx;
@@ -143,7 +149,7 @@ class SensorMenu {
     }
 
     // retrieve config values from the EEPROM
-    EEPROM.get(0, this->config);
+    load_settings_from_eeprom(0, &this->config);
     if (this->config.check()) {
       this->config.dump();
     } else {
@@ -154,12 +160,30 @@ class SensorMenu {
       this->config.file_number = 0;
       this->config.backlight = true;
       this->config.logging = true;
+      this->config.alt_sensor_config = false;
       commit_config();  // write to EEPROM with valid checksum
     }
   }
 
+  // light wrapper for better testing - DO NOT ADD LOGIG HERE
+  virtual void load_settings_from_eeprom(int idx, settings_type * myconfig){
+    EEPROM.get(idx, *myconfig);
+  }
+
   uint16_t get_sensor_threshold(uint8_t id) {
     return this->config.sensor_thresholds[id];
+  }
+
+  bool get_logon_config(){
+    return this->config.logging;
+  }
+
+  bool get_file_number_config(){
+    return this->config.file_number;
+  }
+
+  bool get_alt_sensor_config(){
+    return this->config.alt_sensor_config;
   }
 
   void attach_logfile(LogFile * logfile) {
@@ -168,6 +192,14 @@ class SensorMenu {
 
   void attach_dust_sensor(SmokeSensor * dust) {
     this->dust = dust;
+  }
+
+  LiquidCrystal_I2C * get_lcd(){
+    return this->lcd;
+  }
+
+  bool check_config(){
+    return this->config.check();
   }
 
   void attach_analog_sensors(AnalogSensor * sensors) {
@@ -226,9 +258,9 @@ class SensorMenu {
     return EXIT_FROM_MENU;
   }
 
-  void commit_config() {
+  virtual void commit_config() {
     this->config.store_checksum();
-    EEPROM.put(0, this->config);
+    EEPROM.update(0, this->config);
   }
 
   uint16_t get_log_every_n_loops() {
@@ -245,8 +277,8 @@ class SensorMenu {
     return EXIT_FROM_MENU;  // exit back out to main display
   }
 
-  bool get_logon_config() {
-    return this->config.logging;
+  bool get_log_raw() {
+    return this->config.log_raw;
   }
 
   bool logon_callback() {

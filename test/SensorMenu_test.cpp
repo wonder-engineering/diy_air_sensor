@@ -15,16 +15,48 @@ using ::testing::Mock;
 
 
 
-//test that:
-// init calls EEPROM to get config
-// init loads defaults if no EEPROM is available and commits the config
-// init stores the LCD pointer
-TEST(SensorMenu, init){
-  LiquidCrystal_I2C lcd(8,8,8);
-  SensorMenu sensormenu(&lcd, 5, 5);
+// constructor init test
+TEST(SensorMenu, constructor_init){
+  class MockedSensorMenu : public SensorMenu {
+   public:
+    MockedSensorMenu(LiquidCrystal_I2C * lcd, uint8_t col1_idx, uint8_t col2_idx) : SensorMenu{lcd, col1_idx, col2_idx} {
+		// no special constructor for mocked class
+	}
+	MOCK_METHOD(void, load_settings_from_eeprom, (int idx, settings_type * myconfig), (override));
+	MOCK_METHOD(void, commit_config, (), (override));
+  };
 
-  bool sd_failure = false;
-  ASSERT_FALSE(sd_failure);
+  LiquidCrystal_I2C lcd(8,8,8);
+  MockedSensorMenu sensormenu(&lcd, 5, 5);
+
+  // init calls EEPROM to get config
+  EXPECT_CALL(sensormenu, load_settings_from_eeprom(0,_)).WillRepeatedly([this](int addr, settings_type * settings){
+	 settings->sampling_period_ms = 5;
+	 settings->log_every_n_loops = 23458;
+	 settings->log_raw=false;
+	 settings->file_number=23;
+	 settings->backlight=false;
+	 settings->alt_sensor_config=false;
+	 settings->checksum=0;  // will load an invalid checksum
+  });
+
+  // init loads defaults if no EEPROM is available and commits the config
+  EXPECT_CALL(sensormenu, commit_config());
+
+  // assert that the new checksum checks out
+  sensormenu.init(&lcd, 5, 5);
+
+  // check that the config is now the defaults
+  ASSERT_EQ(sensormenu.get_sampling_period_ms(), DEFAULT_LOOP_PERIOD_MILLIS);
+  ASSERT_EQ(sensormenu.get_log_every_n_loops(), DEFAULT_LOG_EVERY_N_LOOPS);
+  ASSERT_EQ(sensormenu.get_log_raw(), false);
+  ASSERT_EQ(sensormenu.get_file_number_config(), 0);
+  ASSERT_EQ(sensormenu.get_backlight_config(), true);
+  ASSERT_EQ(sensormenu.get_logon_config(), true);
+  ASSERT_EQ(sensormenu.get_alt_sensor_config(), false);
+
+  // init stores the LCD pointer
+  ASSERT_EQ(sensormenu.get_lcd(), &lcd);
 
 }
 
@@ -34,6 +66,7 @@ TEST(SensorMenu, init){
 // menu lines are not longer than max width
 // there's a case to handle each one of them
 TEST(SensorMenu, Menu_Lines){
+
   LiquidCrystal_I2C lcd(8,8,8);
   SensorMenu sensormenu(&lcd, 5, 5);
 
