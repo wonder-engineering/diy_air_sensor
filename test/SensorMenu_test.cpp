@@ -304,11 +304,26 @@ TEST(SensorMenu, backlight_callback){
 
 // we toggle the logging setting and commit the config
 TEST(SensorMenu, logging_callback){
-  LiquidCrystal_I2C lcd(8,8,8);
-  SensorMenu sensormenu(&lcd, 5, 5);
+  	class MockedSensorMenu : public SensorMenu {
+	  public:
+		MockedSensorMenu(LiquidCrystal_I2C * lcd, uint8_t col1_idx, uint8_t col2_idx) : SensorMenu{lcd, col1_idx, col2_idx} {
+			// no special constructor for mocked class
+		}
+		MOCK_METHOD(void, commit_config, (), (override));
+	};
 
-  bool sd_failure = false;
-  ASSERT_FALSE(sd_failure);
+	// Instantiate things
+	LiquidCrystal_I2C lcd(8,8,8);
+	MockedSensorMenu sensormenu(&lcd, 5, 5);
+
+	// set expectations
+	EXPECT_CALL(sensormenu, commit_config()).Times(1);
+	bool original_config = sensormenu.get_logon_config();
+
+	// take action - should return true to exit menu
+	ASSERT_TRUE(sensormenu.logon_callback());
+    // make sure it toggled the value
+	ASSERT_EQ(!original_config, sensormenu.get_logon_config());
 }
 
 
