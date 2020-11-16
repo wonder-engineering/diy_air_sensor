@@ -60,19 +60,64 @@ TEST(SensorMenu, constructor_init){
 
 }
 
-//test that:
-// menu_length is the same as the number of menu lines
-// checksum covers all settings (set expectation on settings size)
-// menu lines are not longer than max width
-// there's a case to handle each one of them
+// Testing for the menu lines that we have configured
 TEST(SensorMenu, Menu_Lines){
 
-  LiquidCrystal_I2C lcd(8,8,8);
-  SensorMenu sensormenu(&lcd, 5, 5);
+  class MockedSensorMenu : public SensorMenu {
+   public:
+    MockedSensorMenu(LiquidCrystal_I2C * lcd, uint8_t col1_idx, uint8_t col2_idx) : SensorMenu{lcd, col1_idx, col2_idx} {
+		// no special constructor for mocked class
+	}
+	MOCK_METHOD(bool, exit_callback, (), (override));
+	MOCK_METHOD(bool, disp_callback, (), (override));
+	MOCK_METHOD(bool, file_callback, (), (override));
+	MOCK_METHOD(bool, sampling_callback, (), (override));
+	MOCK_METHOD(bool, lograte_callback, (), (override));
+	MOCK_METHOD(bool, backlight_callback, (), (override));
+	MOCK_METHOD(bool, logon_callback, (), (override));
+	MOCK_METHOD(bool, sensor_settings_callback, (const char *, uint16_t *), (override));
+	MOCK_METHOD(bool, sensor_t_callback, (), (override));
+	MOCK_METHOD(bool, error_callback, (), (override));
+  };
 
-  bool sd_failure = false;
-  ASSERT_FALSE(sd_failure);
+  // menu_length is the same as the number of menu lines
+  // this is an array of pointers
+  uint16_t num_menu_strings = sizeof(menu_line) / sizeof(menu_line[0]);
+  ASSERT_EQ(num_menu_strings, MENU_LENGTH);
 
+  LiquidCrystal_I2C lcd(8,8,8);  // a fake stub, doesn't matter
+  MockedSensorMenu sensormenu(&lcd, 5, 5);     // params don't matter
+  LogFile * logfile = new LogFile(); // just there to hold a place
+  sensormenu.attach_logfile(logfile);
+
+//   printf("initted\n");
+
+  int num_menu_tests = 0;
+  EXPECT_CALL(sensormenu, exit_callback()); num_menu_tests++;
+  EXPECT_CALL(sensormenu, disp_callback()); num_menu_tests++;
+  EXPECT_CALL(sensormenu, file_callback()); num_menu_tests++;
+  EXPECT_CALL(sensormenu, sampling_callback()); num_menu_tests++;
+  EXPECT_CALL(sensormenu, lograte_callback()); num_menu_tests++;
+  EXPECT_CALL(sensormenu, backlight_callback()); num_menu_tests++;
+  EXPECT_CALL(sensormenu, logon_callback()); num_menu_tests++;
+  EXPECT_CALL(sensormenu, sensor_settings_callback("LPG", _ )); num_menu_tests++;
+  EXPECT_CALL(sensormenu, sensor_settings_callback("CO", _ )); num_menu_tests++;
+  EXPECT_CALL(sensormenu, sensor_settings_callback("O3", _ )); num_menu_tests++;
+  EXPECT_CALL(sensormenu, sensor_settings_callback("GAS", _ )); num_menu_tests++;
+  EXPECT_CALL(sensormenu, sensor_settings_callback("HAZ", _ )); num_menu_tests++;
+  EXPECT_CALL(sensormenu, sensor_settings_callback("PM", _ )); num_menu_tests++;
+  EXPECT_CALL(sensormenu, sensor_t_callback()); num_menu_tests++;
+  ASSERT_EQ(MENU_LENGTH, num_menu_tests); // here to remind you to add a test case when you add a menu item.
+
+  EXPECT_CALL(sensormenu, error_callback()).Times(0);
+
+
+
+  for (int i = 0; i < MENU_LENGTH; i++ ) {
+	  sensormenu.enter_menu_item(i);
+  }
+
+  delete logfile;
 
 }
 

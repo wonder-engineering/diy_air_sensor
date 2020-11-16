@@ -31,7 +31,7 @@
 
 // Menu is stored in progmem to save RAM, which means it has to
 //  be more static here than I'd like
-const char menu_e[]      PROGMEM = "EXIT     ";              // 0
+const char menu_e[]      PROGMEM = "EXIT     ......................................";              // 0
 const char menu_raw[]    PROGMEM = "Disp. Raw / Average";    // 1
 const char menu_file[]   PROGMEM = "File";                   // 2
 const char menu_sam[]    PROGMEM = "Sampling Rate";          // 3
@@ -46,6 +46,7 @@ const char menu_poison[] PROGMEM = "Poison Threshold";       // 11
 const char menu_dust_z[] PROGMEM = "Dust Zero";              // 12
 const char menu_sens_t[] PROGMEM = "Sensor Type";            // 13
 
+// vector-ize these, if I can
 const char *const menu_line[] PROGMEM = {
            menu_e,       //  0: Exit
            menu_raw,     //  1: Raw or averaged data
@@ -230,7 +231,7 @@ class SensorMenu {
   }
 
 
-  bool sensor_settings_callback(const char * name, uint16_t * setting) {
+  virtual bool sensor_settings_callback(const char * name, uint16_t * setting) {
     Serial.print(F("Entered settings callback for ")); Serial.println(name);
 
     this->display_sensor_setting(name, setting);
@@ -254,7 +255,7 @@ class SensorMenu {
     }
   }
 
-  bool exit_callback() {
+  virtual bool exit_callback() {
     return EXIT_FROM_MENU;
   }
 
@@ -271,7 +272,7 @@ class SensorMenu {
     return this->config.backlight;
   }
 
-  bool backlight_callback() {
+  virtual bool backlight_callback() {
     this->config.backlight = !this->config.backlight;
     commit_config();
     return EXIT_FROM_MENU;  // exit back out to main display
@@ -281,13 +282,13 @@ class SensorMenu {
     return this->config.log_raw;
   }
 
-  bool logon_callback() {
+  virtual bool logon_callback() {
     this->config.logging = !this->config.logging;
     commit_config();
     return EXIT_FROM_MENU;  // exit back out to main display
   }
 
-  bool sensor_t_callback() {
+  virtual bool sensor_t_callback() {
     if (this->config.alt_sensor_config)
       this->config.alt_sensor_config = false;
     else
@@ -326,7 +327,7 @@ class SensorMenu {
     lcd->print(F("Blue to exit."));
   }
 
-  bool lograte_callback() {
+  virtual bool lograte_callback() {
       display_lograte_menu();
       wait_for_button_up();
       while (true) {
@@ -362,7 +363,7 @@ class SensorMenu {
     lcd->print(F("Blue to exit."));
   }
 
-  bool sampling_callback() {
+  virtual bool sampling_callback() {
       display_sampling_menu();
       wait_for_button_up();
       while (true) {
@@ -405,7 +406,7 @@ class SensorMenu {
     lcd->print(F("Blue to exit."));
   }
 
-  bool file_callback() {
+  virtual bool file_callback() {
     if (logfile == NULL)
       return REMAIN_IN_MENU;  // just leave if there's no file attached
 
@@ -426,7 +427,7 @@ class SensorMenu {
   }
 
   bool display_raw = false;
-  bool disp_callback() {
+  virtual bool disp_callback() {
     Serial.println(F("Entered Display Callback"));
     lcd->clear();
     lcd->setCursor(0, 0);
@@ -522,9 +523,12 @@ class SensorMenu {
         break;  // 13: toggle the set of sensors I'll use on next restart
       default:
         Serial.println(F("No function exists for this menu item"));
+        error_callback();
     }
     return rv;
   }
+
+  virtual bool error_callback(){ return false;}
 
   void enter_menu() {
     lcd->backlight();
