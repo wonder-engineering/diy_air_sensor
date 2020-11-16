@@ -223,7 +223,6 @@ class SensorMenu {
             // do nothing until all buttons released for at least one cycle
             delay(1);
           }
-    // todo: add a long timeout
   }
 
   bool display_sensor_setting(const char * name, uint16_t * setting) {

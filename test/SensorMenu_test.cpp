@@ -12,6 +12,7 @@ using ::testing::AtLeast;
 using ::testing::Return;
 using ::testing::_;
 using ::testing::Mock;
+using ::testing::A;
 
 
 
@@ -216,28 +217,51 @@ TEST(SensorMenu, settings_type){
 
 }
 
-// we wait for any one of the buttons to be pressed before moving on
-// we time out after a certain number of seconds
-TEST(SensorMenu, wait_for_button_up){
-  LiquidCrystal_I2C lcd(8,8,8);
-  SensorMenu sensormenu(&lcd, 5, 5);
-
-  bool sd_failure = false;
-  ASSERT_FALSE(sd_failure);
-}
-
-
-
 // we clear the screen
 // we call print at least once
 // all calls to setCurser are within a sane range
 // we return REMAIN_IN_MENU
-TEST(SensorMenu, display_sensor_setting){
-  LiquidCrystal_I2C lcd(8,8,8);
-  SensorMenu sensormenu(&lcd, 5, 5);
+TEST(SensorMenu, display_sensor_setting) {
+	class MockedSensorMenu : public SensorMenu {
+	  public:
+		MockedSensorMenu(LiquidCrystal_I2C * lcd, uint8_t col1_idx, uint8_t col2_idx) : SensorMenu{lcd, col1_idx, col2_idx} {
+			// no special constructor for mocked class
+		}
+	};
 
-  bool sd_failure = false;
-  ASSERT_FALSE(sd_failure);
+	class MockedLcd : public LiquidCrystal_I2C {
+	  public:
+		MockedLcd(uint8_t lcd_Addr,uint8_t lcd_cols,uint8_t lcd_rows) : LiquidCrystal_I2C{lcd_Addr, lcd_cols, lcd_rows}{
+			// no special mock constructor
+		}
+		MOCK_METHOD(void, clear, (), (override));
+		MOCK_METHOD(void, print, (char * toprint), (override));
+        MOCK_METHOD(void, print, (const char * toprint), (override));
+        MOCK_METHOD(void, print, (uint16_t toprint), (override));
+		MOCK_METHOD(void, setCursor, (uint8_t, uint8_t), (override));
+
+	};
+
+    // instantiate everything
+	MockedLcd lcd(8,8,8);  // a fake stub, doesn't matter
+	MockedSensorMenu sensormenu(&lcd, 5, 5);     // params don't matter
+	LogFile * logfile = new LogFile(); // just there to hold a place
+	sensormenu.attach_logfile(logfile);
+
+	uint16_t test_number = 2348;
+	const char test_name[] = "TST";
+
+    // set expectations
+	EXPECT_CALL(lcd, clear()).Times(1); // should clear the screen at start
+	EXPECT_CALL(lcd, setCursor( _, _ )).Times(AtLeast(1)); // should at least move the cursor once
+	EXPECT_CALL(lcd, print(test_number)).Times(AtLeast(1));;  // should at least print the setting
+	EXPECT_CALL(lcd, print(A<const char *>())).Times(AtLeast(1));  // at a minimum, should print something else
+	EXPECT_CALL(lcd, print(test_name)).Times(AtLeast(1));  // at a minimum, should print the setting name
+
+	// call method
+    ASSERT_FALSE(sensormenu.display_sensor_setting(test_name, &test_number)); // should remain in menu (false)
+
+	delete logfile;
 }
 
 // we call display first
@@ -246,11 +270,8 @@ TEST(SensorMenu, display_sensor_setting){
 // when we press the menu up button we decrement our sensor setting, display it, then wait for button up but do not commit.
 // we reject bad pointers
 TEST(SensorMenu, sensor_settings_callback){
-  LiquidCrystal_I2C lcd(8,8,8);
-  SensorMenu sensormenu(&lcd, 5, 5);
-
-  bool sd_failure = false;
-  ASSERT_FALSE(sd_failure);
+  // todo: fill in
+  ASSERT_FALSE(false);
 }
 
 
