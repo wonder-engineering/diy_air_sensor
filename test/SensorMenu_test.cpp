@@ -328,13 +328,29 @@ TEST(SensorMenu, logging_callback){
 
 
 // we toggle the sensor type setting and commit the config
-// after that we call delays that sum up to >3 seconds and call resetFunc
 TEST(SensorMenu, sensor_t_callback){
-  LiquidCrystal_I2C lcd(8,8,8);
-  SensorMenu sensormenu(&lcd, 5, 5);
+  	class MockedSensorMenu : public SensorMenu {
+	  public:
+		MockedSensorMenu(LiquidCrystal_I2C * lcd, uint8_t col1_idx, uint8_t col2_idx) : SensorMenu{lcd, col1_idx, col2_idx} {
+			// no special constructor for mocked class
+		}
+		MOCK_METHOD(void, commit_config, (), (override));
+		MOCK_METHOD(void, restart, (), (override));
+	};
 
-  bool sd_failure = false;
-  ASSERT_FALSE(sd_failure);
+	// Instantiate things
+	LiquidCrystal_I2C lcd(8,8,8);
+	MockedSensorMenu sensormenu(&lcd, 5, 5);
+
+	// set expectations
+	EXPECT_CALL(sensormenu, commit_config()).Times(1);
+	EXPECT_CALL(sensormenu, restart()).Times(1);
+	bool original_config = sensormenu.is_alternate_config();
+
+	// take action - should return true to exit menu
+	ASSERT_FALSE(sensormenu.sensor_t_callback());
+
+	ASSERT_EQ(!original_config, sensormenu.is_alternate_config());
 }
 
 

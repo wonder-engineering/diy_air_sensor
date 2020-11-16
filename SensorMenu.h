@@ -312,9 +312,13 @@ class SensorMenu {
     }
     // This is heavy-handed, but we need to re-instantiate all sensors
     // plus restart logging.
+    this->restart();
+    return REMAIN_IN_MENU;  // never actually gets here
+  }
+
+  virtual void restart() {
     void(* resetFunc) (void) = 0;
     resetFunc();
-    return REMAIN_IN_MENU;
   }
 
   bool is_alternate_config() {
