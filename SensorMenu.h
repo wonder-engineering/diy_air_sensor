@@ -84,13 +84,22 @@ struct settings_type {
   uint16_t checksum = 0;
 
   uint16_t calc_checksum() {
-    return sampling_period_ms +
-               log_every_n_loops +
-               log_raw +
-               file_number +
-               backlight +
-               alt_sensor_config +
-               198;  // salt value to avoid all-zeros hazard
+    uint16_t rv = 198;
+    rv += sampling_period_ms;
+    rv += log_every_n_loops;
+    rv += log_raw;
+    rv += file_number;
+    rv += dust_zero;
+    rv += backlight;
+    rv += alt_sensor_config;
+    for (int i=0; i<MAX_SENSORS; i++) {
+	    rv += sensor_thresholds[i];
+    }
+    for (int i=0; i<MAX_SENSORS; i++) {
+	    rv += sensor_zeros[i];
+    }
+    rv += logging;
+    return rv;
   }
   void store_checksum() {
     checksum = calc_checksum();

@@ -111,29 +111,108 @@ TEST(SensorMenu, Menu_Lines){
 
   EXPECT_CALL(sensormenu, error_callback()).Times(0);
 
-
-
   for (int i = 0; i < MENU_LENGTH; i++ ) {
 	  sensormenu.enter_menu_item(i);
   }
 
   delete logfile;
-
 }
 
 
-// loading to EEPROM works
-// loading from EEPROM works
-// checksum works
-// checksum failures cause loading from defaults
-// loading all zeros causes a checksum failure
-TEST(SensorMenu, EEPROM_Config){
-  LiquidCrystal_I2C lcd(8,8,8);
-  SensorMenu sensormenu(&lcd, 5, 5);
+// changes break checksum
+// checksum covers all values
+// once committed, the checsum succeeds
+TEST(SensorMenu, settings_type){
 
-  bool sd_failure = false;
-  ASSERT_FALSE(sd_failure);
+  settings_type settings;
+  int settings_overall_size = sizeof(settings);
+  int settings_tested_size = 0;  // amount of the settings type that's tested
+  settings.sampling_period_ms = 4326;
+  settings_tested_size += sizeof(settings.sampling_period_ms);
+  settings.log_every_n_loops = 12;
+  settings_tested_size += sizeof(settings.log_every_n_loops);
+  settings.file_number = 15;
+  settings_tested_size += sizeof(settings.file_number);
+  settings.dust_zero = 92;
+  settings_tested_size += sizeof(settings.dust_zero);
+  for (int i=0; i<MAX_SENSORS; i++){
+	  settings.sensor_thresholds[i] = 5 * i;
+  }
+  settings_tested_size += sizeof(settings.sensor_thresholds);
+  for (int i=0; i<MAX_SENSORS; i++){
+	  settings.sensor_zeros[i] = i;
+  }
+  settings_tested_size += sizeof(settings.sensor_zeros);
+  settings.log_raw = false;
+  settings_tested_size += sizeof(settings.log_raw);
+  settings.backlight = true;
+  settings_tested_size += sizeof(settings.backlight);
+  settings.logging = true;
+  settings_tested_size += sizeof(settings.logging);
+  settings.alt_sensor_config = false;
+  settings_tested_size += sizeof(settings.alt_sensor_config);
 
+  // Assert that this test initted (and will test) all fields
+  // in the data structure
+  ASSERT_GE(settings_tested_size+3, settings_overall_size);
+
+
+  // Checksum edge cases
+  settings.checksum = 0;  // arbitrary zero checksum
+  ASSERT_FALSE(settings.check());
+  settings.store_checksum();  // calculate correct checksum
+  ASSERT_TRUE(settings.check());
+  settings.checksum = 23976; // arbitrary high checksum
+  ASSERT_FALSE(settings.check());
+  settings.store_checksum();  // calculate correct checksum
+  ASSERT_TRUE(settings.check());
+  settings.checksum = 0xFFFF; // saturated checksum
+  ASSERT_FALSE(settings.check());
+
+  // changing values in any field breaks checksum
+  settings.store_checksum();  // calculate correct checksum
+  ASSERT_TRUE(settings.check());
+  settings.sampling_period_ms = 0;
+  ASSERT_FALSE(settings.check());
+  settings.store_checksum();  // calculate correct checksum
+  ASSERT_TRUE(settings.check());
+  settings.log_every_n_loops = 9546;
+  ASSERT_FALSE(settings.check());
+  settings.store_checksum();  // calculate correct checksum
+  ASSERT_TRUE(settings.check());
+  settings.file_number = 0;
+  ASSERT_FALSE(settings.check());
+  settings.store_checksum();  // calculate correct checksum
+  ASSERT_TRUE(settings.check());
+  settings.dust_zero = 10;
+  ASSERT_FALSE(settings.check());
+  settings.store_checksum();  // calculate correct checksum
+  ASSERT_TRUE(settings.check());
+  settings.sensor_thresholds[2] = 923;
+  ASSERT_FALSE(settings.check());
+  settings.store_checksum();  // calculate correct checksum
+  ASSERT_TRUE(settings.check());
+  settings.sensor_zeros[1] = 6;
+  ASSERT_FALSE(settings.check());
+  settings.store_checksum();  // calculate correct checksum
+  ASSERT_TRUE(settings.check());
+  settings.log_raw = !settings.log_raw;
+  ASSERT_FALSE(settings.check());
+  settings.store_checksum();  // calculate correct checksum
+  ASSERT_TRUE(settings.check());
+  settings.backlight = !settings.backlight;
+  ASSERT_FALSE(settings.check());
+  settings.store_checksum();  // calculate correct checksum
+  ASSERT_TRUE(settings.check());
+  settings.logging = !settings.logging;
+  ASSERT_FALSE(settings.check());
+  settings.store_checksum();  // calculate correct checksum
+  ASSERT_TRUE(settings.check());
+  settings.alt_sensor_config = !settings.alt_sensor_config;
+  ASSERT_FALSE(settings.check());
+  settings.store_checksum();  // calculate correct checksum
+
+  settings_tested_size += sizeof(settings.checksum);
 
 }
 
