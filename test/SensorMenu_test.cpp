@@ -366,19 +366,6 @@ TEST(SensorMenu, display_lograte_menu){
   ASSERT_FALSE(sd_failure);
 }
 
-// we call display first
-// when menu select button is pressed, we commit the config then wait for button up then return.
-// when we press the menu up button we increment our setting, display it, then wait for button up but do not commit.
-// when we press the menu up button we decrement our setting, display it, then wait for button up but do not commit.
-// we return remain_in_menu
-TEST(SensorMenu, lograte_callback){
-  LiquidCrystal_I2C lcd(8,8,8);
-  SensorMenu sensormenu(&lcd, 5, 5);
-
-  bool sd_failure = false;
-  ASSERT_FALSE(sd_failure);
-}
-
 // we clear the screen
 // setcursor positions are sane
 // we call print at least once
@@ -391,37 +378,12 @@ TEST(SensorMenu, display_sampling_menu){
   ASSERT_FALSE(sd_failure);
 }
 
-// we call display first
-// when menu select button is pressed, we commit the config then wait for button up then return.
-// when we press the menu up button we increment our setting, display it, then wait for button up but do not commit.
-// when we press the menu up button we decrement our setting, display it, then wait for button up but do not commit.
-// we return remain_in_menu
-TEST(SensorMenu, sampling_callback){
-  LiquidCrystal_I2C lcd(8,8,8);
-  SensorMenu sensormenu(&lcd, 5, 5);
-
-  bool sd_failure = false;
-  ASSERT_FALSE(sd_failure);
-}
 
 // we clear the screen
 // setcursor positions are sane
 // we call print at least once
 // line strings are not too long
 TEST(SensorMenu, display_file_menu){
-  LiquidCrystal_I2C lcd(8,8,8);
-  SensorMenu sensormenu(&lcd, 5, 5);
-
-  bool sd_failure = false;
-  ASSERT_FALSE(sd_failure);
-}
-
-// we call display first
-// when menu select button is pressed, we commit the config then wait for button up then return.
-// when we press the menu up button we increment our setting, display it, then wait for button up but do not commit.
-// when we press the menu up button we decrement our setting, display it, then wait for button up but do not commit.
-// we return remain_in_menu
-TEST(SensorMenu, file_callback){
   LiquidCrystal_I2C lcd(8,8,8);
   SensorMenu sensormenu(&lcd, 5, 5);
 
@@ -443,18 +405,6 @@ TEST(SensorMenu, display_disp_menu){
   ASSERT_FALSE(sd_failure);
 }
 
-// we call display first
-// when menu select button is pressed, we commit the config then wait for button up then return.
-// when we press the menu up button we increment our setting, display it, then wait for button up but do not commit.
-// when we press the menu up button we decrement our setting, display it, then wait for button up but do not commit.
-// we return remain_in_menu
-TEST(SensorMenu, disp_callback){
-  LiquidCrystal_I2C lcd(8,8,8);
-  SensorMenu sensormenu(&lcd, 5, 5);
-
-  bool sd_failure = false;
-  ASSERT_FALSE(sd_failure);
-}
 
 // We render only 3 lines
 // We render correct menu at zero
