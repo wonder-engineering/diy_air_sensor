@@ -17,6 +17,17 @@ using ::testing::Gt;
 using ::testing::Lt;
 
 
+#define SANE_LCD_WIDTH          20
+#define SANE_LCD_COL1            0
+#define SANE_LCD_COL2            SANE_LCD_WIDTH/2
+#define SANE_LCD_HEIGHT          4
+#define SANE_SAMPLING_PERIOD_MS  5
+#define SANE_LOG_EVERY_N_LOOPS  15
+#define SANE_FILE_NUMBER        23
+#define SANE_LCD_ADDR           10
+#define SANE_SETTING_NAME    "TST"
+#define SANE_SETTING_VALUE    2348
+
 
 // constructor init test
 TEST(SensorMenu, constructor_init){
@@ -29,25 +40,25 @@ TEST(SensorMenu, constructor_init){
 	MOCK_METHOD(void, commit_config, (), (override));
   };
 
-  LiquidCrystal_I2C lcd(8,8,8);
-  MockedSensorMenu sensormenu(&lcd, 5, 5);
+  LiquidCrystal_I2C lcd(SANE_LCD_ADDR, SANE_LCD_WIDTH, SANE_LCD_HEIGHT );
+  MockedSensorMenu sensormenu(&lcd, SANE_LCD_COL1, SANE_LCD_COL2);
 
   // init calls EEPROM to get config
   EXPECT_CALL(sensormenu, load_settings_from_eeprom(0,_)).WillRepeatedly([this](int addr, settings_type * settings){
-	 settings->sampling_period_ms = 5;
-	 settings->log_every_n_loops = 23458;
-	 settings->log_raw=false;
-	 settings->file_number=23;
-	 settings->backlight=false;
-	 settings->alt_sensor_config=false;
-	 settings->checksum=0;  // will load an invalid checksum
+	 settings->sampling_period_ms = SANE_SAMPLING_PERIOD_MS;
+	 settings->log_every_n_loops = SANE_LOG_EVERY_N_LOOPS;
+	 settings->log_raw = false;
+	 settings->file_number = SANE_FILE_NUMBER;
+	 settings->backlight = false;
+	 settings->alt_sensor_config = false;
+	 settings->checksum = 0;  // will load an invalid checksum
   });
 
   // init loads defaults if no EEPROM is available and commits the config
   EXPECT_CALL(sensormenu, commit_config());
 
   // assert that the new checksum checks out
-  sensormenu.init(&lcd, 5, 5);
+  sensormenu.init(&lcd, SANE_LCD_COL1, SANE_LCD_COL2);
 
   // check that the config is now the defaults
   ASSERT_EQ(sensormenu.get_sampling_period_ms(), DEFAULT_LOOP_PERIOD_MILLIS);
@@ -88,8 +99,8 @@ TEST(SensorMenu, Menu_Lines){
   uint16_t num_menu_strings = sizeof(menu_line) / sizeof(menu_line[0]);
   ASSERT_EQ(num_menu_strings, MENU_LENGTH);
 
-  LiquidCrystal_I2C lcd(8,8,8);  // a fake stub, doesn't matter
-  MockedSensorMenu sensormenu(&lcd, 5, 5);     // params don't matter
+  LiquidCrystal_I2C lcd(SANE_LCD_ADDR, SANE_LCD_WIDTH, SANE_LCD_HEIGHT );  // a fake stub, doesn't matter
+  MockedSensorMenu sensormenu(&lcd, SANE_LCD_COL1, SANE_LCD_COL2);     // params don't matter
   LogFile * logfile = new LogFile(); // just there to hold a place
   sensormenu.attach_logfile(logfile);
 
@@ -121,28 +132,30 @@ TEST(SensorMenu, Menu_Lines){
   delete logfile;
 }
 
+#define HIGH_CHECKSUM       23976
+#define SATURATED_CHECKSUM 0xFFFF
 
 // changes break checksum
 // checksum covers all values
 // once committed, the checsum succeeds
-TEST(SensorMenu, settings_type){
+TEST(SensorMenu, settings_type) {
 
   settings_type settings;
   int settings_overall_size = sizeof(settings);
   int settings_tested_size = 0;  // amount of the settings type that's tested
-  settings.sampling_period_ms = 4326;
+  settings.sampling_period_ms = SANE_SAMPLING_PERIOD_MS;
   settings_tested_size += sizeof(settings.sampling_period_ms);
-  settings.log_every_n_loops = 12;
+  settings.log_every_n_loops = SANE_LOG_EVERY_N_LOOPS;
   settings_tested_size += sizeof(settings.log_every_n_loops);
-  settings.file_number = 15;
+  settings.file_number = SANE_FILE_NUMBER;
   settings_tested_size += sizeof(settings.file_number);
   settings.dust_zero = 92;
   settings_tested_size += sizeof(settings.dust_zero);
-  for (int i=0; i<MAX_SENSORS; i++){
+  for (int i = 0; i < MAX_SENSORS; i++) {
 	  settings.sensor_thresholds[i] = 5 * i;
   }
   settings_tested_size += sizeof(settings.sensor_thresholds);
-  for (int i=0; i<MAX_SENSORS; i++){
+  for (int i = 0; i < MAX_SENSORS; i++) {
 	  settings.sensor_zeros[i] = i;
   }
   settings_tested_size += sizeof(settings.sensor_zeros);
@@ -165,25 +178,25 @@ TEST(SensorMenu, settings_type){
   ASSERT_FALSE(settings.check());
   settings.store_checksum();  // calculate correct checksum
   ASSERT_TRUE(settings.check());
-  settings.checksum = 23976; // arbitrary high checksum
+  settings.checksum = HIGH_CHECKSUM;
   ASSERT_FALSE(settings.check());
   settings.store_checksum();  // calculate correct checksum
   ASSERT_TRUE(settings.check());
-  settings.checksum = 0xFFFF; // saturated checksum
+  settings.checksum = SATURATED_CHECKSUM;
   ASSERT_FALSE(settings.check());
 
   // changing values in any field breaks checksum
   settings.store_checksum();  // calculate correct checksum
   ASSERT_TRUE(settings.check());
-  settings.sampling_period_ms = 0;
+  settings.sampling_period_ms = SANE_SAMPLING_PERIOD_MS + 1;
   ASSERT_FALSE(settings.check());
   settings.store_checksum();  // calculate correct checksum
   ASSERT_TRUE(settings.check());
-  settings.log_every_n_loops = 9546;
+  settings.log_every_n_loops = SANE_LOG_EVERY_N_LOOPS + 10;
   ASSERT_FALSE(settings.check());
   settings.store_checksum();  // calculate correct checksum
   ASSERT_TRUE(settings.check());
-  settings.file_number = 0;
+  settings.file_number = SANE_FILE_NUMBER * 0;
   ASSERT_FALSE(settings.check());
   settings.store_checksum();  // calculate correct checksum
   ASSERT_TRUE(settings.check());
@@ -191,7 +204,7 @@ TEST(SensorMenu, settings_type){
   ASSERT_FALSE(settings.check());
   settings.store_checksum();  // calculate correct checksum
   ASSERT_TRUE(settings.check());
-  settings.sensor_thresholds[2] = 923;
+  settings.sensor_thresholds[2] = settings.sensor_thresholds[2] + 5;
   ASSERT_FALSE(settings.check());
   settings.store_checksum();  // calculate correct checksum
   ASSERT_TRUE(settings.check());
@@ -219,10 +232,7 @@ TEST(SensorMenu, settings_type){
 
 }
 
-// we clear the screen
-// we call print at least once
-// all calls to setCurser are within a sane range
-// we return REMAIN_IN_MENU
+
 TEST(SensorMenu, display_sensor_setting) {
 	class MockedSensorMenu : public SensorMenu {
 	  public:
@@ -245,13 +255,13 @@ TEST(SensorMenu, display_sensor_setting) {
 	};
 
     // instantiate everything
-	MockedLcd lcd(8,8,8);  // a fake stub, doesn't matter
-	MockedSensorMenu sensormenu(&lcd, 5, 5);     // params don't matter
+	MockedLcd lcd(SANE_LCD_ADDR, SANE_LCD_WIDTH, SANE_LCD_HEIGHT );  // a fake stub, doesn't matter
+	MockedSensorMenu sensormenu(&lcd, SANE_LCD_COL1, SANE_LCD_COL2);     // params don't matter
 	LogFile * logfile = new LogFile(); // just there to hold a place
 	sensormenu.attach_logfile(logfile);
 
-	uint16_t test_number = 2348;
-	const char test_name[] = "TST";
+	uint16_t test_number = SANE_SETTING_VALUE;
+	const char test_name[] = SANE_SETTING_NAME;
 
     // set expectations
 	EXPECT_CALL(lcd, clear()).Times(1); // should clear the screen at start
@@ -271,7 +281,7 @@ TEST(SensorMenu, display_sensor_setting) {
 // when we press the menu up button we increment our sensor setting, display it, then wait for button up but do not commit.
 // when we press the menu up button we decrement our sensor setting, display it, then wait for button up but do not commit.
 // we reject bad pointers
-TEST(SensorMenu, sensor_settings_callback){
+TEST(SensorMenu, sensor_settings_callback) {
   // todo: fill in (lowpri)
   ASSERT_FALSE(false);
 }
@@ -279,7 +289,7 @@ TEST(SensorMenu, sensor_settings_callback){
 
 
 // we toggle the backlight setting and commit the config
-TEST(SensorMenu, backlight_callback){
+TEST(SensorMenu, backlight_callback) {
   	class MockedSensorMenu : public SensorMenu {
 	  public:
 		MockedSensorMenu(LiquidCrystal_I2C * lcd, uint8_t col1_idx, uint8_t col2_idx) : SensorMenu{lcd, col1_idx, col2_idx} {
@@ -289,8 +299,8 @@ TEST(SensorMenu, backlight_callback){
 	};
 
 	// Instantiate things
-	LiquidCrystal_I2C lcd(8,8,8);
-	MockedSensorMenu sensormenu(&lcd, 5, 5);
+	LiquidCrystal_I2C lcd(SANE_LCD_ADDR, SANE_LCD_WIDTH, SANE_LCD_HEIGHT );
+	MockedSensorMenu sensormenu(&lcd, SANE_LCD_COL1, SANE_LCD_COL2);
 
 	// set expectations
 	EXPECT_CALL(sensormenu, commit_config()).Times(1);
@@ -305,7 +315,7 @@ TEST(SensorMenu, backlight_callback){
 
 
 // we toggle the logging setting and commit the config
-TEST(SensorMenu, logging_callback){
+TEST(SensorMenu, logging_callback) {
   	class MockedSensorMenu : public SensorMenu {
 	  public:
 		MockedSensorMenu(LiquidCrystal_I2C * lcd, uint8_t col1_idx, uint8_t col2_idx) : SensorMenu{lcd, col1_idx, col2_idx} {
@@ -315,8 +325,8 @@ TEST(SensorMenu, logging_callback){
 	};
 
 	// Instantiate things
-	LiquidCrystal_I2C lcd(8,8,8);
-	MockedSensorMenu sensormenu(&lcd, 5, 5);
+	LiquidCrystal_I2C lcd(SANE_LCD_ADDR, SANE_LCD_WIDTH, SANE_LCD_HEIGHT );
+	MockedSensorMenu sensormenu(&lcd, SANE_LCD_COL1, SANE_LCD_COL2);
 
 	// set expectations
 	EXPECT_CALL(sensormenu, commit_config()).Times(1);
@@ -330,7 +340,7 @@ TEST(SensorMenu, logging_callback){
 
 
 // we toggle the sensor type setting and commit the config
-TEST(SensorMenu, sensor_t_callback){
+TEST(SensorMenu, sensor_t_callback) {
   	class MockedSensorMenu : public SensorMenu {
 	  public:
 		MockedSensorMenu(LiquidCrystal_I2C * lcd, uint8_t col1_idx, uint8_t col2_idx) : SensorMenu{lcd, col1_idx, col2_idx} {
@@ -341,8 +351,8 @@ TEST(SensorMenu, sensor_t_callback){
 	};
 
 	// Instantiate things
-	LiquidCrystal_I2C lcd(8,8,8);
-	MockedSensorMenu sensormenu(&lcd, 5, 5);
+	LiquidCrystal_I2C lcd(SANE_LCD_ADDR, SANE_LCD_WIDTH, SANE_LCD_HEIGHT );
+	MockedSensorMenu sensormenu(&lcd, SANE_LCD_COL1, SANE_LCD_COL2);
 
 	// set expectations
 	EXPECT_CALL(sensormenu, commit_config()).Times(1);
@@ -356,7 +366,7 @@ TEST(SensorMenu, sensor_t_callback){
 }
 
 
-TEST(SensorMenu, display_lograte_menu){
+TEST(SensorMenu, display_lograte_menu) {
 	class MockedSensorMenu : public SensorMenu {
 	  public:
 		MockedSensorMenu(LiquidCrystal_I2C * lcd, uint8_t col1_idx, uint8_t col2_idx) : SensorMenu{lcd, col1_idx, col2_idx} {
@@ -366,7 +376,7 @@ TEST(SensorMenu, display_lograte_menu){
 
 	class MockedLcd : public LiquidCrystal_I2C {
 	  public:
-		MockedLcd(uint8_t lcd_Addr,uint8_t lcd_cols,uint8_t lcd_rows) : LiquidCrystal_I2C{lcd_Addr, lcd_cols, lcd_rows}{
+		MockedLcd(uint8_t lcd_Addr,uint8_t lcd_cols,uint8_t lcd_rows) : LiquidCrystal_I2C{lcd_Addr, lcd_cols, lcd_rows} {
 			// no special mock constructor
 		}
 		MOCK_METHOD(void, clear, (), (override));
@@ -378,8 +388,8 @@ TEST(SensorMenu, display_lograte_menu){
 	};
 
     // instantiate everything
-	MockedLcd lcd(8,8,8);  // a fake stub, doesn't matter
-	MockedSensorMenu sensormenu(&lcd, 5, 5);     // params don't matter
+	MockedLcd lcd(SANE_LCD_ADDR, SANE_LCD_WIDTH, SANE_LCD_HEIGHT );  // a fake stub, doesn't matter
+	MockedSensorMenu sensormenu(&lcd, SANE_LCD_COL1, SANE_LCD_COL2);     // params don't matter
 
     // set expectations
 	EXPECT_CALL(lcd, clear()).Times(1); // should clear the screen at start
@@ -395,7 +405,7 @@ TEST(SensorMenu, display_lograte_menu){
 // setcursor positions are sane
 // we call print at least once
 // line strings are not too long
-TEST(SensorMenu, display_sampling_menu){
+TEST(SensorMenu, display_sampling_menu) {
 	class MockedSensorMenu : public SensorMenu {
 	  public:
 		MockedSensorMenu(LiquidCrystal_I2C * lcd, uint8_t col1_idx, uint8_t col2_idx) : SensorMenu{lcd, col1_idx, col2_idx} {
@@ -405,7 +415,7 @@ TEST(SensorMenu, display_sampling_menu){
 
 	class MockedLcd : public LiquidCrystal_I2C {
 	  public:
-		MockedLcd(uint8_t lcd_Addr,uint8_t lcd_cols,uint8_t lcd_rows) : LiquidCrystal_I2C{lcd_Addr, lcd_cols, lcd_rows}{
+		MockedLcd(uint8_t lcd_Addr,uint8_t lcd_cols,uint8_t lcd_rows) : LiquidCrystal_I2C{lcd_Addr, lcd_cols, lcd_rows} {
 			// no special mock constructor
 		}
 		MOCK_METHOD(void, clear, (), (override));
@@ -417,8 +427,8 @@ TEST(SensorMenu, display_sampling_menu){
 	};
 
     // instantiate everything
-	MockedLcd lcd(8,8,8);  // a fake stub, doesn't matter
-	MockedSensorMenu sensormenu(&lcd, 5, 5);     // params don't matter
+	MockedLcd lcd(SANE_LCD_ADDR, SANE_LCD_WIDTH, SANE_LCD_HEIGHT );  // a fake stub, doesn't matter
+	MockedSensorMenu sensormenu(&lcd, SANE_LCD_COL1, SANE_LCD_COL2);     // params don't matter
 
     // set expectations
 	EXPECT_CALL(lcd, clear()).Times(1); // should clear the screen at start
@@ -432,7 +442,7 @@ TEST(SensorMenu, display_sampling_menu){
 
 
 
-TEST(SensorMenu, display_file_menu){
+TEST(SensorMenu, display_file_menu) {
 	class MockedSensorMenu : public SensorMenu {
 	  public:
 		MockedSensorMenu(LiquidCrystal_I2C * lcd, uint8_t col1_idx, uint8_t col2_idx) : SensorMenu{lcd, col1_idx, col2_idx} {
@@ -442,7 +452,7 @@ TEST(SensorMenu, display_file_menu){
 
 	class MockedLcd : public LiquidCrystal_I2C {
 	  public:
-		MockedLcd(uint8_t lcd_Addr,uint8_t lcd_cols,uint8_t lcd_rows) : LiquidCrystal_I2C{lcd_Addr, lcd_cols, lcd_rows}{
+		MockedLcd(uint8_t lcd_Addr,uint8_t lcd_cols,uint8_t lcd_rows) : LiquidCrystal_I2C{lcd_Addr, lcd_cols, lcd_rows} {
 			// no special mock constructor
 		}
 		MOCK_METHOD(void, clear, (), (override));
@@ -454,8 +464,8 @@ TEST(SensorMenu, display_file_menu){
 	};
 
     // instantiate everything
-	MockedLcd lcd(8,8,8);  // a fake stub, doesn't matter
-	MockedSensorMenu sensormenu(&lcd, 5, 5);     // params don't matter
+	MockedLcd lcd(SANE_LCD_ADDR, SANE_LCD_WIDTH, SANE_LCD_HEIGHT );  // a fake stub, doesn't matter
+	MockedSensorMenu sensormenu(&lcd, SANE_LCD_COL1, SANE_LCD_COL2);     // params don't matter
 	LogFile * logfile = new LogFile(); // just there to hold a place
 	sensormenu.attach_logfile(logfile);
 
@@ -501,8 +511,8 @@ TEST(SensorMenu, render_menu){
 	// };
 
     // // instantiate everything
-	// MockedLcd lcd(8,8,8);  // a fake stub, doesn't matter
-	// MockedSensorMenu sensormenu(&lcd, 5, 5);     // params don't matter
+	// MockedLcd lcd(SANE_LCD_ADDR, SANE_LCD_WIDTH, SANE_LCD_HEIGHT );  // a fake stub, doesn't matter
+	// MockedSensorMenu sensormenu(&lcd, SANE_LCD_COL1, SANE_LCD_COL2);     // params don't matter
     // printf("entering loop\n");
     // // set expectations
 	// for (int scroll_pos = 0; scroll_pos < (MENU_LENGTH -4); scroll_pos++) {
