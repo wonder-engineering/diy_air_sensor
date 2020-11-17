@@ -10,6 +10,7 @@ Bit-by-bit, I'm going to build some tests then start refactoring.  I'll remove t
 * Factor out reliance on side effects
 * Use modern STL constructs for lists
 * DRY-ify code
+* use clang-tidy
 * consistent formatting
 * obey the linter
 * linter as automatic tests

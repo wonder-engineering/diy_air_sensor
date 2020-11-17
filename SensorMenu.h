@@ -1,4 +1,5 @@
 // Copyright 2020 Brett M. Leedy
+// todo: move code to cpp for reusabiltiy.
 
 #ifndef GAS_SENSOR_SENSORMENU_H_
 #define GAS_SENSOR_SENSORMENU_H_
@@ -402,9 +403,6 @@ class SensorMenu {
   }
 
   void display_file_menu() {
-    if (logfile == NULL)
-      return;  // just leave if there's no file attached
-
     Serial.println(F("Entered file Callback"));
     lcd->clear();
     lcd->setCursor(0, 0);
@@ -478,7 +476,7 @@ class SensorMenu {
   void render_menu(uint8_t line) {
     lcd->clear();
     for (int d_row=line; d_row < line + 4 && d_row < MENU_LENGTH; d_row++) {
-      char buffer[21];  // make sure this is large enough for the largest string
+      char buffer[21];  // make sure this is large enough for the largest string  todo: magic number
       strcpy_P(buffer,
         reinterpret_cast<char *>(pgm_read_word(&(menu_line[d_row]))));
       lcd->setCursor(col1, d_row-line);
