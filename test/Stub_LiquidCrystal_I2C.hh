@@ -116,20 +116,5 @@ virtual void draw_horizontal_graph(uint8_t row, uint8_t column, uint8_t len,  ui
 virtual void draw_vertical_graph(uint8_t row, uint8_t column, uint8_t len,  uint8_t pixel_col_end){};
 
 
-private:
-//   void init_priv();
-//   void send(uint8_t, uint8_t);
-//   void write4bits(uint8_t);
-//   void expanderWrite(uint8_t);
-//   void pulseEnable(uint8_t);
-//   uint8_t _Addr;
-//   uint8_t _displayfunction;
-//   uint8_t _displaycontrol;
-//   uint8_t _displaymode;
-//   uint8_t _numlines;
-//   bool _oled = false;
-//   uint8_t _cols;
-//   uint8_t _rows;
-//   uint8_t _backlightval;
 };
 #endif

@@ -1,5 +1,9 @@
 // Copyright 2020 Brett M. Leedy
 // todo: move code to cpp for reusabiltiy.
+// todo: This classcurrently takes in pointers to  other things it has no business
+//   changing and calls methods to things.  In an ideal world, this class will only
+//   be responsible for updating a config, that other things will then consume as
+//   the user-input state.  This is a very high priority.
 
 #ifndef GAS_SENSOR_SENSORMENU_H_
 #define GAS_SENSOR_SENSORMENU_H_
@@ -14,8 +18,8 @@
 #include "test/Stub_Serial.h"
 #include "test/Stub_LiquidCrystal_I2C.hh"
 #include "test/Stub_EEPROM.hh"
-#include "test/Stub_SmokeSensor.hh"
-#include "test/Stub_AnalogSensor.hh"
+#include "test/Stub_SmokeSensor.hh"  // todo: include real files
+#include "test/Stub_AnalogSensor.hh" // todo: include real files
 #endif
 
 #include "LogFile.h"
@@ -26,13 +30,13 @@
 #define MENU_UP_BUTTON     6
 #define MENU_DN_BUTTON     5
 
-#define MAX_SENSORS        8
+#define MAX_SENSORS        8  // todo: make sure I check that this is not exceeded
 
 #define MENU_LENGTH 14
 
 // Menu is stored in progmem to save RAM, which means it has to
 //  be more static here than I'd like
-const char menu_e[]      PROGMEM = "EXIT     ......................................";              // 0
+const char menu_e[]      PROGMEM = "EXIT";                   // 0
 const char menu_raw[]    PROGMEM = "Disp. Raw / Average";    // 1
 const char menu_file[]   PROGMEM = "File";                   // 2
 const char menu_sam[]    PROGMEM = "Sampling Rate";          // 3
@@ -93,10 +97,10 @@ struct settings_type {
     rv += dust_zero;
     rv += backlight;
     rv += alt_sensor_config;
-    for (int i=0; i<MAX_SENSORS; i++) {
+    for (int i = 0; i < MAX_SENSORS; i++) {
 	    rv += sensor_thresholds[i];
     }
-    for (int i=0; i<MAX_SENSORS; i++) {
+    for (int i=0; i < MAX_SENSORS; i++) {
 	    rv += sensor_zeros[i];
     }
     rv += logging;
@@ -135,9 +139,9 @@ struct settings_type {
 
 class SensorMenu {
   LiquidCrystal_I2C * lcd = NULL;
-  LogFile * logfile = NULL;
-  AnalogSensor * sensors = NULL;
-  SmokeSensor * dust = NULL;
+  LogFile * logfile = NULL;  // todo: break this dependency
+  AnalogSensor * sensors = NULL;  // todo: break this dependency
+  SmokeSensor * dust = NULL;  // todo: break this dependency
   uint8_t col1, col2;
   settings_type config;
 
