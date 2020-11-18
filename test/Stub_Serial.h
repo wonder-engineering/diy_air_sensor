@@ -23,7 +23,7 @@ class Serial_ {
     static void setPrintToCout(bool flag){};
 
   public:
-    static std::size_t print(const char[]){return 0;};
+    static size_t print(const char[]){return 0;};
     static size_t print(char){return 0;};
     static size_t print(unsigned char, int = DEC){return 0;};
     static size_t print(int, int = DEC){return 0;};

@@ -9,18 +9,26 @@ AnalogSensor::AnalogSensor(LiquidCrystal_I2C* lcd) {
 void AnalogSensor::set_display_raw(bool display_raw) {
   this->display_raw = display_raw;
 }
+sensor_config AnalogSensor::get_sensor_config(uint8_t sensor_num) {
+  return this->config[sensor_num];
+}
 
-void AnalogSensor::add_sensor(const char short_name[SHORT_NAME_LEN],
+bool AnalogSensor::add_sensor(const char short_name[SHORT_NAME_LEN],
               uint8_t column,
               uint8_t row,
               uint8_t analog_pin,
               float accum_rate) {
+
+
+  if (this->num_sensors >= MAX_NUM_SENSORS)
+    return false;  // cannot add sensor. take no action
+
   // Init the config
   strncpy(this->config[this->num_sensors].short_name,
             short_name, SHORT_NAME_LEN);
   this->config[this->num_sensors].accum_rate = accum_rate;
 
-  if (column > 19 || row > 3)
+  if (column > 19 || row > 3)  // todo: remove magic numbers
     Serial.println(F("WARNING: out of bounds display config!"));
   this->config[this->num_sensors].display_column = column;
   this->config[this->num_sensors].display_row = row;
@@ -35,6 +43,8 @@ void AnalogSensor::add_sensor(const char short_name[SHORT_NAME_LEN],
 
   this->num_sensors++;  // mark this sensor as inited
   Serial.print(short_name); Serial.println(F(" added!"));
+
+  return true;
 }
 
 
@@ -50,10 +60,11 @@ uint16_t AnalogSensor::sense(uint8_t id) {
   this->state[id].avg_value =
     this->state[id].avg_value*(1.0-this->config[id].accum_rate)
     + this->state[id].last_value*this->config[id].accum_rate;
-  this->state[id].last_value;
 
   if ( this->lcd != NULL)
     this->update_lcd();
+
+  return this->state[id].last_value;
 }
 
 void AnalogSensor::log_all(File * log_file) {
@@ -117,4 +128,9 @@ void AnalogSensor::set_zero(uint8_t sensor_id, uint16_t zero_adjust) {
 
 uint16_t AnalogSensor::get_sensor_avg(uint8_t sensor_id) {
   return this->state[sensor_id].avg_value;
+}
+
+// todo: make id names consistent
+sensor_state AnalogSensor::get_sensor_state(uint8_t sensor_num) {
+  return this->state[sensor_num];
 }

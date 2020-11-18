@@ -81,6 +81,7 @@ public:
   virtual void print(char * toprint){};
   virtual void print(const char * toprint){};
   virtual void print(uint16_t toprint){};
+  virtual void print(uint16_t toprint, uint8_t precision){};
   // Example: 	const char bell[8] PROGMEM = {B00100,B01110,B01110,B01110,B11111,B00000,B00100,B00000};
 
   virtual void setCursor(uint8_t, uint8_t){};

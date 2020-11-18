@@ -5,6 +5,8 @@
 #define ARDUINO_H
 
 #include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,6 +42,15 @@ extern "C" {
 #define FALLING 2
 #define RISING 3
 
+#define A0 0
+#define A1 1
+#define A2 2
+#define A3 3
+#define A4 4
+#define A5 5
+#define A6 6
+#define A7 7
+
 typedef uint8_t boolean;
 typedef uint8_t byte;
 
@@ -74,6 +85,8 @@ uint16_t pgm_read_word(const char *const *);
 #define UNUSED(expr) do { (void)(expr); } while (0)
 
 //typedef uint16_t size_t;
+
+//#define NULL 0
 
 #ifdef __cplusplus
 } // extern "C"
