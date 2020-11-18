@@ -4,7 +4,7 @@ This is the project for the DIY Air Quality Sensor.  The code right now is, fran
 Bit-by-bit, I'm going to build some tests then start refactoring.  I'll remove this readme-of-shame when I have something resembling real code.
 
 # TODO List:
-* Write unit tests
+* Refactor sensor classes - full overhaul
 * Make unit tests actually run in cmake environment
 * Factor out classes sharing static dependencies
 * Factor out reliance on side effects
