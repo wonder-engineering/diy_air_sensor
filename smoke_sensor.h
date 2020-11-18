@@ -3,11 +3,21 @@
 #ifndef GAS_SENSOR_SMOKE_SENSOR_H_
 #define GAS_SENSOR_SMOKE_SENSOR_H_
 
+#ifdef IN_TESTING
+#define PROGMEM
+#include "test/Stub_Arduino.h"
+#include "test/Stub_Serial.h"
+#include "test/Stub_LiquidCrystal_I2C.hh"
+#include "test/File_mock.h"
+#else
+#include <LiquidCrystal_I2C.h>
+#endif
+
 /*-------------------------------------------------------------
   smoke_sensor
 
-  This code drives a Sharp GP2Y1010AU0F sensor with control of 
-  a fan and LCD display.  
+  This code drives a Sharp GP2Y1010AU0F sensor with control of
+  a fan and LCD display.
 
   For calibration, achart of pm10 vs pm2.5:https://tinyurl.com/y3fkjgo7
   Best note for sample code: https://tinyurl.com/y6xhshw4
@@ -21,6 +31,8 @@
 #define DUST_OFFSET_CAL 0    // offset to pm2.5 value n
 #define DUST_SLOPE_CAL 1.65  // multiplier for pm2.5 value
 
+
+// todo: add unit tests after ripping out entanglement with the logfile and lcd
 
 class SmokeSensor {
  private:

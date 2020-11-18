@@ -13,7 +13,6 @@
 #include "test/Stub_Arduino.h"
 #include "test/Stub_Serial.h"
 #include "test/Stub_LiquidCrystal_I2C.hh"
-#include "test/Stub_SmokeSensor.hh"  // todo: include real files
 #include "test/File_mock.h"
 #else
 #include <Wire.h>
