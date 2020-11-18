@@ -7,7 +7,6 @@
   #include <Arduino.h>
   #include <SPI.h>
   #include <SD.h>
-  #include <EEPROM.h>
 #else
   #include "gmock/gmock.h"
   #include "gtest/gtest.h"

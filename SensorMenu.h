@@ -19,6 +19,11 @@
 #include "test/Stub_LiquidCrystal_I2C.hh"
 #include "test/Stub_EEPROM.hh"
 #include "smoke_sensor.h"  // todo: include real files
+
+#else
+// non-test includes
+#include <EEPROM.h>
+
 #endif
 
 #include "AnalogSensor.h" // todo: include real files
