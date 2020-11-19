@@ -4,7 +4,7 @@
 #include<Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include <SD.h>
-#include "AnalogSensor.h"
+#include "SensorArray.hh"
 #include "LogFile.h"
 #include "smoke_sensor.h"
 #include "SensorMenu.h"
@@ -53,7 +53,7 @@
 // Classes for main components
 LiquidCrystal_I2C * lcd;
 LogFile           * logfile;
-AnalogSensor      * sensors;  // container for all the sensors I configure
+SensorArray      * sensors;  // container for all the sensors I configure
 SmokeSensor       * dust;
 SensorMenu        * menu;
 
@@ -86,7 +86,7 @@ void setup() {
   menu = new SensorMenu(lcd, LCD_COLUMN_1, LCD_COLUMN_2);
 
   Serial.println(F("Init gas Sensors..."));
-  sensors = new AnalogSensor(lcd);
+  sensors = new SensorArray(lcd);
   if(!menu->is_alternate_config()){
     //Args are: (Shortname, LCD_column, LCD_row, Ain_pin, averaging_rate) //
     sensors->add_sensor(" LPG", LCD_COLUMN_1, 1, A1, 0.1);  // MQ5 - LPG, City Gas Leak

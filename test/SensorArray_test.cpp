@@ -5,7 +5,7 @@
 #include "gmock/gmock.h"
 
 
-#include "../AnalogSensor.h"
+#include "../SensorArray.hh"
 #include "../MQSensor.hh"
 
 using ::testing::AtLeast;
@@ -25,9 +25,9 @@ using ::testing::Lt;
 #define LCD_FIRST_ROW       0
 
 
-TEST(AnalogSensor, add_sensor) {
+TEST(SensorArray, add_sensor) {
 
-	AnalogSensor analogsensor;
+	SensorArray sensor_array;
 
 	char short_name_buffer[SENSOR_SHORT_NAME_LEN];
 	// Successfully add the max number of sensors.
@@ -35,27 +35,27 @@ TEST(AnalogSensor, add_sensor) {
 
 		ASSERT_LE(snprintf(short_name_buffer, sizeof(short_name_buffer), "S_%d", sensor_number),
 							SENSOR_SHORT_NAME_LEN);  // make sure test name meets short name requirement
-		ASSERT_TRUE(analogsensor.add_sensor(new MQSensor(short_name_buffer, SANE_ACCUM_RATE,
+		ASSERT_TRUE(sensor_array.add_sensor(new MQSensor(short_name_buffer, SANE_ACCUM_RATE,
 								sensor_number, SANE_ZERO_ADJUST, SANE_GAIN)));
-		ASSERT_EQ(analogsensor.get_num_sensors(), sensor_number+1);
+		ASSERT_EQ(sensor_array.get_num_sensors(), sensor_number+1);
 		char compare_name_buffer[SENSOR_SHORT_NAME_LEN];
-		analogsensor.get_short_name(sensor_number, compare_name_buffer, sizeof(short_name_buffer));
+		sensor_array.get_short_name(sensor_number, compare_name_buffer, sizeof(short_name_buffer));
 		ASSERT_STREQ(short_name_buffer, compare_name_buffer);
 
 		// State should start zeroed always
-		ASSERT_EQ(analogsensor.get_sensor_avg(analogsensor.get_num_sensors()-1), SENSOR_DEFAULT_AVG_VALUE);
-		ASSERT_EQ(analogsensor.get_sensor_raw(analogsensor.get_num_sensors()-1), SENSOR_DEFAULT_LAST_VALUE);
+		ASSERT_EQ(sensor_array.get_sensor_avg(sensor_array.get_num_sensors()-1), SENSOR_DEFAULT_AVG_VALUE);
+		ASSERT_EQ(sensor_array.get_sensor_raw(sensor_array.get_num_sensors()-1), SENSOR_DEFAULT_LAST_VALUE);
 
 	}
 
 	// Confirm test filled up the sensors
-    ASSERT_EQ(analogsensor.get_num_sensors(), MAX_NUM_SENSORS);
+    ASSERT_EQ(sensor_array.get_num_sensors(), MAX_NUM_SENSORS);
 
     // I cannot add more sensors after the max:
 	ASSERT_LE(snprintf(short_name_buffer, sizeof(short_name_buffer), "S_%d", SANE_TEST_ID),
 					SENSOR_SHORT_NAME_LEN);  // make sure test name meets short name requirement
-	ASSERT_FALSE(analogsensor.add_sensor(new MQSensor(short_name_buffer, SANE_ACCUM_RATE,
+	ASSERT_FALSE(sensor_array.add_sensor(new MQSensor(short_name_buffer, SANE_ACCUM_RATE,
 								SANE_TEST_ID, SANE_ZERO_ADJUST, SANE_GAIN)));
-	ASSERT_EQ(analogsensor.get_num_sensors(), MAX_NUM_SENSORS);
+	ASSERT_EQ(sensor_array.get_num_sensors(), MAX_NUM_SENSORS);
 
 }

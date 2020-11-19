@@ -34,11 +34,11 @@
 
 
 //todo: pull lcd awareness out of the sensor
-class AnalogSensor {
+class SensorArray {
   std::deque<Sensor *> sensors;  // deque has better memory and
                             // access properties for this use case
  public:
-  explicit AnalogSensor();
+  explicit SensorArray();
   bool add_sensor(Sensor * newsens);
   void sense_all();
   void log_all_serial_only();

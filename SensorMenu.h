@@ -31,7 +31,7 @@
 
 #endif
 
-#include "AnalogSensor.h" // todo: include real files
+#include "SensorArray.hh" // todo: include real files
 
 #include "LogFile.h"
 #include <stdint.h>
@@ -151,7 +151,7 @@ struct settings_type {
 class SensorMenu {
   LiquidCrystal_I2C * lcd = NULL;
   LogFile * logfile = NULL;  // todo: break this dependency
-  AnalogSensor * sensors = NULL;  // todo: break this dependency
+  SensorArray * sensors = NULL;  // todo: break this dependency
   SmokeSensor * dust = NULL;  // todo: break this dependency
   uint8_t col1, col2;
   settings_type config;
@@ -228,7 +228,7 @@ class SensorMenu {
     return this->config.check();
   }
 
-  void attach_analog_sensors(AnalogSensor * sensors) {
+  void attach_analog_sensors(SensorArray * sensors) {
     this->sensors = sensors;
   }
 

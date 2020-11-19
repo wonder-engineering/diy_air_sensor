@@ -36,7 +36,7 @@ set(COMPILE_FLAGS "" CACHE STRING "Additional Compiler Flags")
 set(SRC_FILES ${PROJECT_NAME}.cpp
 				LogFile.cpp
 				SensorMenu.h # note: this is a header with all source
-				AnalogSensor.cpp
+				SensorArray.cpp
 				Sd_I.cpp
 				)
 
