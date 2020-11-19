@@ -2,136 +2,63 @@
 
 #include "AnalogSensor.h"
 
-AnalogSensor::AnalogSensor(LiquidCrystal_I2C* lcd) {
-  this->lcd = lcd;
+AnalogSensor::AnalogSensor() {
 }
 
-void AnalogSensor::set_display_raw(bool display_raw) {
-  this->display_raw = display_raw;
-}
-sensor_config AnalogSensor::get_sensor_config(uint8_t sensor_num) {
-  return this->config[sensor_num];
-}
 
-bool AnalogSensor::add_sensor(const char short_name[SHORT_NAME_LEN],
-              uint8_t column,
-              uint8_t row,
-              uint8_t analog_pin,
-              float accum_rate) {
-
-
-  if (this->num_sensors >= MAX_NUM_SENSORS)
+bool AnalogSensor::add_sensor(Sensor * newsens) {
+  if (this->sensors.size() >= MAX_NUM_SENSORS)
     return false;  // cannot add sensor. take no action
-
-  // Init the config
-  strncpy(this->config[this->num_sensors].short_name,
-            short_name, SHORT_NAME_LEN);
-  this->config[this->num_sensors].accum_rate = accum_rate;
-
-  if (column > 19 || row > 3)  // todo: remove magic numbers
-    Serial.println(F("WARNING: out of bounds display config!"));
-  this->config[this->num_sensors].accum_rate = accum_rate;
-  this->config[this->num_sensors].display_column = column;
-  this->config[this->num_sensors].display_row = row;
-  this->config[this->num_sensors].analog_pin = analog_pin;
-
-  // Init the data
-  this->state[this->num_sensors].last_value = 0;
-  this->state[this->num_sensors].avg_value = 0.0;
+  sensors.push_back(newsens);
 
   // Init the analog input pin
-  pinMode(analog_pin, INPUT);
+  pinMode(newsens->get_pin(), INPUT);
 
-  this->num_sensors++;  // mark this sensor as inited
-  Serial.print(short_name); Serial.println(F(" added!"));
+  char buffer[SENSOR_SHORT_NAME_LEN];
+  newsens->get_short_name(buffer, SENSOR_SHORT_NAME_LEN);
+  Serial.print(buffer); Serial.println(F(" added!"));
 
   return true;
 }
 
 
 void AnalogSensor::sense_all() {
-  for (uint8_t i=0; i < num_sensors; i++) {
-    this->sense(i);
-  }
-}
-
-// Sense the line and do averaging
-uint16_t AnalogSensor::sense(uint8_t id) {
-  this->state[id].last_value = analogRead(this->config[id].analog_pin);
-  this->state[id].avg_value =
-    this->state[id].avg_value*(1.0-this->config[id].accum_rate)
-    + this->state[id].last_value*this->config[id].accum_rate;
-
-  if ( this->lcd != NULL)
-    this->update_lcd();
-
-  return this->state[id].last_value;
-}
-
-void AnalogSensor::log_all(File * log_file) {
-  for (uint8_t i=0; i < num_sensors; i++) {
-    this->log(log_file, i);
-  }
-}
-
-
-void AnalogSensor::update_lcd() {
-  for (uint8_t id=0; id < num_sensors; id++) {
-    lcd->setCursor(this->config[id].display_column,
-                    this->config[id].display_row);
-    lcd->print(this->config[id].short_name);
-    lcd->print(":");
-    if (this->display_raw)
-      lcd->print(this->state[id].last_value);
-    else
-      lcd->print(this->state[id].avg_value, 0);
-  }
-}
-
-
-void AnalogSensor::log(File * log_file, uint8_t id) {
-  // Serial console output
-  this->log_serial(id);
-
-  // Logfile output (if configured)
-  if (log_file != NULL) {
-    log_file->print(this->state[id].avg_value);
-    log_file->print(",");
-    log_file->print(this->state[id].last_value);
-    log_file->print(",");
+  for (std::deque <Sensor *> :: iterator sensor = sensors.begin();
+        sensor != sensors.end();
+        ++sensor) {
+    (*sensor)->sense();
   }
 }
 
 void AnalogSensor::log_all_serial_only() {
-  for (uint8_t i = 0; i < num_sensors; i++) {
+  for (uint8_t i = 0; i < this->sensors.size(); i++) {
     this->log_serial(i);
   }
 }
 
-void AnalogSensor::log_serial(uint8_t id) {
-  Serial.print(this->config[id].analog_pin);
+void AnalogSensor::log_serial(uint8_t sensor_id) {
+  Serial.print(this->sensors[sensor_id]->get_pin());
   Serial.print(F("| "));
-  Serial.print(this->config[id].short_name);
+  char buffer[SENSOR_SHORT_NAME_LEN];
+ sensors[sensor_id]->get_short_name(buffer, SENSOR_SHORT_NAME_LEN);
+  Serial.print(buffer);
   Serial.print(F("- avg: "));
-  Serial.print(this->state[id].avg_value, 1);
+  Serial.print(this->sensors[sensor_id]->get_sensor_avg(), 1);
+  Serial.print(F("- raw: "));
+  Serial.print(this->sensors[sensor_id]->get_last_raw());
   Serial.print(F(" | last: "));
-  Serial.println(this->state[id].last_value);
+  Serial.println(this->sensors[sensor_id]->get_last_value());
 }
 
-
-void AnalogSensor::set_zero(uint8_t sensor_id, uint16_t zero_adjust) {
-  if (this->config[sensor_id].zero_adjust != zero_adjust) {
-    Serial.print(F("setting sensor ")); Serial.print(sensor_id);
-    Serial.print(F(" zero adjust to ")); Serial.println(zero_adjust);
-    this->config[sensor_id].zero_adjust = zero_adjust;
-  }
-}
 
 uint16_t AnalogSensor::get_sensor_avg(uint8_t sensor_id) {
-  return this->state[sensor_id].avg_value;
+  return this->sensors[sensor_id]->get_sensor_avg();
 }
 
-// todo: make id names consistent
-sensor_state AnalogSensor::get_sensor_state(uint8_t sensor_num) {
-  return this->state[sensor_num];
+uint16_t AnalogSensor::get_sensor_raw(uint8_t sensor_id) {
+  return this->sensors[sensor_id]->get_last_raw();
+}
+
+uint16_t AnalogSensor::get_sensor_value(uint8_t sensor_id) {
+  return this->sensors[sensor_id]->get_last_value();
 }

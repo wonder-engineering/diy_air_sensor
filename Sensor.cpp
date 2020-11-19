@@ -8,13 +8,13 @@ Sensor::Sensor(char * short_name,
                     uint8_t pin,
                     uint16_t zero_adjust,
                     float gain) {
-  strncpy(this->short_name, short_name, SHORT_NAME_LEN);
+  strncpy(this->short_name, short_name, SENSOR_SHORT_NAME_LEN);
   this->accum_rate = accum_rate;
   this->pin = pin;
   this->zero_adjust = zero_adjust;
   this->gain = gain;
-  this->last_raw = MQ_DEFAULT_LAST_VALUE;
-  this->avg_value = MQ_DEFAULT_AVG_VALUE;
+  this->last_raw = SENSOR_DEFAULT_LAST_VALUE;
+  this->avg_value = SENSOR_DEFAULT_AVG_VALUE;
 }
 
 float Sensor::get_sensor_avg() {

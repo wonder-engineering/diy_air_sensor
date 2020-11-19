@@ -469,8 +469,8 @@ class SensorMenu {
 
     while (true) {
       if (digitalRead(MENU_SELECT_BUTTON) == LOW) {
-        if (dust    != NULL) {dust->set_display_raw(display_raw);}
-        if (sensors != NULL) {sensors->set_display_raw(display_raw);}
+        // if (dust    != NULL) {dust->set_display_raw(display_raw);}  //fixme
+        // if (sensors != NULL) {sensors->set_display_raw(display_raw);}  //fixme
         wait_for_button_up();
         return REMAIN_IN_MENU;
       } else if (digitalRead(MENU_UP_BUTTON) == LOW ||

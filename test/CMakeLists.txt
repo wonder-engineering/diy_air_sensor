@@ -9,7 +9,7 @@ project(arduino-mock-test-all
 add_subdirectory(googletest
 				EXCLUDE_FROM_ALL)
 
-file(GLOB SRCS "*.cpp" "../Sd_i.cpp" "../LogFile.cpp" "../SensorMenu.cpp" "../AnalogSensor.cpp" "AnalogSensor_test.cpp")
+file(GLOB SRCS "*.cpp" "../Sd_i.cpp" "../LogFile.cpp" "../SensorMenu.cpp" "../AnalogSensor.cpp" "AnalogSensor_test.cpp" "../Sensor.cpp" "../MQSensor.cpp")
 add_executable(test-all ${SRCS})
 
 target_link_libraries(test-all
