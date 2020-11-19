@@ -5,6 +5,11 @@ Bit-by-bit, I'm going to build some tests then start refactoring.  I'll remove t
 
 # TODO List:
 * Refactor sensor classes - full overhaul
+ * Remove entanglement with LCD, File Logging
+ * Naming
+ * Protected / public members
+ * Passthrough for space efficiency
+ * Testing/testability
 * Make unit tests actually run in cmake environment
 * Factor out classes sharing static dependencies
 * Factor out reliance on side effects

@@ -5,6 +5,11 @@
 //   be responsible for updating a config, that other things will then consume as
 //   the user-input state.  This is a very high priority.
 
+
+// todo:
+// Factor out smoke sensor
+// Factor out logfile
+
 #ifndef GAS_SENSOR_SENSORMENU_H_
 #define GAS_SENSOR_SENSORMENU_H_
 
@@ -186,7 +191,7 @@ class SensorMenu {
     }
   }
 
-  // light wrapper for better testing - DO NOT ADD LOGIG HERE
+  // light wrapper for better testing - DO NOT ADD LOGIC HERE
   virtual void load_settings_from_eeprom(int idx, settings_type * myconfig){
     EEPROM.get(idx, *myconfig);
   }

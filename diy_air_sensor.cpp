@@ -3,7 +3,6 @@
 #include<Arduino.h>
 #include<Wire.h>
 #include <LiquidCrystal_I2C.h>
-#include <SPI.h>
 #include <SD.h>
 #include "AnalogSensor.h"
 #include "LogFile.h"
@@ -12,32 +11,10 @@
 #include "custom_lcd_glyphs.h"
 
 
-#ifdef BULD_WITH_CMAKE
-// #include "WProgram.h"
-
-//after build -- to flash
-//avr-objcopy -O ihex -R .eeprom blink.out blink.hex
-//sudo avrdude -V -c dragon_isp -p m168 -b 19200 -P usb -U flash:w:cmaketest.hex
-
-//http://zedcode.blogspot.com/2007/02/gcc-c-link-problems-on-small-embedded.html
-//to keep from needing to link to c++ std lib, maybe? not totally sure
-// solves this error:
-//../../libarduino/libarduinocore.a(Print.o):(.data+0x6): undefined reference to `__cxa_pure_virtual'
-extern "C" void __cxa_pure_virtual(void)
-{
-	// call to a pure virtual function happened ... wow, should never happen ... stop
-	for(;;)
-	{
-
-	}
-}
-#endif
-
-
 /*------------------------------------
  * Gas sensor test harness
- * 
- * MQ-2 - Smoke - 
+ *
+ * MQ-2 - Smoke -
  ** MQ-3 - Alcohol Gas - https://www.sparkfun.com/products/8880
  * MQ-4 - Mehane (CNG) - https://www.sparkfun.com/products/9404
  ** MQ-5 - LPG, natural gas, town gas - https://tinyurl.com/y464ghh8
@@ -48,7 +25,7 @@ extern "C" void __cxa_pure_virtual(void)
  ** MQ-131 - Ozone - https://www.sparkfun.com/products/17051
  * MQ-135 - Harmful Gasses https://components101.com/sensors/mq135-gas-sensor-for-air-quality
  ** ! MQ-136 - Hydrogen Sulfide - https://www.sparkfun.com/products/17052 (spare one in yellow box)
- ** ! MQ-137 - Ammonia - https://www.sparkfun.com/products/17053 
+ ** ! MQ-137 - Ammonia - https://www.sparkfun.com/products/17053
  * ! Multi-channel gas sensor: https://wiki.seeedstudio.com/Grove-Multichannel_Gas_Sensor/
  */
 /*
@@ -57,9 +34,13 @@ extern "C" void __cxa_pure_virtual(void)
  *   - Calibrate particle sensor
  */
 
+// todo: trivialize all business logic in here and add tests to it
+
 // Indices of LCD columns
-#define COL1  0
-#define COL2 10
+#define LCD_COLUMN_1  0
+#define LCD_COLUMN_2 10
+#define LCD_BOTTOM_ROW 3
+#define LCD_NUM_COLUMNS 20
 
 // LCD Glyph ID's for this sketch
 #define FILE_OK_GLYPH  0
@@ -77,7 +58,7 @@ SmokeSensor       * dust;
 SensorMenu        * menu;
 
 void setup() {
-  
+
   // Init Serial port
   Serial.begin(115200);
   while (!Serial); // Wait for it to be initialized.
@@ -86,10 +67,10 @@ void setup() {
   pinMode(MENU_SELECT_BUTTON, INPUT_PULLUP);
   pinMode(MENU_UP_BUTTON,     INPUT_PULLUP);
   pinMode(MENU_DN_BUTTON,     INPUT_PULLUP);
-  
+
   Serial.println(F("Init LCD..."));
   lcd = new LiquidCrystal_I2C(0x27,20,4);
-  lcd->init(); 
+  lcd->init();
   lcd->backlight();
   lcd->clear();
   lcd->createChar(FILE_OK_GLYPH,  file_ok_glyph);
@@ -102,27 +83,27 @@ void setup() {
     lcd->noBacklight();
 
   Serial.println(F("Init sensor menu..."));
-  menu = new SensorMenu(lcd, COL1, COL2);
+  menu = new SensorMenu(lcd, LCD_COLUMN_1, LCD_COLUMN_2);
 
   Serial.println(F("Init gas Sensors..."));
   sensors = new AnalogSensor(lcd);
   if(!menu->is_alternate_config()){
     //Args are: (Shortname, LCD_column, LCD_row, Ain_pin, averaging_rate) //
-    sensors->add_sensor(" LPG", COL1, 1, A1, 0.1);  // MQ5 - LPG, City Gas Leak
-    sensors->add_sensor("  CO", COL1, 2, A6, 0.1);  // MQ7 - Carbon Monoxide
-    sensors->add_sensor("Ozon", COL2, 0, A7, 0.1);  // MQ131 - Ozone
-    sensors->add_sensor(" Gas", COL2, 1, A3, 0.1);  // MP9 Gas leaks
-    sensors->add_sensor(" Haz", COL2, 2, A2, 0.1);  // MQ135Poison Gasses (organic)
+    sensors->add_sensor(" LPG", LCD_COLUMN_1, 1, A1, 0.1);  // MQ5 - LPG, City Gas Leak
+    sensors->add_sensor("  CO", LCD_COLUMN_1, 2, A6, 0.1);  // MQ7 - Carbon Monoxide
+    sensors->add_sensor("Ozon", LCD_COLUMN_2, 0, A7, 0.1);  // MQ131 - Ozone
+    sensors->add_sensor(" Gas", LCD_COLUMN_2, 1, A3, 0.1);  // MP9 Gas leaks
+    sensors->add_sensor(" Haz", LCD_COLUMN_2, 2, A2, 0.1);  // MQ135Poison Gasses (organic)
     Serial.println(F("Init Particle Sensor..."));
-    dust = new SmokeSensor(A0, 4, lcd, COL1, 0);
+    dust = new SmokeSensor(A0, 4, lcd, LCD_COLUMN_1, 0);
     menu->attach_dust_sensor(dust);
   } else {
-    sensors->add_sensor("MQ2 ", COL1, 1, A0, 0.1);  // MQ2 - smoke
-    sensors->add_sensor("MQ7 ", COL1, 2, A1, 0.1);  // MQ7 - Carbon Monoxide
-    sensors->add_sensor("MQ4 ", COL2, 0, A2, 0.1);  // MQ4 - Methane (CNG)
-    sensors->add_sensor("MQ6 ", COL2, 1, A3, 0.1);  // MQ-6 - LPG, iso-butane, propane
-    sensors->add_sensor("MQ8 ", COL2, 2, A6, 0.1);  // MQ-8 - Hydrogen
-    sensors->add_sensor("M137", COL1, 0, A7, 0.1);  // MQ-137 - Ammonia
+    sensors->add_sensor("MQ2 ", LCD_COLUMN_1, 1, A0, 0.1);  // MQ2 - smoke
+    sensors->add_sensor("MQ7 ", LCD_COLUMN_1, 2, A1, 0.1);  // MQ7 - Carbon Monoxide
+    sensors->add_sensor("MQ4 ", LCD_COLUMN_2, 0, A2, 0.1);  // MQ4 - Methane (CNG)
+    sensors->add_sensor("MQ6 ", LCD_COLUMN_2, 1, A3, 0.1);  // MQ-6 - LPG, iso-butane, propane
+    sensors->add_sensor("MQ8 ", LCD_COLUMN_2, 2, A6, 0.1);  // MQ-8 - Hydrogen
+    sensors->add_sensor("M137", LCD_COLUMN_1, 0, A7, 0.1);  // MQ-137 - Ammonia
     Serial.println(F("No Particle Sensor in config!"));
     dust = NULL;
   }
@@ -137,12 +118,17 @@ void setup() {
 
 void check_menu(){
   // Run the menu.  Stop logging and sampling if the menu is activated
-  if(digitalRead(MENU_SELECT_BUTTON) == LOW || 
+  if(digitalRead(MENU_SELECT_BUTTON) == LOW ||
      digitalRead(MENU_UP_BUTTON) == LOW ||
      digitalRead(MENU_DN_BUTTON) == LOW){
- 
+
     Serial.println(F("Enter Menu"));
-    delay(1000);  // debounce
+    // wait for button to be released
+    while(digitalRead(MENU_SELECT_BUTTON) == LOW ||
+          digitalRead(MENU_UP_BUTTON) == LOW ||
+          digitalRead(MENU_DN_BUTTON) == LOW) {
+      delay(10);
+    }
     menu->enter_menu();
   }
 }
@@ -152,7 +138,7 @@ uint32_t loop_start_millis = 0;
 
 void loop() {
   loop_start_millis = millis();
-  
+
   // Serial log start
   Serial.print(loop_number++);
   Serial.print(F(" ----------- "));
@@ -168,7 +154,7 @@ void loop() {
     dust->sense();
     dust->log_serial();
   }
-  
+
 
 
   // Wrap the file every day
@@ -185,9 +171,9 @@ void loop() {
       if(dust != NULL){dust->log(logfile->get_file_ptr());}
       logfile->close_line();
     }
-  
+
     // Print glyph overlay for file status
-    lcd->setCursor(19,3);
+    lcd->setCursor((LCD_NUM_COLUMNS-1), LCD_BOTTOM_ROW);
     if(logfile->is_sd_failed()){
       lcd->write(byte(FILE_BAD_GLYPH));  // Dead File
     } else {
@@ -198,7 +184,7 @@ void loop() {
   // Display sensor threshod warnings
   for(uint8_t sensor_id = 0; sensor_id < sensors->get_num_sensors(); sensor_id++){
     if(sensors->get_sensor_avg(sensor_id) > menu->get_sensor_threshold(sensor_id)){
-      lcd->setCursor(COL1, 3);
+      lcd->setCursor(LCD_COLUMN_1, LCD_BOTTOM_ROW);
       lcd->print(sensors->get_short_name(sensor_id));
       lcd->print(F(" WARNING "));
       lcd->write(byte(SKULL_GLYPH));
@@ -209,7 +195,7 @@ void loop() {
   check_menu();
 
   // Set sensor zeros, based on menu adjustments
-  
+
   // Burn remainder of the loop period
   while(millis() < loop_start_millis + menu->get_sampling_period_ms()) {
     // Check that millis() hasn't wrapped
@@ -222,7 +208,4 @@ void loop() {
     check_menu();
   }// while(millis)
 
-  
-  
 }
-

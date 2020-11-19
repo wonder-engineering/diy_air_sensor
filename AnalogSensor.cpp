@@ -30,6 +30,7 @@ bool AnalogSensor::add_sensor(const char short_name[SHORT_NAME_LEN],
 
   if (column > 19 || row > 3)  // todo: remove magic numbers
     Serial.println(F("WARNING: out of bounds display config!"));
+  this->config[this->num_sensors].accum_rate = accum_rate;
   this->config[this->num_sensors].display_column = column;
   this->config[this->num_sensors].display_row = row;
   this->config[this->num_sensors].analog_pin = analog_pin;

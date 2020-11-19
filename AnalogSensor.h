@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <deque>
 
 #ifdef IN_TESTING
 // just skip progmem macro for test builds
@@ -21,8 +22,16 @@
 #include <SD.h>
 #endif
 
+#include "Sensor.hh"
+
 #define SHORT_NAME_LEN  5
 #define MAX_NUM_SENSORS 6
+
+#define MQ_DEFAULT_LAST_VALUE 0
+#define MQ_DEFAULT_AVG_VALUE  0.0
+
+//todo: pull lcd awareness out of the senso
+
 
 //todo: pull lcd awareness out of the sensor
 struct sensor_config {
