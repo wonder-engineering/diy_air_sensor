@@ -6,7 +6,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <deque>
+
 
 #ifdef IN_TESTING
 // just skip progmem macro for test builds
@@ -15,12 +15,15 @@
 #include "test/Stub_Serial.h"
 #include "test/Stub_LiquidCrystal_I2C.hh"
 #include "test/File_mock.h"
+
 #else
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include <SPI.h>
 #include <SD.h>
+#include "Arduino.h"
 #endif
+
 
 #include "Sensor.hh"
 
@@ -33,9 +36,30 @@
 //todo: pull lcd awareness out of the senso
 
 
+class SensorList {  // in lieu o unsupported STL containers
+ public:
+  SensorList(){}
+  bool push_back(Sensor* new_sensor) {
+    if(this->num_sensors >= MAX_NUM_SENSORS)
+      return false;
+    this->list[this->num_sensors] = new_sensor;
+    return true;
+  }
+  uint8_t size(){return this->num_sensors;}
+  uint8_t begin(){return 0;}
+  uint8_t end(){return (this->num_sensors-1);}
+
+  Sensor * operator [](uint8_t index){return this->list[index];};
+  
+  private:
+   uint8_t num_sensors;
+   Sensor * list[MAX_NUM_SENSORS];
+};
+
+
 //todo: pull lcd awareness out of the sensor
 class SensorArray {
-  std::deque<Sensor *> sensors;  // deque has better memory and
+  SensorList sensors;  // deque has better memory and
                             // access properties for this use case
  public:
   explicit SensorArray();

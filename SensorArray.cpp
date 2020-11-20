@@ -21,12 +21,9 @@ bool SensorArray::add_sensor(Sensor * newsens) {
   return true;
 }
 
-
 void SensorArray::sense_all() {
-  for (std::deque <Sensor *> :: iterator sensor = sensors.begin();
-        sensor != sensors.end();
-        ++sensor) {
-    (*sensor)->sense();
+  for (uint8_t idx = sensors.begin(); idx <= sensors.end(); idx++) {
+    sensors[idx]->sense();
   }
 }
 

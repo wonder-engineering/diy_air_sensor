@@ -3,7 +3,7 @@
 #include "Sensor.hh"
 
 // Generic sensor constructor
-Sensor::Sensor(char * short_name,
+Sensor::Sensor(const char * short_name,
                     float accum_rate,
                     uint8_t pin,
                     uint16_t zero_adjust,

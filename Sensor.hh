@@ -27,7 +27,7 @@ class Sensor{
   void get_short_name(char * buffer, uint8_t buffer_size);
   uint8_t get_pin();
 
-  Sensor(char * short_name, float accum_rate,
+  Sensor(const char * short_name, float accum_rate,
         uint8_t analog_pin, uint16_t zero_adjust, float gain);
 
  private:
