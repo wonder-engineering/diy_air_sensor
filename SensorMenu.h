@@ -84,6 +84,8 @@ const char *const menu_line[] PROGMEM = {
 #define DEFAULT_LOG_EVERY_N_LOOPS    10  // every ten seconds
 
 struct settings_type {
+
+  // todo: move all of these into the SensorInfo Data structure
   uint16_t sampling_period_ms = DEFAULT_LOOP_PERIOD_MILLIS;
   uint16_t log_every_n_loops = DEFAULT_LOG_EVERY_N_LOOPS;
   uint16_t file_number = 0;
@@ -152,23 +154,16 @@ class SensorMenu {
   LiquidCrystal_I2C * lcd = NULL;
   LogFile * logfile = NULL;  // todo: break this dependency
   SensorArray * sensors = NULL;  // todo: break this dependency
-  SmokeSensor * dust = NULL;  // todo: break this dependency
-  uint8_t col1, col2;
+//  SmokeSensor * dust = NULL;  // todo: break this dependency
   settings_type config;
 
  public:
-  SensorMenu(LiquidCrystal_I2C * lcd,
-             uint8_t col1_idx,
-             uint8_t col2_idx) {
-    init(lcd, col1_idx, col2_idx);
+  SensorMenu(LiquidCrystal_I2C * lcd) {
+    init(lcd);
   }
 
-  void init(LiquidCrystal_I2C * lcd,
-             uint8_t col1_idx,
-             uint8_t col2_idx) {
+  void init(LiquidCrystal_I2C * lcd) {
     this->lcd = lcd;
-    this->col1 = col1_idx;
-    this->col2 = col2_idx;
 
     for (int i=0; i < MAX_SENSORS; i++) {
       config.sensor_zeros[i] = 0;  // todo: define these based on menu options
@@ -214,10 +209,6 @@ class SensorMenu {
 
   void attach_logfile(LogFile * logfile) {
     this->logfile = logfile;
-  }
-
-  void attach_dust_sensor(SmokeSensor * dust) {
-    this->dust = dust;
   }
 
   LiquidCrystal_I2C * get_lcd(){
@@ -494,7 +485,7 @@ class SensorMenu {
       char buffer[21];  // make sure this is large enough for the largest string  todo: magic number
       strcpy_P(buffer,
         reinterpret_cast<char *>(pgm_read_word(&(menu_line[d_row]))));
-      lcd->setCursor(col1, d_row-line);
+      lcd->setCursor(0, d_row-line);
       lcd->print(buffer);
       Serial.print("render line "); Serial.println(d_row);
     }

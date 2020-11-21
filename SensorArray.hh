@@ -2,7 +2,6 @@
 
 #ifndef GAS_SENSOR_ANALOGSENSOR_H_
 #define GAS_SENSOR_ANALOGSENSOR_H_
-// todo: use c++ .hh header conventions
 
 #include <stdio.h>
 #include <string.h>

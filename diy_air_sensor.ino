@@ -1,15 +1,14 @@
 // Copyright 2020 Brett M. Leedy
 
-#include<Arduino.h>
-#include<Wire.h>
+#include <Arduino.h>
+#include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include <SD.h>
 #include "SensorArray.hh"
 #include "LogFile.h"
 #include "smoke_sensor.h"
-#include "SensorMenu.h"
-#include "custom_lcd_glyphs.h"
 #include "MQSensor.hh"
+#include "AirSensorDisplay.hh"
 
 
 /*------------------------------------
@@ -37,17 +36,6 @@
 
 // todo: trivialize all business logic in here and add tests to it
 
-// Indices of LCD columns
-#define LCD_COLUMN_1  0
-#define LCD_COLUMN_2 10
-#define LCD_BOTTOM_ROW 3
-#define LCD_NUM_COLUMNS 20
-
-// LCD Glyph ID's for this sketch
-#define FILE_OK_GLYPH  0
-#define FILE_BAD_GLYPH 1
-#define SKULL_GLYPH    2
-
 // Constants
 #define SECONDS_PER_DAY 86400
 #define SENSOR_ACCUM_RATE  0.1
@@ -55,16 +43,17 @@
 #define DEFAULT_GAIN        1.0
 
 // Classes for main components
-LiquidCrystal_I2C * lcd;
+SensorState       sensor_state;  // one "database" for stateful data
 LogFile           * logfile;
 SensorArray       * sensors;  // container for all the sensors
 SmokeSensor       * dust;
-SensorMenu        * menu;
+AirSensorDisplay  * sensor_display;
 
 
 // todo: makethe sensors container pass an iterable sensor data object out for the display and the 
 // todo: create a SensorDisplay class, that you pass sensor data (and other statethings) to
 // todo: create a SensorLog class, that you pass sensor data (and other state things to)
+
 
 void setup() {
 
@@ -77,34 +66,16 @@ void setup() {
   pinMode(MENU_UP_BUTTON,     INPUT_PULLUP);
   pinMode(MENU_DN_BUTTON,     INPUT_PULLUP);
 
-  Serial.println(F("Init LCD..."));
-  lcd = new LiquidCrystal_I2C(0x27,20,4);
-  lcd->init();
-  lcd->backlight();
-  lcd->clear();
-  lcd->createChar(FILE_OK_GLYPH,  file_ok_glyph);
-  lcd->createChar(FILE_BAD_GLYPH, file_bad_glyph);
-  lcd->createChar(SKULL_GLYPH,    skull_glyph);
-  lcd->setCursor(0,0);
-  if(menu->get_backlight_config())
-    lcd->backlight();
-  else
-    lcd->noBacklight();
-
-  Serial.println(F("Init sensor menu..."));
-  menu = new SensorMenu(lcd, LCD_COLUMN_1, LCD_COLUMN_2);
-
   Serial.println(F("Init gas Sensors..."));
   sensors = new SensorArray();
-  if(!menu->is_alternate_config()){
+  if(!sensor_state.device.is_alternate_config){
     sensors->add_sensor(new MQSensor(" LPG", SENSOR_ACCUM_RATE, A1, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ5 - LPG, City Gas Leak
     sensors->add_sensor(new MQSensor("  CO", SENSOR_ACCUM_RATE, A6, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ7 - Carbon Monoxide
     sensors->add_sensor(new MQSensor("Ozon", SENSOR_ACCUM_RATE, A7, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ131 - Ozone
     sensors->add_sensor(new MQSensor(" Gas", SENSOR_ACCUM_RATE, A3, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MP9 Gas leaks
     sensors->add_sensor(new MQSensor(" Haz", SENSOR_ACCUM_RATE, A2, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ135Poison Gasses (organic)
     Serial.println(F("Init Particle Sensor..."));
-    dust = new SmokeSensor(A0, 4, lcd, LCD_COLUMN_1, 0);
-    menu->attach_dust_sensor(dust);
+    // todo: roll into sensor class dust = new SmokeSensor(A0, 4, lcd, LCD_COLUMN_1, 0);
   } else {
 //    sensors->add_sensor("MQ2 ", LCD_COLUMN_1, 1, A0, 0.1);  // MQ2 - smoke
 //    sensors->add_sensor("MQ7 ", LCD_COLUMN_1, 2, A1, 0.1);  // MQ7 - Carbon Monoxide
@@ -115,30 +86,14 @@ void setup() {
     Serial.println(F("No Particle Sensor in config!"));
     dust = NULL;
   }
-  menu->attach_analog_sensors(sensors);
+
+  Serial.println(F("Init LCD..."));
+  sensor_display = new AirSensorDisplay();
 
   Serial.println(F("Init Logfile..."));
   logfile = new LogFile();
-  menu->attach_logfile(logfile);
 
   Serial.println(F("Init done."));
-}
-
-void check_menu(){
-  // Run the menu.  Stop logging and sampling if the menu is activated
-  if(digitalRead(MENU_SELECT_BUTTON) == LOW ||
-     digitalRead(MENU_UP_BUTTON) == LOW ||
-     digitalRead(MENU_DN_BUTTON) == LOW){
-
-    Serial.println(F("Enter Menu"));
-    // wait for button to be released
-    while(digitalRead(MENU_SELECT_BUTTON) == LOW ||
-          digitalRead(MENU_UP_BUTTON) == LOW ||
-          digitalRead(MENU_DN_BUTTON) == LOW) {
-      delay(10);
-    }
-    menu->enter_menu();
-  }
 }
 
 uint32_t loop_number = 0;
@@ -152,8 +107,7 @@ void loop() {
   Serial.print(F(" ----------- "));
   Serial.println(loop_start_millis);
 
-  // Clear the LCD before sensing, which updates all the fields
-  lcd->clear();
+
 
   // Collect and print sensor data to screen
   sensors->sense_all();
@@ -166,48 +120,24 @@ void loop() {
 
 
   // Wrap the file every day
-  if(loop_number % (SECONDS_PER_DAY / (menu->get_sampling_period_ms() / 1000)) == 0){
+  if(loop_number % (SECONDS_PER_DAY / (sensor_state.device.sampling_period_ms / 1000)) == 0){
     Serial.println(F("Wrapping the log File"));
   }
 
   // Log to file every N loops, if file logging is configured on
-  if(menu->get_logon_config()){
-    if(loop_number % menu->get_log_every_n_loops() == 0 &&
-        menu->get_logon_config()) {
+  if(sensor_state.device.logging_enabled){
+    if(loop_number % sensor_state.device.log_every_n_loops == 0) {
       logfile->open_line(loop_number, loop_start_millis);
       // fixme sensors->log_all(logfile->get_file_ptr());
       if(dust != NULL){dust->log(logfile->get_file_ptr());}
       logfile->close_line();
     }
-
-    // Print glyph overlay for file status
-    lcd->setCursor((LCD_NUM_COLUMNS-1), LCD_BOTTOM_ROW);
-    if(logfile->is_sd_failed()){
-      lcd->write(byte(FILE_BAD_GLYPH));  // Dead File
-    } else {
-      lcd->write(byte(FILE_OK_GLYPH));  // OK File
-    }
   }
-
-  // Display sensor threshod warnings
-  for(uint8_t sensor_id = 0; sensor_id < sensors->get_num_sensors(); sensor_id++){
-    if(sensors->get_sensor_avg(sensor_id) > menu->get_sensor_threshold(sensor_id)){
-      lcd->setCursor(LCD_COLUMN_1, LCD_BOTTOM_ROW);
-      char cbuffer[SENSOR_SHORT_NAME_LEN];
-      sensors->get_short_name(sensor_id, cbuffer, SENSOR_SHORT_NAME_LEN);
-      lcd->print(cbuffer);
-      lcd->print(F(" WARNING "));
-      lcd->write(byte(SKULL_GLYPH));
-      break;  // only have room to print one.
-    }
-  }
-
-  check_menu();
 
   // Set sensor zeros, based on menu adjustments
 
   // Burn remainder of the loop period
-  while(millis() < loop_start_millis + menu->get_sampling_period_ms()) {
+  while(millis() < loop_start_millis + sensor_state.device.sampling_period_ms) {
     // Check that millis() hasn't wrapped
     if(loop_start_millis > millis()){
       //millis have wrapped - Should happen every 50 days, give or take
@@ -215,7 +145,6 @@ void loop() {
       break;
     }
 
-    check_menu();
   }// while(millis)
 
 }
