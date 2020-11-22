@@ -7,7 +7,7 @@ SensorArray::SensorArray() {
 
 
 bool SensorArray::add_sensor(Sensor * newsens) {
-  if (this->sensors.size() >= MAX_NUM_SENSORS)
+  if (this->sensors.size() >= SENSORSTATE_MAX_NUM_SENSORS)
     return false;  // cannot add sensor. take no action
   sensors.push_back(newsens);
 
@@ -21,10 +21,18 @@ bool SensorArray::add_sensor(Sensor * newsens) {
   return true;
 }
 
-void SensorArray::sense_all() {
-  for (uint8_t idx = sensors.begin(); idx <= sensors.end(); idx++) {
-    sensors[idx]->sense();
+void SensorArray::sense_all(SensorState * state) {
+  for (uint8_t sensor_id = sensors.begin(); sensor_id < sensors.end(); sensor_id++) {
+    sensors[sensor_id]->sense();
+
+    // for each sensor, store it in the state DB
+    state->sensor[sensor_id].data.value = sensors[sensor_id]->get_last_value();
+    state->sensor[sensor_id].data.raw = sensors[sensor_id]->get_last_raw();
   }
+
+  // store data to state
+  state->device.num_sensors = sensors.size();
+  
 }
 
 void SensorArray::log_all_serial_only() {
@@ -58,4 +66,17 @@ uint16_t SensorArray::get_sensor_raw(uint8_t sensor_id) {
 
 uint16_t SensorArray::get_sensor_value(uint8_t sensor_id) {
   return this->sensors[sensor_id]->get_last_value();
+}
+
+void SensorArray::write_sensor_configs(SensorState * state){
+  // write all the config values of the sensors
+  // used to initialize the sensor configs
+  for (uint8_t sensor_id = sensors.begin(); sensor_id < sensors.end(); sensor_id++) {
+    sensors[sensor_id]->get_short_name(state->sensor[sensor_id].config.shortname, SENSOR_SHORT_NAME_LEN);
+  }
+}
+
+void SensorArray::read_sensor_configs(SensorState * state){
+  // write all the config values that might have been manipulated by external,
+  //   like an interactive menu.
 }

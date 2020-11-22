@@ -25,9 +25,9 @@
 
 
 #include "Sensor.hh"
+#include "SensorState.hh"
 
 #define SHORT_NAME_LEN  5
-#define MAX_NUM_SENSORS 6
 
 #define MQ_DEFAULT_LAST_VALUE 0
 #define MQ_DEFAULT_AVG_VALUE  0.0
@@ -37,11 +37,12 @@
 
 class SensorList {  // in lieu o unsupported STL containers
  public:
-  SensorList(){}
+  SensorList(){this->num_sensors=0;}
   bool push_back(Sensor* new_sensor) {
-    if(this->num_sensors >= MAX_NUM_SENSORS)
+    if(this->num_sensors >= SENSORSTATE_MAX_NUM_SENSORS)
       return false;
     this->list[this->num_sensors] = new_sensor;
+    this->num_sensors++;
     return true;
   }
   uint8_t size(){return this->num_sensors;}
@@ -52,7 +53,7 @@ class SensorList {  // in lieu o unsupported STL containers
   
   private:
    uint8_t num_sensors;
-   Sensor * list[MAX_NUM_SENSORS];
+   Sensor * list[SENSORSTATE_MAX_NUM_SENSORS];
 };
 
 
@@ -63,8 +64,10 @@ class SensorArray {
  public:
   explicit SensorArray();
   bool add_sensor(Sensor * newsens);
-  void sense_all();
+  void sense_all(SensorState * state);
   void log_all_serial_only();
+  void write_sensor_configs(SensorState * state);
+  void read_sensor_configs(SensorState * state);
 
   uint16_t get_sensor_avg(uint8_t sensor_id);
   uint16_t get_sensor_raw(uint8_t sensor_id);

@@ -10,6 +10,8 @@ Bit-by-bit, I'm going to build some tests then start refactoring.  I'll remove t
  * Protected / public members
  * Passthrough for space efficiency
  * Testing/testability
+* try SDfat for more modern SD writing
+* Log over serial to SD to eliminate memory pressure
 * Make unit tests actually run in cmake environment
 * Factor out classes sharing static dependencies
 * Factor out reliance on side effects

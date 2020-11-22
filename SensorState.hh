@@ -1,7 +1,9 @@
 #ifndef SENSOR_STATE_HH
 #define SENSOR_STATE_HH
 
-#include "SensorArray.hh"
+#include "Sensor.hh"
+
+#define SENSORSTATE_MAX_NUM_SENSORS 6
 
 enum SdState {
   kFileOk = 0,
@@ -10,6 +12,7 @@ enum SdState {
 
 struct SensorData {
   float value = 0.0;
+  uint16_t raw=0;
 };
 
 struct DeviceStatus {
@@ -32,9 +35,9 @@ struct SensorInfo {
 };
 
 // the one "database" class of state info
-class SensorState {
+struct SensorState {
   public:
-  SensorInfo sensor[MAX_NUM_SENSORS];
+  SensorInfo sensor[SENSORSTATE_MAX_NUM_SENSORS];
   DeviceStatus device;
 };
 

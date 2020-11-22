@@ -4,7 +4,6 @@
 void AirSensorDisplay::init_lcd() {
   lcd = new LiquidCrystal_I2C(0x27,LCD_NUM_COLUMNS,LCD_NUM_ROWS);
   lcd->init();
-  
   lcd->clear();
   lcd->createChar(FILE_OK_GLYPH,  file_ok_glyph);
   lcd->createChar(FILE_BAD_GLYPH, file_bad_glyph);
@@ -15,13 +14,14 @@ void AirSensorDisplay::init_lcd() {
 
 AirSensorDisplay::AirSensorDisplay() {
   init_lcd();
+  Serial.println(F("Init SensorMenu:"));
   this->menu = new SensorMenu(lcd);
 }
 
-AirSensorDisplay::AirSensorDisplay(SensorMenu * menu) {
-  init_lcd();
-  this->menu = menu;
-}
+//AirSensorDisplay::AirSensorDisplay(SensorMenu * menu) {
+//  init_lcd();
+//  this->menu = menu;
+//}
 
 void AirSensorDisplay::display_data(SensorState * sensor_state) {
   // Clear the LCD to ensure clean slate
@@ -46,17 +46,19 @@ void AirSensorDisplay::display_data(SensorState * sensor_state) {
   //   space to display them.
   // todo: support rotating rows if not enough to display all at once
   // Reserve the last row for other display items
-  uint8_t row, column = 0;
+  uint8_t row = 0, column = 0;
   for(uint8_t sensor_number = 0;
       sensor_number < sensor_state->device.num_sensors;
       sensor_number++) {
+      lcd->setCursor(column,row);
       // print sensor info
       lcd->print(sensor_state->sensor[sensor_number].config.shortname);
       lcd->print(":");
-      lcd->print(sensor_state->sensor[sensor_number].data.value);
+      lcd->print(sensor_state->sensor[sensor_number].data.value, DISPLAY_DATA_PRECISION);
 
       // move to the next valid cursor location, or stop
-      if( (column + LCD_SENSOR_COLUMNS) < (LCD_NUM_COLUMNS - LCD_SENSOR_COLUMNS) ) {
+      //  (space needed to add a column)   (space available)
+      if( (column + LCD_SENSOR_COLUMNS) < (LCD_NUM_COLUMNS) ) {
         column += LCD_SENSOR_COLUMNS;
       } else {  // no column space left, try new row
         if(row < (LCD_NUM_ROWS-1)) { // we have another row available

@@ -34,6 +34,7 @@
 #include "SensorArray.hh" // todo: include real files
 
 #include "LogFile.h"
+#include "SensorState.hh"
 #include <stdint.h>
 
 // Menu Buttons
@@ -41,7 +42,6 @@
 #define MENU_UP_BUTTON     6
 #define MENU_DN_BUTTON     5
 
-#define MAX_SENSORS        8  // todo: make sure I check that this is not exceeded
 
 #define MENU_LENGTH 14
 
@@ -91,8 +91,8 @@ struct settings_type {
   uint16_t file_number = 0;
 
   uint16_t dust_zero = 0;
-  uint16_t sensor_thresholds[MAX_SENSORS];
-  uint16_t sensor_zeros[MAX_SENSORS];
+  uint16_t sensor_thresholds[SENSORSTATE_MAX_NUM_SENSORS];
+  uint16_t sensor_zeros[SENSORSTATE_MAX_NUM_SENSORS];
 
   bool log_raw = false;
   bool backlight = true;
@@ -110,13 +110,19 @@ struct settings_type {
     rv += dust_zero;
     rv += backlight;
     rv += alt_sensor_config;
-    for (int i = 0; i < MAX_SENSORS; i++) {
+    Serial.println("here");
+    for (int i = 0; i < SENSORSTATE_MAX_NUM_SENSORS; i++) {
+      Serial.println("here2");
 	    rv += sensor_thresholds[i];
     }
-    for (int i=0; i < MAX_SENSORS; i++) {
+    Serial.println("here3");
+    for (int i=0; i < SENSORSTATE_MAX_NUM_SENSORS; i++) {
+      Serial.println("here4");
 	    rv += sensor_zeros[i];
     }
+    Serial.println("here5");
     rv += logging;
+    Serial.println("here6");
     return rv;
   }
   void store_checksum() {
@@ -165,14 +171,16 @@ class SensorMenu {
   void init(LiquidCrystal_I2C * lcd) {
     this->lcd = lcd;
 
-    for (int i=0; i < MAX_SENSORS; i++) {
+    for (int i=0; i < SENSORSTATE_MAX_NUM_SENSORS; i++) {
       config.sensor_zeros[i] = 0;  // todo: define these based on menu options
     }
 
     // retrieve config values from the EEPROM
     load_settings_from_eeprom(0, &this->config);
     if (this->config.check()) {
+      Serial.println(F("Dumping config."));
       this->config.dump();
+      Serial.println(F("Config Dump complete."));
     } else {
       Serial.println(F("Checksum failed! Writing default config."));
       this->config.sampling_period_ms = DEFAULT_LOOP_PERIOD_MILLIS;

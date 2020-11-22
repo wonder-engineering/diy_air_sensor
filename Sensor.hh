@@ -17,7 +17,7 @@
 #define SENSOR_DEFAULT_AVG_VALUE  0.0
 
 // Sensor interface for a type of analog sensor
-class Sensor{
+class Sensor {
  public:
   // sensor external  interface
   uint16_t sense();
@@ -36,6 +36,7 @@ class Sensor{
   virtual uint16_t read_sensor() = 0;
 
   // data - config
+  // todo: I could save space here if I make the sensors stateless
   char short_name[SENSOR_SHORT_NAME_LEN];
   float accum_rate;
   uint16_t zero_adjust;

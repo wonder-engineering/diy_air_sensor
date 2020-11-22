@@ -14,6 +14,7 @@
 #define FILE_BAD_GLYPH 1
 #define SKULL_GLYPH    2
 
+#define DISPLAY_DATA_PRECISION 1
 
 /*
  * This class contains the project-specific design of the display.
@@ -27,7 +28,7 @@ class AirSensorDisplay {
   void add_menu(SensorMenu * menu);
   void display_data(SensorState * sensor_state);
   AirSensorDisplay();
-  AirSensorDisplay(SensorMenu * menu);
+  //AirSensorDisplay(SensorMenu * menu);
 
  private:
   LiquidCrystal_I2C * lcd;
