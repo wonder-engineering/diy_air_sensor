@@ -1,4 +1,4 @@
-#include "smoke_sensor.h"
+#include "GP2YSensor.hh"
 
 GP2YSensor::GP2YSensor(const char * short_name, float accum_rate,
                uint8_t analog_pin, uint16_t zero_adjust, float gain, uint8_t led_power_pin) :

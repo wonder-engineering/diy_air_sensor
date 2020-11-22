@@ -6,7 +6,7 @@
 
 #include "SensorArray.hh"
 #include "LogFile.h"
-#include "smoke_sensor.h"
+#include "GP2YSensor.hh"
 #include "MQSensor.hh"
 #include "AirSensorDisplay.hh"
 
