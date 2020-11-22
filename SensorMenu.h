@@ -110,19 +110,13 @@ struct settings_type {
     rv += dust_zero;
     rv += backlight;
     rv += alt_sensor_config;
-    Serial.println("here");
     for (int i = 0; i < SENSORSTATE_MAX_NUM_SENSORS; i++) {
-      Serial.println("here2");
 	    rv += sensor_thresholds[i];
     }
-    Serial.println("here3");
     for (int i=0; i < SENSORSTATE_MAX_NUM_SENSORS; i++) {
-      Serial.println("here4");
 	    rv += sensor_zeros[i];
     }
-    Serial.println("here5");
     rv += logging;
-    Serial.println("here6");
     return rv;
   }
   void store_checksum() {

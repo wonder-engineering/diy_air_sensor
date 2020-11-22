@@ -18,7 +18,7 @@ struct SensorData {
 struct DeviceStatus {
   SdState file_status = kFileFail;
   uint8_t num_sensors = 0;
-  uint16_t sampling_period_ms = 0;
+  uint16_t sampling_period_ms = 1000;
   uint16_t log_every_n_loops = 10; // todo: make constants for defaults
   bool logging_enabled = false;
   bool is_alternate_config = false;
