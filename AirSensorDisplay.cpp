@@ -39,7 +39,7 @@ void AirSensorDisplay::display_data(SensorState * sensor_state) {
           digitalRead(MENU_DN_BUTTON) == LOW) {
       delay(10);
     }
-    menu->enter_menu();
+    menu->enter_menu(sensor_state);
   }
 
   // print sensor states, rotating them if there are more sensors than

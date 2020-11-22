@@ -1,14 +1,16 @@
 #ifndef SENSOR_STATE_HH
 #define SENSOR_STATE_HH
 
+#include "Arduino.h"
 #include "Sensor.hh"
-
-#define SENSORSTATE_MAX_NUM_SENSORS 6
+#include "LogFile.h"
+#include "SensorSettings.hh"
 
 enum SdState {
   kFileOk = 0,
   kFileFail,
 };
+
 
 struct SensorData {
   float value = 0.0;
@@ -16,12 +18,10 @@ struct SensorData {
 };
 
 struct DeviceStatus {
+  char current_file_name[MAX_FILENAME_LEN];
   SdState file_status = kFileFail;
   uint8_t num_sensors = 0;
-  uint16_t sampling_period_ms = 1000;
-  uint16_t log_every_n_loops = 10; // todo: make constants for defaults
-  bool logging_enabled = false;
-  bool is_alternate_config = false;
+  SensorSettings settings;  // EEPROM Settings
 };
 
 struct SensorConfig {

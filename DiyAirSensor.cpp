@@ -13,25 +13,25 @@ DiyAirSensor::DiyAirSensor() {
   pinMode(MENU_UP_BUTTON,     INPUT_PULLUP);
   pinMode(MENU_DN_BUTTON,     INPUT_PULLUP);
 
-  //Serial.println(F("Init Logfile..."));
-  //logfile = new LogFile();
+  Serial.println(F("Init Logfile..."));
+  logfile = new LogFile();
 
   Serial.println(F("Init Sensors..."));
   sensors = new SensorArray();
-  if(!sensor_state.device.is_alternate_config){
+  if(!sensor_state.device.settings.data.alt_sensor_config){
     sensors->add_sensor(new MQSensor(" LPG", SENSOR_ACCUM_RATE, A1, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ5 - LPG, City Gas Leak
     sensors->add_sensor(new MQSensor("  CO", SENSOR_ACCUM_RATE, A6, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ7 - Carbon Monoxide
     sensors->add_sensor(new MQSensor("Ozon", SENSOR_ACCUM_RATE, A7, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ131 - Ozone
-    sensors->add_sensor(new MQSensor(" Gas", SENSOR_ACCUM_RATE, A3, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MP9 Gas leaks
+    sensors->add_sensor(new MQSensor(" Gas", SENSOR_ACCUM_RATE, A3, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ9 Gas leaks
     sensors->add_sensor(new MQSensor(" Haz", SENSOR_ACCUM_RATE, A2, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ135Poison Gasses (organic)
     sensors->add_sensor(new GP2YSensor("Dust", SENSOR_ACCUM_RATE, A0, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN, 4)); // PM2.5 sensor
   } else {
-//    sensors->add_sensor("MQ2 ", LCD_COLUMN_1, 1, A0, 0.1);  // MQ2 - smoke
-//    sensors->add_sensor("MQ7 ", LCD_COLUMN_1, 2, A1, 0.1);  // MQ7 - Carbon Monoxide
-//    sensors->add_sensor("MQ4 ", LCD_COLUMN_2, 0, A2, 0.1);  // MQ4 - Methane (CNG)
-//    sensors->add_sensor("MQ6 ", LCD_COLUMN_2, 1, A3, 0.1);  // MQ-6 - LPG, iso-butane, propane
-//    sensors->add_sensor("MQ8 ", LCD_COLUMN_2, 2, A6, 0.1);  // MQ-8 - Hydrogen
-//    sensors->add_sensor("M137", LCD_COLUMN_1, 0, A7, 0.1);  // MQ-137 - Ammonia
+    sensors->add_sensor(new MQSensor("MQ2 ", SENSOR_ACCUM_RATE, A0, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ2 - smoke
+    sensors->add_sensor(new MQSensor("MQ7 ", SENSOR_ACCUM_RATE, A1, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ7 - Carbon Monoxide
+    sensors->add_sensor(new MQSensor("MQ4 ", SENSOR_ACCUM_RATE, A2, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ4 - Methane (CNG)
+    sensors->add_sensor(new MQSensor("MQ6 ", SENSOR_ACCUM_RATE, A3, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ-6 - LPG, iso-butane, propane
+    sensors->add_sensor(new MQSensor("MQ8 ", SENSOR_ACCUM_RATE, A6, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ-8 - Hydrogen
+    sensors->add_sensor(new MQSensor("M137", SENSOR_ACCUM_RATE, A7, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ-137 - Ammonia
   }
 
   Serial.println(F("Init Configs..."));
@@ -78,7 +78,7 @@ void DiyAirSensor::loop() {
 //  // Set sensor zeros, based on menu adjustments
 //
   // Burn remainder of the loop period
-  while(millis() < loop_start_millis + sensor_state.device.sampling_period_ms) {
+  while(millis() < loop_start_millis + sensor_state.device.settings.data.sampling_period_ms) {
     // Check that millis() hasn't wrapped
     if(loop_start_millis > millis()){
       //millis have wrapped - Should happen every 50 days, give or take

@@ -3,6 +3,7 @@
 
 #include "SensorState.hh"
 #include "SensorMenu.h"
+#include "LiquidCrystal_I2C.h"
 
 // Indices of LCD columns
 #define LCD_NUM_ROWS     4
@@ -20,9 +21,9 @@
  * This class contains the project-specific design of the display.
  *  It ingests data from the sensors and (optionally) has a menu to change
  *  the configuration of the air sensor unit.
- * 
+ *
  */
- 
+
 class AirSensorDisplay {
  public:
   void add_menu(SensorMenu * menu);
