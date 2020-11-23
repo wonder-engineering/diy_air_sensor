@@ -73,7 +73,7 @@ void AirSensorDisplay::display_data(SensorState * sensor_state) {
       sensor_number < sensor_state->device.num_sensors;
       sensor_number++) {
     if(sensor_state->sensor[sensor_number].data.value >
-        sensor_state->sensor[sensor_number].config.threshold ) {
+        sensor_state->device.settings.data.sensor_thresholds[sensor_number] ) {
       lcd->setCursor(0, (LCD_NUM_ROWS-1));
       char cbuffer[SENSOR_SHORT_NAME_LEN];
       lcd->print(sensor_state->sensor[sensor_number].config.shortname);
