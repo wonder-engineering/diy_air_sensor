@@ -39,7 +39,6 @@ struct DeviceStatus {
 };
 
 struct SensorConfig {
-  uint16_t threshold;
   char shortname[SENSOR_SHORT_NAME_LEN] = "";
 };
 
