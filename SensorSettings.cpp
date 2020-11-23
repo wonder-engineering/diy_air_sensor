@@ -1,3 +1,4 @@
+// Copyright 2020 Brett M. Leedy
 #include "SensorSettings.hh"
 
  SensorSettings::SensorSettings() {
@@ -24,7 +25,6 @@
   void SensorSettings::load_settings_from_eeprom(int idx, SettingsType * myconfig) {
     EEPROM.get(idx, *myconfig);
   }
-
 
   uint32_t SensorSettings::calc_checksum() {
     uint32_t rv = 198;

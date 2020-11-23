@@ -1,3 +1,16 @@
+// Copyright 2020 Brett M. Leedy
+/*
+  SensorSettings class
+
+  This class contains the setting data for the sensor.  On
+    construction, it reads any existing settings from the EEPROM,
+    validates them, and stores them.  This is the only persistent
+    storage for the sensor.
+
+    Change this class if you want to add more persistent data
+    to the sensor (often when you add a new menu item).
+*/
+
 #ifndef SENSOR_SETTINGS_HH
 #define SENSOR_SETTINGS_HH
 

@@ -1,3 +1,5 @@
+// Copyright 2020 Brett M. Leedy
+
 #include "AirSensorDisplay.hh"
 #include "custom_lcd_glyphs.h"
 
@@ -17,11 +19,6 @@ AirSensorDisplay::AirSensorDisplay() {
   Serial.println(F("Init SensorMenu:"));
   this->menu = new SensorMenu(lcd);
 }
-
-//AirSensorDisplay::AirSensorDisplay(SensorMenu * menu) {
-//  init_lcd();
-//  this->menu = menu;
-//}
 
 void AirSensorDisplay::display_data(SensorState * sensor_state) {
   // Clear the LCD to ensure clean slate
@@ -75,7 +72,7 @@ void AirSensorDisplay::display_data(SensorState * sensor_state) {
   for(uint8_t sensor_number = 0;
       sensor_number < sensor_state->device.num_sensors;
       sensor_number++) {
-    if(sensor_state->sensor[sensor_number].data.value > 
+    if(sensor_state->sensor[sensor_number].data.value >
         sensor_state->sensor[sensor_number].config.threshold ) {
       lcd->setCursor(0, (LCD_NUM_ROWS-1));
       char cbuffer[SENSOR_SHORT_NAME_LEN];
@@ -85,7 +82,7 @@ void AirSensorDisplay::display_data(SensorState * sensor_state) {
       break;  // only have room to print one.
     }
   }  // for (sensor_id)
-  
+
   // Print glyph overlay on right side of last line for file status
   lcd->setCursor((LCD_NUM_COLUMNS-1), (LCD_NUM_ROWS-1));
   if(sensor_state->device.file_status == kFileFail){

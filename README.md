@@ -39,3 +39,19 @@ Bit-by-bit, I'm going to build some tests then start refactoring.  I'll remove t
 * testing/assembly instructions in this project.
 * Calibration instructions
 * Fix logging to card - slow down SPI bus?
+
+
+# Gas sensor info
+ * MQ-2 - Smoke -
+ * MQ-3 - Alcohol Gas - https://www.sparkfun.com/products/8880
+ * MQ-4 - Mehane (CNG) - https://www.sparkfun.com/products/9404
+ * MQ-5 - LPG, natural gas, town gas - https://tinyurl.com/y464ghh8
+ * MQ-6 - LPG, iso-butane, propane - https://tinyurl.com/y4pnkfsl
+ * MQ-7 - Carbon Monoxide (CO) - https://tinyurl.com/zr2uqtn
+ * MQ-8 - Hydrogen - https://www.sparkfun.com/products/10916
+ * MQ-9 - Gas leaks - https://wiki.seeedstudio.com/Grove-Gas_Sensor-MQ9/
+ * MQ-131 - Ozone - https://www.sparkfun.com/products/17051
+ * MQ-135 - Harmful Gasses https://components101.com/sensors/mq135-gas-sensor-for-air-quality
+ * MQ-136 - Hydrogen Sulfide - https://www.sparkfun.com/products/17052 (spare one in yellow box)
+ * MQ-137 - Ammonia - https://www.sparkfun.com/products/17053
+ * Multi-channel gas sensor: https://wiki.seeedstudio.com/Grove-Multichannel_Gas_Sensor/

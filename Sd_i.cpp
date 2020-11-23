@@ -1,4 +1,4 @@
-#include "LogFile.h"
+#include "Sd_i.hh"
 
 Sd_i::Sd_i(){}
 

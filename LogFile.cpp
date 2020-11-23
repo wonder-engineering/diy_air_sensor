@@ -2,8 +2,6 @@
 
 #include "LogFile.h"
 
-// todo: create unit tests, especially for string manipulation, which scares me.
-
 LogFile::LogFile() {
 	this->sd = new Sd_i();
   this->re_init_sd();
@@ -160,12 +158,6 @@ void LogFile::override_file_number(uint16_t new_id) {
 File * LogFile::get_file_ptr() {
   // todo: make this safer
   return &this->file;
-}
-
-
-void LogFile::replace_sd_interface(Sd_i * new_sd){
-  // delete this->sd;
-	this->sd = new_sd;
 }
 
 void LogFile::set_pinmode(uint8_t pin, uint8_t flags){

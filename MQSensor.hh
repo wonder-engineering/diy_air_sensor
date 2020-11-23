@@ -1,5 +1,14 @@
 // Copyright 2020 Brett M. Leedy
 
+/*
+  MQSensor class
+
+  This class implements the Sensor interface.  It is instantiated
+    by DiyAirSensor and managed in a SensorArray.
+
+  See Sensor.hh for all public methods.
+*/
+
 #ifndef DIY_AIR_SENSOR_MQ_SENSOR_H_
 #define DIY_AIR_SENSOR_MQ_SENSOR_H_
 
@@ -14,7 +23,7 @@ class MQSensor : public Sensor {
                Sensor{short_name, accum_rate, analog_pin, zero_adjust, gain} {}
 
  private:
-  uint16_t read_sensor();
+  uint16_t read_sensor();  // sensor read implementation
 };
 
 #endif

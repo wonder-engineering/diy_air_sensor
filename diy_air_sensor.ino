@@ -1,4 +1,10 @@
 // Copyright 2020 Brett M. Leedy
+/*
+ * diy_air_sensor
+ *
+ * This contains the Arduino main() callbacks.
+ * See DiyAirSensor class for implementation.
+*/
 
 #include <Arduino.h>
 #include "DiyAirSensor.hh"

@@ -1,3 +1,18 @@
+// Copyright 2020 Brett M. Leedy
+/*
+  SensorState class
+
+  This class represents the one "database" of context information
+    for the DIY air sensor.  It is read and updated by various
+    methods:
+
+    * SensorMenu changes the settings
+    * SensorArray inputs the number of sensors and their config
+    * SensorArray updates the data values when we call sense()
+    * LogFile reads values out and writes them to the logfile
+    * AirSensorDisplay reads values out and displays them
+*/
+
 #ifndef SENSOR_STATE_HH
 #define SENSOR_STATE_HH
 
@@ -10,7 +25,6 @@ enum SdState {
   kFileOk = 0,
   kFileFail,
 };
-
 
 struct SensorData {
   float value = 0.0;

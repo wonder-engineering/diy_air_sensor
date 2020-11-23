@@ -5,7 +5,6 @@
 SensorArray::SensorArray() {
 }
 
-
 bool SensorArray::add_sensor(Sensor * newsens) {
   if (this->sensors.size() >= SENSORSTATE_MAX_NUM_SENSORS)
     return false;  // cannot add sensor. take no action
@@ -32,7 +31,7 @@ void SensorArray::sense_all(SensorState * state) {
 
   // store data to state
   state->device.num_sensors = sensors.size();
-  
+
 }
 
 void SensorArray::log_all_serial_only() {
@@ -54,7 +53,6 @@ void SensorArray::log_serial(uint8_t sensor_id) {
   Serial.print(F(" | last: "));
   Serial.println(this->sensors[sensor_id]->get_last_value());
 }
-
 
 uint16_t SensorArray::get_sensor_avg(uint8_t sensor_id) {
   return this->sensors[sensor_id]->get_sensor_avg();

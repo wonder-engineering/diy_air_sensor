@@ -1,3 +1,4 @@
+// Copyright 2020 Brett M. Leedy
 #include "GP2YSensor.hh"
 
 GP2YSensor::GP2YSensor(const char * short_name, float accum_rate,
@@ -12,13 +13,13 @@ GP2YSensor::GP2YSensor(const char * short_name, float accum_rate,
   Serial.print(F("led: ")); Serial.println(led_power_pin);
 }
 
-
-uint16_t GP2YSensor::read_sensor() {  //////////////////////////////////////////////////////////
+// Must implement writing to last_raw and return the same
+uint16_t GP2YSensor::read_sensor() {
   // Note: this will block all other actions while I'm sensing
   digitalWrite(led_power, LOW);              // power on sensor LED
-  delayMicroseconds(DUST_DELAY_TIME_1);           // wait for data collection
+  delayMicroseconds(DUST_DELAY_TIME_1);      // wait for data collection
   this->last_raw = analogRead(this->pin);    // read sensor value
-  delayMicroseconds(DUST_DELAY_TIME_2);           // wait for a settling time
+  delayMicroseconds(DUST_DELAY_TIME_2);      // wait for a settling time
   digitalWrite(led_power, HIGH);             // power off the sensor LED
 
   return this->last_raw;

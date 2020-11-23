@@ -1,8 +1,22 @@
+// Copyright 2020 Brett M. Leedy
+/*
+ * AirSensorDisplay class.
+ *
+ * This class is responsible for the overall structure of the LCD
+ *  display.  It initializes the LCD and then will refresh the display
+ *  every time you call display_data().  at the time of the display_data()
+ *  call, if any buttons are pressed it will enter menu mode and do work
+ *  on the SensorState data structure, depennding on the menu interaction.
+ *
+ * Modify this class if you want to change the appearance of the sensor
+ *  display.
+*/
+
 #ifndef AIR_SENSOR_DISPLAY_HH
 #define AIR_SENSOR_DISPLAY_HH
 
 #include "SensorState.hh"
-#include "SensorMenu.h"
+#include "SensorMenu.hh"
 #include "LiquidCrystal_I2C.h"
 
 // Indices of LCD columns
@@ -10,7 +24,7 @@
 #define LCD_NUM_COLUMNS 20
 #define LCD_SENSOR_COLUMNS 10 // number of columns reserved for a sensor to display
 
-// LCD Glyph ID's for this sketch
+// LCD Glyph ID's for this class
 #define FILE_OK_GLYPH  0
 #define FILE_BAD_GLYPH 1
 #define SKULL_GLYPH    2
@@ -26,10 +40,12 @@
 
 class AirSensorDisplay {
  public:
-  void add_menu(SensorMenu * menu);
+  // Refreshes the LCD display based on state passed in
+  // Also check whether to enter the menu
   void display_data(SensorState * sensor_state);
+
+  // Initializes the LCD and menu
   AirSensorDisplay();
-  //AirSensorDisplay(SensorMenu * menu);
 
  private:
   LiquidCrystal_I2C * lcd;

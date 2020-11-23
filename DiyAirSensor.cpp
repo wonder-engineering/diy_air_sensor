@@ -1,5 +1,17 @@
+// Copyright 2020 Brett M. Leedy
 #include "DiyAirSensor.hh"
 
+/*
+  At init, instantiate all other components.  Here we:
+    * Start the serial port
+    * Configure the Digital I/O pins for buttons
+    * Instantiate the LogFile class to which we write logs
+    * Add and configre all of the sensors
+    * Update my configs with my sensor info
+    * Start up the LCD display
+
+  At construction, class variable SensorState will also read settings from EEPROM.
+*/
 DiyAirSensor::DiyAirSensor() {
   this->loop_number = 0;
   this->loop_start_millis = 0;
@@ -13,8 +25,8 @@ DiyAirSensor::DiyAirSensor() {
   pinMode(MENU_UP_BUTTON,     INPUT_PULLUP);
   pinMode(MENU_DN_BUTTON,     INPUT_PULLUP);
 
-  Serial.println(F("Init Logfile..."));
-  logfile = new LogFile();
+  // Serial.println(F("Init Logfile..."));
+  // logfile = new LogFile();
 
   Serial.println(F("Init Sensors..."));
   sensors = new SensorArray();

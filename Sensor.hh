@@ -1,5 +1,16 @@
 // Copyright 2020 Brett M. Leedy
 
+/*
+  Sensor class
+
+  This is the interface for all single-output sensor types.
+
+  To implement, create a derived class which implements the read_sensor()
+    method.  The read_sensor() method must do two things:
+     * store the most recent raw sensor reading in last_raw
+     * return the most recent raw sensor reading
+*/
+
 #ifndef DIY_AIR_SENSOR_SENSOR_H_
 #define DIY_AIR_SENSOR_SENSOR_H_
 // todo: use c++ .hh header conventions
