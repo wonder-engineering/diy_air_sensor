@@ -10,7 +10,6 @@
 #else
 #endif
 
-#include "Arduino.h"
 #include "Sensor.hh"
 
 /*

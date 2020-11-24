@@ -23,11 +23,10 @@
   #include <Arduino.h>
   #include <SPI.h>
 #else
-  #include "gmock/gmock.h"
-  #include "gtest/gtest.h"
   #include "test/Stub_Arduino.h"
   #include "test/Stub_Serial.h"
   #include "test/File_mock.h"
+  #include <stdlib.h>
 #endif
 #include "Sd_i.hh"
 

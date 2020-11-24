@@ -12,62 +12,88 @@
 
   At construction, class variable SensorState will also read settings from EEPROM.
 */
-DiyAirSensor::DiyAirSensor() {
-  this->loop_number = 0;
+// Initializes serial
+// Inits pins
+// Instantiates the sensors, config, and LCD
+// Updates the system state with sensor info
+// Calls serial a few times to update us on what's happening
+DiyAirSensor::DiyAirSensor(Serial_ * serial, bool do_init) {
+  if(do_init)
+    this->init(serial);
+}
+void DiyAirSensor::init(Serial_ * serial) {
+  if(initialized) {
+    serial->println(F("WARNING: Initialization will only run once."));
+    return;
+  }
+
+  this->loop_number = 0;        // state for loop control
   this->loop_start_millis = 0;
 
   // Init Serial port
-  Serial.begin(115200);
-  while (!Serial); // Wait for it to be initialized.
+  serial->begin(115200);
 
-  Serial.println(F("Init Button Pins..."));
+  serial->println(F("Init Button Pins..."));
+  this->initPins();
+
+  // serial->println(F("Init Logfile..."));
+  // logfile = new LogFile();
+  serial->println(F("Init Sensors..."));
+  sensors = new SensorArray();
+  this->addSensors(sensors);
+
+  serial->println(F("Init Configs..."));
+  this->updateConfigsFromSensor();
+
+  serial->println(F("Init LCD..."));
+  sensor_display = new AirSensorDisplay();
+
+  serial->println(F("Init done."));
+  this->initialized = true;
+
+}
+
+void DiyAirSensor::updateConfigsFromSensor() {
+  sensors->write_sensor_configs(&sensor_state);
+}
+
+// Adds sensors to the sensor array, depending on config
+void DiyAirSensor::addSensors(SensorArray * array) {
+  if(!sensor_state.device.settings.data.alt_sensor_config){
+    array->add_sensor(new MQSensor(" LPG", SENSOR_ACCUM_RATE, A1, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ5 - LPG, City Gas Leak
+    array->add_sensor(new MQSensor("  CO", SENSOR_ACCUM_RATE, A6, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ7 - Carbon Monoxide
+    array->add_sensor(new MQSensor("Ozon", SENSOR_ACCUM_RATE, A7, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ131 - Ozone
+    array->add_sensor(new MQSensor(" Gas", SENSOR_ACCUM_RATE, A3, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ9 Gas leaks
+    array->add_sensor(new MQSensor(" Haz", SENSOR_ACCUM_RATE, A2, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ135Poison Gasses (organic)
+    array->add_sensor(new GP2YSensor("Dust", SENSOR_ACCUM_RATE, A0, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN, 4)); // PM2.5 sensor
+  } else {
+    array->add_sensor(new MQSensor("MQ2 ", SENSOR_ACCUM_RATE, A0, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ2 - smoke
+    array->add_sensor(new MQSensor("MQ7 ", SENSOR_ACCUM_RATE, A1, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ7 - Carbon Monoxide
+    array->add_sensor(new MQSensor("MQ4 ", SENSOR_ACCUM_RATE, A2, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ4 - Methane (CNG)
+    array->add_sensor(new MQSensor("MQ6 ", SENSOR_ACCUM_RATE, A3, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ-6 - LPG, iso-butane, propane
+    array->add_sensor(new MQSensor("MQ8 ", SENSOR_ACCUM_RATE, A6, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ-8 - Hydrogen
+    array->add_sensor(new MQSensor("M137", SENSOR_ACCUM_RATE, A7, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ-137 - Ammonia
+  }
+}
+
+// Initializes arduino pins
+void DiyAirSensor::initPins() {
   pinMode(MENU_SELECT_BUTTON, INPUT_PULLUP);
   pinMode(MENU_UP_BUTTON,     INPUT_PULLUP);
   pinMode(MENU_DN_BUTTON,     INPUT_PULLUP);
-
-  // Serial.println(F("Init Logfile..."));
-  // logfile = new LogFile();
-
-  Serial.println(F("Init Sensors..."));
-  sensors = new SensorArray();
-  if(!sensor_state.device.settings.data.alt_sensor_config){
-    sensors->add_sensor(new MQSensor(" LPG", SENSOR_ACCUM_RATE, A1, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ5 - LPG, City Gas Leak
-    sensors->add_sensor(new MQSensor("  CO", SENSOR_ACCUM_RATE, A6, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ7 - Carbon Monoxide
-    sensors->add_sensor(new MQSensor("Ozon", SENSOR_ACCUM_RATE, A7, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ131 - Ozone
-    sensors->add_sensor(new MQSensor(" Gas", SENSOR_ACCUM_RATE, A3, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ9 Gas leaks
-    sensors->add_sensor(new MQSensor(" Haz", SENSOR_ACCUM_RATE, A2, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ135Poison Gasses (organic)
-    sensors->add_sensor(new GP2YSensor("Dust", SENSOR_ACCUM_RATE, A0, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN, 4)); // PM2.5 sensor
-  } else {
-    sensors->add_sensor(new MQSensor("MQ2 ", SENSOR_ACCUM_RATE, A0, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ2 - smoke
-    sensors->add_sensor(new MQSensor("MQ7 ", SENSOR_ACCUM_RATE, A1, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ7 - Carbon Monoxide
-    sensors->add_sensor(new MQSensor("MQ4 ", SENSOR_ACCUM_RATE, A2, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ4 - Methane (CNG)
-    sensors->add_sensor(new MQSensor("MQ6 ", SENSOR_ACCUM_RATE, A3, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ-6 - LPG, iso-butane, propane
-    sensors->add_sensor(new MQSensor("MQ8 ", SENSOR_ACCUM_RATE, A6, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ-8 - Hydrogen
-    sensors->add_sensor(new MQSensor("M137", SENSOR_ACCUM_RATE, A7, DEFAULT_ZERO_ADJUST, DEFAULT_GAIN));  // MQ-137 - Ammonia
-  }
-
-  Serial.println(F("Init Configs..."));
-  sensors->write_sensor_configs(&sensor_state);
-  Serial.print(F("sensor 0 shorname: ")); Serial.println(sensor_state.sensor[0].config.shortname);
-
-  Serial.println(F("Init LCD..."));
-  sensor_display = new AirSensorDisplay();
-
-  Serial.println(F("Init done."));
 }
 
-
-
-void DiyAirSensor::loop() {
-  loop_start_millis = millis();
+// Called continuously in a loop
+void DiyAirSensor::loop(Serial_ * serial) {
+  loop_start_millis = this->getMillis();
 
   // Before anything else, collect sensor data for most-precise timing.
   sensors->sense_all(&sensor_state);
 
   // Serial log loop start and sensor data
-  Serial.print(loop_number++);
-  Serial.print(F(" ----------- "));
-  Serial.println(loop_start_millis);
+  serial->print(loop_number++);
+  serial->print(F(" ----------- "));
+  serial->println(loop_start_millis);
   sensors->log_all_serial_only();
 
   // Output to the display
@@ -75,7 +101,7 @@ void DiyAirSensor::loop() {
 //
 //  // Wrap the file every day
 //  if(loop_number % (SECONDS_PER_DAY / (sensor_state.device.sampling_period_ms / 1000)) == 0){
-//    Serial.println(F("Wrapping the log File"));
+//    serial->println(F("Wrapping the log File"));
 //  }
 //
 //  // Log to file every N loops, if file logging is configured on
@@ -90,13 +116,20 @@ void DiyAirSensor::loop() {
 //  // Set sensor zeros, based on menu adjustments
 //
   // Burn remainder of the loop period
-  while(millis() < loop_start_millis + sensor_state.device.settings.data.sampling_period_ms) {
+  this->waitForSamplingPeriodEnd();
+}
+
+uint32_t DiyAirSensor::getMillis() {
+  return millis();  // Arduino millis call
+}
+
+void DiyAirSensor::waitForSamplingPeriodEnd() {
+  while(this->getMillis() < loop_start_millis + sensor_state.device.settings.data.sampling_period_ms) {
     // Check that millis() hasn't wrapped
-    if(loop_start_millis > millis()){
+    if(loop_start_millis > this->getMillis()){
       //millis have wrapped - Should happen every 50 days, give or take
-      loop_start_millis = millis(); //hacky
+      loop_start_millis = this->getMillis(); //hacky
       break;
     }
-
-  }// while(millis)
+  }
 }

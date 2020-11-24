@@ -18,8 +18,13 @@
 #define DEFAULT_LOG_EVERY_N_LOOPS    10  // every ten seconds
 #define SENSORSTATE_MAX_NUM_SENSORS 6
 
+#ifdef IN_TESTING
+#include "test/Stub_Arduino.h"
+#include "test/Stub_Serial.h"
+#else
 #include "Arduino.h"
-#include "EEPROM.h"
+#endif
+
 
 struct SettingsType {
   uint16_t sensor_thresholds[SENSORSTATE_MAX_NUM_SENSORS];

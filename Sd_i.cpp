@@ -1,5 +1,11 @@
 #include "Sd_i.hh"
 
+#ifdef IN_TESTING
+#include "test/Stub_SD.h"
+#else
+#include "SD.h"
+#endif
+
 Sd_i::Sd_i(){}
 
 bool Sd_i::begin(uint8_t csPin){

@@ -7,7 +7,12 @@
 #ifndef SD_I_HH
 #define SD_I_HH
 
+#ifdef IN_TESTING
+#include "test/File_mock.h"
+#include "test/Stub_Arduino.h"
+#else
 #include "SD.h"
+#endif
 
 class Sd_i{
     public:

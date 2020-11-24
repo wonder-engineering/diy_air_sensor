@@ -64,6 +64,7 @@ void analogReference(uint8_t mode);
 void analogWrite(uint8_t, int);
 
 unsigned long millis(void);
+
 unsigned long micros(void);
 void delay(unsigned long);
 void delayMicroseconds(unsigned int us);
@@ -84,6 +85,7 @@ uint16_t pgm_read_word(const char *const *);
 #define F(x) (x)
 #define UNUSED(expr) do { (void)(expr); } while (0)
 
+#define B 0b
 //typedef uint16_t size_t;
 
 //#define NULL 0

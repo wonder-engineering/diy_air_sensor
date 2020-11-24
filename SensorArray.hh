@@ -58,9 +58,9 @@ class SensorList {
 
 class SensorArray {
  public:
-  bool add_sensor(Sensor * newsens);
-  void sense_all(SensorState * state);
-  void log_all_serial_only();
+  virtual bool add_sensor(Sensor * newsens);
+  virtual void sense_all(SensorState * state);
+  virtual void log_all_serial_only();
   void write_sensor_configs(SensorState * state);
   void read_sensor_configs(SensorState * state);
   explicit SensorArray();

@@ -61,6 +61,6 @@ class EEPROMClass{
 //         return t;
         return t;
     }
-} EEPROM;
+}EEPROM;
 
 #endif

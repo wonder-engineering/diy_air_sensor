@@ -12,7 +12,6 @@
 #ifndef DIY_AIR_SENSOR_MQ_SENSOR_H_
 #define DIY_AIR_SENSOR_MQ_SENSOR_H_
 
-#include<Arduino.h>
 #include "Sensor.hh"
 
 

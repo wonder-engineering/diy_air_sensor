@@ -20,6 +20,8 @@
 
 #ifdef IN_TESTING
 #include "test/Stub_Arduino.h"
+#else
+#include "Arduino.h"
 #endif
 
 #define SENSOR_SHORT_NAME_LEN  5

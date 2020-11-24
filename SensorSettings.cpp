@@ -1,5 +1,10 @@
 // Copyright 2020 Brett M. Leedy
 #include "SensorSettings.hh"
+#ifdef IN_TESTING
+#include "test/Stub_EEPROM.hh"
+#else
+#include "EEPROM.h"
+#endif
 
  SensorSettings::SensorSettings() {
     // When instantiated, try to load myself from EEPROM.

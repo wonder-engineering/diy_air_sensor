@@ -46,7 +46,7 @@ class Serial_ {
     size_t write(const char *str){return 0;};
     size_t write(const uint8_t *buffer, size_t size){return 0;};
 
-    uint8_t begin(uint32_t){return 0;};
+    virtual uint8_t begin(uint32_t){return 0;};
 
     uint8_t available(){return 0;};
     uint8_t read(){return 0;};
@@ -54,9 +54,6 @@ class Serial_ {
     static void flush(){};
 };
 extern Serial_ Serial;
-
-// SerialMock* serialMockInstance(){return NULL;};
-// void releaseSerialMock(){};
 
 
 #endif // SERIAL_H

@@ -16,7 +16,6 @@
 #ifndef SENSOR_STATE_HH
 #define SENSOR_STATE_HH
 
-#include "Arduino.h"
 #include "Sensor.hh"
 #include "LogFile.h"
 #include "SensorSettings.hh"

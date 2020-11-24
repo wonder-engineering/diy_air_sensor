@@ -17,7 +17,11 @@
 
 #include "SensorState.hh"
 #include "SensorMenu.hh"
+#ifdef IN_TESTING
+#include "test/Stub_LiquidCrystal_I2C.hh"
+#else
 #include "LiquidCrystal_I2C.h"
+#endif
 
 // Indices of LCD columns
 #define LCD_NUM_ROWS     4
@@ -42,7 +46,7 @@ class AirSensorDisplay {
  public:
   // Refreshes the LCD display based on state passed in
   // Also check whether to enter the menu
-  void display_data(SensorState * sensor_state);
+  virtual void display_data(SensorState * sensor_state);
 
   // Initializes the LCD and menu
   AirSensorDisplay();
