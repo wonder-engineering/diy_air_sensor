@@ -83,7 +83,7 @@ class SensorMenu {
   SensorMenu(LiquidCrystal_I2C * lcd);
   void enter_menu(SensorState * state);
 
- private:
+ protected:
   void render_menu(uint8_t line);
   bool enter_menu_item(uint8_t id, SensorState * state);
   void init(LiquidCrystal_I2C * lcd);
