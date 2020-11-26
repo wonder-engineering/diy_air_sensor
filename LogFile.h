@@ -53,6 +53,7 @@ class LogFile{
 	virtual bool is_first_run(){bool rv = this->first_run; this->first_run = false; return rv;};
 	virtual uint16_t get_millis(){return millis();};
 	void reset_first_run(){this->first_run=true;}; // for testing
+  void replace_sd_interface(Sd_i * interface);
 
  private:
   virtual uint16_t get_highest_used_id();

@@ -160,6 +160,10 @@ File * LogFile::get_file_ptr() {
   return &this->file;
 }
 
-void LogFile::set_pinmode(uint8_t pin, uint8_t flags){
+void LogFile::set_pinmode(uint8_t pin, uint8_t flags) {
 				pinMode(pin, flags);  // just set pinmode
+}
+
+void LogFile::replace_sd_interface(Sd_i * interface) {
+				this->sd = interface;
 }

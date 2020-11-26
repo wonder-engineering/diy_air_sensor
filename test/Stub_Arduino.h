@@ -85,7 +85,6 @@ uint16_t pgm_read_word(const char *const *);
 #define F(x) (x)
 #define UNUSED(expr) do { (void)(expr); } while (0)
 
-#define B 0b
 //typedef uint16_t size_t;
 
 //#define NULL 0
