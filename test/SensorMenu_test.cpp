@@ -62,8 +62,6 @@ TEST(SensorMenu, Menu_Lines){
   MockedSensorMenu sensormenu(&lcd);     // params don't matter
 
 
-//   printf("initted\n");
-
   int num_menu_tests = 0;
   EXPECT_CALL(sensormenu, exit_callback()); num_menu_tests++;
   EXPECT_CALL(sensormenu, disp_callback(_)); num_menu_tests++;
