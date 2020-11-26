@@ -27,11 +27,19 @@ using ::testing::Lt;
 
 TEST(SensorArray, add_sensor) {
 
-	SensorArray sensor_array;
+	class InstrumentedSensorArray : public SensorArray {
+	  public:
+		uint8_t get_num_sensors() {return SensorArray::get_num_sensors();}
+		uint8_t get_sensor_avg(uint8_t sensor_id) {return SensorArray::get_sensor_avg(sensor_id);}
+		uint8_t get_sensor_raw(uint8_t sensor_id) {return SensorArray::get_sensor_raw(sensor_id);}
+		void get_short_name(uint8_t i, char buffer[], uint8_t buffer_size ) {
+			SensorArray::get_short_name(i, buffer, buffer_size);
+		}
+	} sensor_array;
 
 	char short_name_buffer[SENSOR_SHORT_NAME_LEN];
 	// Successfully add the max number of sensors.
-	for (int sensor_number = 0; sensor_number < MAX_NUM_SENSORS; sensor_number++ ) {
+	for (int sensor_number = 0; sensor_number < SENSORSTATE_MAX_NUM_SENSORS; sensor_number++ ) {
 
 		ASSERT_LE(snprintf(short_name_buffer, sizeof(short_name_buffer), "S_%d", sensor_number),
 							SENSOR_SHORT_NAME_LEN);  // make sure test name meets short name requirement
@@ -49,13 +57,22 @@ TEST(SensorArray, add_sensor) {
 	}
 
 	// Confirm test filled up the sensors
-    ASSERT_EQ(sensor_array.get_num_sensors(), MAX_NUM_SENSORS);
+    ASSERT_EQ(sensor_array.get_num_sensors(), SENSORSTATE_MAX_NUM_SENSORS);
 
     // I cannot add more sensors after the max:
 	ASSERT_LE(snprintf(short_name_buffer, sizeof(short_name_buffer), "S_%d", SANE_TEST_ID),
 					SENSOR_SHORT_NAME_LEN);  // make sure test name meets short name requirement
 	ASSERT_FALSE(sensor_array.add_sensor(new MQSensor(short_name_buffer, SANE_ACCUM_RATE,
 								SANE_TEST_ID, SANE_ZERO_ADJUST, SANE_GAIN)));
-	ASSERT_EQ(sensor_array.get_num_sensors(), MAX_NUM_SENSORS);
+	ASSERT_EQ(sensor_array.get_num_sensors(), SENSORSTATE_MAX_NUM_SENSORS);
 
 }
+
+
+// todo: sense_all
+
+
+// todo: log_all_serial
+
+
+// todo: write_sensor_configs

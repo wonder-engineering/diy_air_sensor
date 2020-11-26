@@ -65,14 +65,21 @@ class SensorArray {
   void read_sensor_configs(SensorState * state);
   explicit SensorArray();
 
+  // todo: make private
+
+
  private:
   SensorList sensors;
   void log_serial(uint8_t id);
   uint16_t sense(uint8_t id);
+  uint16_t get_sensor_value(uint8_t sensor_id);
+ protected:
+  uint8_t get_num_sensors() {return sensors.size();}
   uint16_t get_sensor_avg(uint8_t sensor_id);
   uint16_t get_sensor_raw(uint8_t sensor_id);
-  uint16_t get_sensor_value(uint8_t sensor_id);
-  uint8_t get_num_sensors() {return sensors.size();}
-  void get_short_name(uint8_t i, char buffer[], uint8_t buffer_size ) {sensors[i]->get_short_name(buffer, buffer_size);}
+  void get_short_name(uint8_t i, char buffer[], uint8_t buffer_size ) {
+    sensors[i]->get_short_name(buffer, buffer_size);
+  }
+
 };
 #endif  // GAS_SENSOR_ANALOGSENSOR_H_
