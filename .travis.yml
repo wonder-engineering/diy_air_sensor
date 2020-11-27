@@ -29,9 +29,10 @@ before_install:
 install:
 # # https://github.com/arduino/Arduino/blob/master/build/shared/manpage.adoc
 #    - arduino --install-library "AltSoftSerial","MemoryUsage","Stepper"
-# Install cpplint for style check
+   # Install cpplint for style check
    - /usr/bin/python -m pip install --user cpplint
-     # first we create a directory for the CMake binaries
+
+   # first we create a directory for the CMake binaries
    # Install CMAKE
    - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
    - mkdir ${DEPS_DIR} && cd ${DEPS_DIR}
@@ -48,10 +49,11 @@ install:
    # don't forget to switch back to the main build directory once you are done
    - cd ${TRAVIS_BUILD_DIR}
 
+# this is where you run stuff
 script:
-#    - build_main_platforms
-# do a linting pass
+   # do a linting pass
    - ./run_lint.bash
+   # build and run tests
    - cd test && ./build.sh
 
 # Generate and deploy documentation
