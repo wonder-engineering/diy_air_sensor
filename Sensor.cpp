@@ -18,7 +18,7 @@ Sensor::Sensor(const char * short_name,
 }
 
 float Sensor::get_sensor_avg() {
-  return this->avg_value;
+  return this->avg_value * gain + zero_adjust;
 }
 
 float Sensor::get_last_value() {

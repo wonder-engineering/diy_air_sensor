@@ -74,7 +74,7 @@ void SensorArray::write_sensor_configs(SensorState * state){
   }
 }
 
-void SensorArray::read_sensor_configs(SensorState * state){
-  // write all the config values that might have been manipulated by external,
+void SensorArray::read_sensor_configs(SensorState * state) {
+  // Read all the config values that might have been manipulated by external,
   //   like an interactive menu.
 }
