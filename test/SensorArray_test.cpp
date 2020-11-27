@@ -52,7 +52,7 @@ TEST(SensorArray, add_sensor) {
 		ASSERT_STREQ(short_name_buffer, compare_name_buffer);
 
 		// State should start zeroed always
-		ASSERT_EQ(sensor_array.get_sensor_avg(sensor_array.get_num_sensors()-1), SENSOR_DEFAULT_AVG_VALUE);
+		ASSERT_EQ(sensor_array.get_sensor_avg(sensor_array.get_num_sensors()-1), SENSOR_DEFAULT_AVG_VALUE + SANE_ZERO_ADJUST);
 		ASSERT_EQ(sensor_array.get_sensor_raw(sensor_array.get_num_sensors()-1), SENSOR_DEFAULT_LAST_VALUE);
 	}
 

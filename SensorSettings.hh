@@ -46,7 +46,7 @@ class SensorSettings {
   virtual void commit();
   SettingsType data;
 
- private:
+ protected:
   void dump();
   void store_checksum();
   bool check();
