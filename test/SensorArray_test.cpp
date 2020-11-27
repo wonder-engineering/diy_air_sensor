@@ -117,10 +117,4 @@ TEST(SensorArray, sense_all) {
 	for (int sensor_number = 0; sensor_number < SENSORSTATE_MAX_NUM_SENSORS; sensor_number++ ) {
 		delete mock_sensor[sensor_number];
 	}
-
 }
-
-// todo: log_all_serial
-
-
-// todo: write_sensor_configs
