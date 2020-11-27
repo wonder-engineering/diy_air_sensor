@@ -23,6 +23,7 @@ using ::testing::Lt;
 #define SANE_ACCUM_RATE   0.1
 #define SANE_ZERO_ADJUST   100
 #define LCD_FIRST_ROW       0
+#define FAKE_SENSOR_READING 876
 
 
 TEST(SensorArray, add_sensor) {
@@ -70,7 +71,54 @@ TEST(SensorArray, add_sensor) {
 
 
 // todo: sense_all
+TEST(SensorArray, sense_all) {
+	class MockMQSensor : public MQSensor {
+	  public:
+		MockMQSensor(const char * short_name, float accum_rate,
+               uint8_t analog_pin, uint16_t zero_adjust, float gain) :
+               MQSensor{short_name, accum_rate, analog_pin, zero_adjust, gain} {}
+		MOCK_METHOD(uint16_t, read_sensor, (), (override));
+	};
 
+	class InstrumentedSensorArray : public SensorArray {
+	  public:
+		uint8_t get_num_sensors() {return SensorArray::get_num_sensors();}
+	};
+
+	InstrumentedSensorArray sensor_array = InstrumentedSensorArray();
+
+	char short_name_buffer[SENSOR_SHORT_NAME_LEN];
+	MockMQSensor * mock_sensor[SENSORSTATE_MAX_NUM_SENSORS];
+	// Successfully add the max number of sensors.
+	for (int sensor_number = 0; sensor_number < SENSORSTATE_MAX_NUM_SENSORS; sensor_number++ ) {
+		ASSERT_LE(snprintf(short_name_buffer, sizeof(short_name_buffer), "S_%d", SANE_TEST_ID),
+					SENSOR_SHORT_NAME_LEN);  // make sure test name meets short name requirement
+		mock_sensor[sensor_number] = new MockMQSensor(short_name_buffer, SANE_ACCUM_RATE,
+					sensor_number, SANE_ZERO_ADJUST, SANE_GAIN);
+		testing::Mock::AllowLeak(mock_sensor[sensor_number]);
+		sensor_array.add_sensor(mock_sensor[sensor_number]);
+	}
+
+	// Confirm test filled up the sensors
+    ASSERT_EQ(sensor_array.get_num_sensors(), SENSORSTATE_MAX_NUM_SENSORS);
+
+	// Expect each configured sensor to be called once
+	for (int sensor_number = 0; sensor_number < SENSORSTATE_MAX_NUM_SENSORS; sensor_number++ ) {
+		EXPECT_CALL(*mock_sensor[sensor_number], read_sensor()).WillRepeatedly(Return(FAKE_SENSOR_READING));
+	}
+
+	SensorState state;
+    sensor_array.sense_all(&state);
+
+	for (int sensor_number = 0; sensor_number < SENSORSTATE_MAX_NUM_SENSORS; sensor_number++ ) {
+		ASSERT_EQ(FAKE_SENSOR_READING, state.sensor[sensor_number].data.raw);
+	}
+
+	for (int sensor_number = 0; sensor_number < SENSORSTATE_MAX_NUM_SENSORS; sensor_number++ ) {
+		delete mock_sensor[sensor_number];
+	}
+
+}
 
 // todo: log_all_serial
 

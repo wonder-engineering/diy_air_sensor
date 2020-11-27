@@ -21,7 +21,7 @@ bool SensorArray::add_sensor(Sensor * newsens) {
 }
 
 void SensorArray::sense_all(SensorState * state) {
-  for (uint8_t sensor_id = sensors.begin(); sensor_id < sensors.end(); sensor_id++) {
+  for (uint8_t sensor_id = sensors.begin(); sensor_id <= sensors.end(); sensor_id++) {
     sensors[sensor_id]->sense();
 
     // for each sensor, store it in the state DB
