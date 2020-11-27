@@ -1,7 +1,7 @@
 // Copyright 2020 Brett M Leedy
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
-#include "../LogFile.h"
+#include "../src/LogFile.h"
 
 // SD interface mock
 class MockSd_i : public Sd_i {

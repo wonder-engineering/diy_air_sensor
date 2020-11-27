@@ -19,8 +19,8 @@
 #define SENSORSTATE_MAX_NUM_SENSORS 6
 
 #ifdef IN_TESTING
-#include "test/Stub_Arduino.h"
-#include "test/Stub_Serial.h"
+#include "../test/Stub_Arduino.h"
+#include "../test/Stub_Serial.h"
 #else
 #include "Arduino.h"
 #endif

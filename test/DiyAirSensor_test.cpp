@@ -4,8 +4,7 @@
 #include "gmock/gmock.h"
 
 
-#include "../DiyAirSensor.hh"
-// #include "../SensorArray.hh"
+#include "../src/DiyAirSensor.hh"
 
 using ::testing::AtLeast;
 using ::testing::Between;

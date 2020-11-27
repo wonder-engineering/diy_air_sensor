@@ -24,9 +24,9 @@
   #include <SPI.h>
 #else
   #include <stdlib.h>
-  #include "test/Stub_Arduino.h"
-  #include "test/Stub_Serial.h"
-  #include "test/File_mock.h"
+  #include "../test/Stub_Arduino.h"
+  #include "../test/Stub_Serial.h"
+  #include "../test/File_mock.h"
 #endif
 #include "Sd_i.hh"
 

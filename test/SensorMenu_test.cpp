@@ -5,7 +5,7 @@
 #include "Stub_LiquidCrystal_I2C.hh"
 
 
-#include "../SensorMenu.hh"
+#include "../src/SensorMenu.hh"
 
 using ::testing::AtLeast;
 using ::testing::Return;

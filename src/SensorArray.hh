@@ -20,10 +20,10 @@
 #ifdef IN_TESTING
 // just skip progmem macro for test builds
 #define PROGMEM
-#include "test/Stub_Arduino.h"
-#include "test/Stub_Serial.h"
-#include "test/Stub_LiquidCrystal_I2C.hh"
-#include "test/File_mock.h"
+#include "../test/Stub_Arduino.h"
+#include "../test/Stub_Serial.h"
+#include "../test/Stub_LiquidCrystal_I2C.hh"
+#include "../test/File_mock.h"
 #else
 #include "Arduino.h"
 #endif

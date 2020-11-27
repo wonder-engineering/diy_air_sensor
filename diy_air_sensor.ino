@@ -7,7 +7,7 @@
 */
 
 #include <Arduino.h>
-#include "DiyAirSensor.hh"
+#include "src/DiyAirSensor.hh"
 
 
 // Classes for main components

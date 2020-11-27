@@ -1,7 +1,7 @@
 // Copyright 2020 Brett M. Leedy
 #include "SensorSettings.hh"
 #ifdef IN_TESTING
-#include "test/Stub_EEPROM.hh"
+#include "../test/Stub_EEPROM.hh"
 #else
 #include "EEPROM.h"
 #endif

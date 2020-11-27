@@ -5,8 +5,8 @@
 
 #ifdef IN_TESTING
 #define PROGMEM
-#include "test/Stub_Arduino.h"
-#include "test/Stub_Serial.h"
+#include "../test/Stub_Arduino.h"
+#include "../test/Stub_Serial.h"
 #else
 #endif
 

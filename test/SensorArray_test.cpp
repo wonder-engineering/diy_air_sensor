@@ -5,8 +5,8 @@
 #include "gmock/gmock.h"
 
 
-#include "../SensorArray.hh"
-#include "../MQSensor.hh"
+#include "../src/SensorArray.hh"
+#include "../src/MQSensor.hh"
 
 using ::testing::AtLeast;
 using ::testing::Return;

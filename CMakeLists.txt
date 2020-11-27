@@ -33,17 +33,17 @@ set(COMPILE_FLAGS "" CACHE STRING "Additional Compiler Flags")
 
 # Set own source files
 # Simply list all your C / C++ source (not header!) files here
-set(SRC_FILES ${PROJECT_NAME}.cpp
-				LogFile.cpp
-				SensorMenu.cpp
-				SensorArray.cpp
-				Sd_i.cpp
-				AirSensorDisplay.cpp
-				DiyAirSensor.cpp
-				GP2YSensor.cpp
-				MQSensor.cpp
-				Sensor.cpp
-				SensorSettings.cpp
+set(SRC_FILES src/${PROJECT_NAME}.cpp
+				src/LogFile.cpp
+				src/SensorMenu.cpp
+				src/SensorArray.cpp
+				src/Sd_i.cpp
+				src/AirSensorDisplay.cpp
+				src/DiyAirSensor.cpp
+				src/GP2YSensor.cpp
+				src/MQSensor.cpp
+				src/Sensor.cpp
+				src/SensorSettings.cpp
 				)
 
 # Get cmake to recognize *.ino files as C++

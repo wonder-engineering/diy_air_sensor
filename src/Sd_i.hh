@@ -8,8 +8,8 @@
 #define SD_I_HH_
 
 #ifdef IN_TESTING
-#include "test/File_mock.h"
-#include "test/Stub_Arduino.h"
+#include "../test/File_mock.h"
+#include "../test/Stub_Arduino.h"
 #else
 #include "SD.h"
 #endif

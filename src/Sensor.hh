@@ -18,7 +18,7 @@
 #include <string.h>
 
 #ifdef IN_TESTING
-#include "test/Stub_Arduino.h"
+#include "../test/Stub_Arduino.h"
 #else
 #include "Arduino.h"
 #endif

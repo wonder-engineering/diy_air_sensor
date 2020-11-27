@@ -2,7 +2,7 @@
 #include "Sd_i.hh"
 
 #ifdef IN_TESTING
-#include "test/Stub_SD.h"
+#include "../test/Stub_SD.h"
 #else
 #include "SD.h"
 #endif

@@ -5,7 +5,7 @@
 #include "gmock/gmock.h"
 
 
-#include "../SensorSettings.hh"
+#include "../src/SensorSettings.hh"
 
 using ::testing::AtLeast;
 using ::testing::Return;

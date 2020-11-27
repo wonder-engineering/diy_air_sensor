@@ -4,7 +4,7 @@
 #define CUSTOM_LCD_GLYPHS_H_
 
 #ifdef IN_TESTING
-#include "test/Stub_Arduino.h"
+#include "../test/Stub_Arduino.h"
 #endif
 
 byte file_ok_glyph[8] = {

@@ -10,16 +10,16 @@ add_subdirectory(googletest
 				EXCLUDE_FROM_ALL)
 
 file(GLOB SRCS "*.cpp"
-               "../Sd_i.cpp"
-			   "../LogFile.cpp"
-			   "../SensorMenu.cpp"
-			   "../SensorArray.cpp"
-			   "../Sensor.cpp"
-			   "../MQSensor.cpp"
-			   "../SensorSettings.cpp"
-			   "../DiyAirSensor.cpp"
-			   "../GP2YSensor.cpp"
-			   "../AirSensorDisplay.cpp")
+               "../src/Sd_i.cpp"
+			   "../src/LogFile.cpp"
+			   "../src/SensorMenu.cpp"
+			   "../src/SensorArray.cpp"
+			   "../src/Sensor.cpp"
+			   "../src/MQSensor.cpp"
+			   "../src/SensorSettings.cpp"
+			   "../src/DiyAirSensor.cpp"
+			   "../src/GP2YSensor.cpp"
+			   "../src/AirSensorDisplay.cpp")
 add_executable(test-all ${SRCS})
 
 target_link_libraries(test-all

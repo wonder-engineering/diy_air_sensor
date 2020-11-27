@@ -18,7 +18,7 @@
 #include "SensorState.hh"
 #include "SensorMenu.hh"
 #ifdef IN_TESTING
-#include "test/Stub_LiquidCrystal_I2C.hh"
+#include "../test/Stub_LiquidCrystal_I2C.hh"
 #else
 #include "LiquidCrystal_I2C.h"
 #endif

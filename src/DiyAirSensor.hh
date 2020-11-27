@@ -12,7 +12,7 @@
 #ifndef IN_TESTING
 #include "Arduino.h"
 #else
-#include "test/Stub_Serial.h"
+#include "../test/Stub_Serial.h"
 #endif
 
 #include "SensorArray.hh"
