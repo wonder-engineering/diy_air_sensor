@@ -14,8 +14,8 @@
     read or otherwise change the way sensors are handled.
 */
 
-#ifndef GAS_SENSOR_ANALOGSENSOR_H_
-#define GAS_SENSOR_ANALOGSENSOR_H_
+#ifndef SENSORARRAY_HH_
+#define SENSORARRAY_HH_
 
 #ifdef IN_TESTING
 // just skip progmem macro for test builds
@@ -37,23 +37,23 @@
 */
 class SensorList {
  public:
-  SensorList(){this->num_sensors=0;}
+  SensorList() {this->num_sensors = 0;}
   bool push_back(Sensor* new_sensor) {
-    if(this->num_sensors >= SENSORSTATE_MAX_NUM_SENSORS)
+    if (this->num_sensors >= SENSORSTATE_MAX_NUM_SENSORS)
       return false;
     this->list[this->num_sensors] = new_sensor;
     this->num_sensors++;
     return true;
   }
-  uint8_t size(){return this->num_sensors;}
-  uint8_t begin(){return 0;}
-  uint8_t end(){return (this->num_sensors-1);}
+  uint8_t size() {return this->num_sensors;}
+  uint8_t begin() {return 0;}
+  uint8_t end() {return (this->num_sensors-1);}
 
-  Sensor * operator [](uint8_t index){return this->list[index];};
+  Sensor * operator[](uint8_t index) {return this->list[index];}
 
-  private:
-   uint8_t num_sensors;
-   Sensor * list[SENSORSTATE_MAX_NUM_SENSORS];
+ private:
+  uint8_t num_sensors;
+  Sensor * list[SENSORSTATE_MAX_NUM_SENSORS];
 };
 
 class SensorArray {
@@ -63,16 +63,14 @@ class SensorArray {
   virtual void log_all_serial_only();
   void write_sensor_configs(SensorState * state);
   void read_sensor_configs(SensorState * state);
-  explicit SensorArray();
-
-  // todo: make private
-
+  SensorArray();
 
  private:
   SensorList sensors;
   void log_serial(uint8_t id);
   uint16_t sense(uint8_t id);
   uint16_t get_sensor_value(uint8_t sensor_id);
+
  protected:
   uint8_t get_num_sensors() {return sensors.size();}
   uint16_t get_sensor_avg(uint8_t sensor_id);
@@ -80,6 +78,5 @@ class SensorArray {
   void get_short_name(uint8_t i, char buffer[], uint8_t buffer_size ) {
     sensors[i]->get_short_name(buffer, buffer_size);
   }
-
 };
-#endif  // GAS_SENSOR_ANALOGSENSOR_H_
+#endif  // SENSORARRAY_HH_

@@ -3,24 +3,24 @@
 #include "LogFile.h"
 
 LogFile::LogFile() {
-	this->sd = new Sd_i();
+  this->sd = new Sd_i();
   this->re_init_sd();
 }
 
 bool LogFile::re_init_sd() {
-	// don't try to re-init if cooldown has not expired
-	uint16_t nowtime = this->get_millis();
+  // don't try to re-init if cooldown has not expired
+  uint16_t nowtime = this->get_millis();
   if ((nowtime >= this->cooldown_start_millis) &&  // millis hasn't wrapped
       (nowtime < this->cooldown_start_millis +
-                          SD_COOLDOWN_LENGTH) &&             // waited for the cooldn
-      (!this->is_first_run())                                // we've run this once
+                          SD_COOLDOWN_LENGTH) &&  // waited for the cooldn
+      (!this->is_first_run())                     // we've run this once
     ) {
     return this->sd_failure;
   } else {
     this->cooldown_start_millis = nowtime;  // we  ran, so reset
   }
   // Init the SD card
-	this->set_pinmode(10, OUTPUT);
+  this->set_pinmode(10, OUTPUT);
   pinMode(10, OUTPUT);
   Serial.println(F("LogFile: Init SD card..."));
   this->sd_failure = !this->begin_sd();  // begin returns false on failure
@@ -38,8 +38,8 @@ bool LogFile::re_init_sd() {
   return this->sd_failure;
 }
 
-bool LogFile::begin_sd(){
-				return this->sd->begin(10);
+bool LogFile::begin_sd() {
+        return this->sd->begin(10);
 }
 
 void LogFile::get_file_name(char * buffer, uint8_t max_size) {
@@ -112,14 +112,14 @@ uint16_t LogFile::get_highest_used_id() {
     char * token;
     strncpy(temp_filename, entry.name(), MAX_FILENAME_LEN);
     // string is of the format "LOGFILE_NAME_BASE.number.csv"
-    token = strtok(temp_filename, "-");
+    token = strtok(temp_filename, "-");  // NOLINT
 
     // compare the first token to the filename
     if (strncmp(token, log_file_name_base, MAX_FILENAME_LEN) != 0) {
       continue;  // different base name - ignore
     }
 
-    token = strtok(NULL, ".");
+    token = strtok(NULL, ".");    // NOLINT
     // convert and compare the number token (if found)
     uint16_t file_number = atoi(token);
     if (file_number > highest_number_found) {
@@ -161,9 +161,9 @@ File * LogFile::get_file_ptr() {
 }
 
 void LogFile::set_pinmode(uint8_t pin, uint8_t flags) {
-				pinMode(pin, flags);  // just set pinmode
+        pinMode(pin, flags);  // just set pinmode
 }
 
 void LogFile::replace_sd_interface(Sd_i * interface) {
-				this->sd = interface;
+        this->sd = interface;
 }

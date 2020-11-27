@@ -5,8 +5,8 @@
   This class wraps contains all of the functionality of the DIY Air Sensor
     and is responsible for it's configuration and execution order.
 */
-#ifndef DIY_AIR_SENSOR_HH_
-#define DIY_AIR_SENSOR_HH_
+#ifndef DIYAIRSENSOR_HH_
+#define DIYAIRSENSOR_HH_
 
 // todo: when IN_TEST is defined put gmock mocked classes in their place
 #ifndef IN_TESTING
@@ -27,16 +27,16 @@
 #define DEFAULT_GAIN         1.0
 
 class DiyAirSensor {
-  public:
-    DiyAirSensor(Serial_ * serial, bool do_init=false);  // called once at start in diy_air_sensor.ino
+ public:
+    explicit DiyAirSensor(Serial_ * serial, bool do_init = false);
     void init(Serial_ *  serial);
-    void loop(Serial_ * serial);     // called continuously forever after start
+    void loop(Serial_ * serial);  // called continuously forever after start
 
-  protected:
+ protected:
     // Classes for main components
     SensorState       sensor_state;  // one "database" for stateful data
     // LogFile           * logfile     = NULL;
-    SensorArray       * sensors        = NULL;     // container for all the sensors
+    SensorArray       * sensors        = NULL;
     AirSensorDisplay  * sensor_display = NULL;
     uint32_t loop_number;
     uint32_t loop_start_millis;
@@ -48,4 +48,4 @@ class DiyAirSensor {
     bool initialized = false;
 };
 
-  #endif
+#endif  // DIYAIRSENSOR_HH_

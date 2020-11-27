@@ -2,9 +2,9 @@
 #include "GP2YSensor.hh"
 
 GP2YSensor::GP2YSensor(const char * short_name, float accum_rate,
-               uint8_t analog_pin, uint16_t zero_adjust, float gain, uint8_t led_power_pin) :
+               uint8_t analog_pin, uint16_t zero_adjust, float gain,
+               uint8_t led_power_pin) :
                Sensor{short_name, accum_rate, analog_pin, zero_adjust, gain}  {
-
   this->led_power = led_power_pin;
   pinMode(led_power_pin, OUTPUT);  // Turns sensor LED on/off
 

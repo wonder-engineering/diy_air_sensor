@@ -1,6 +1,5 @@
 // Copyright 2020 Brett M Leedy
 
-
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "Stub_LiquidCrystal_I2C.hh"
@@ -30,61 +29,74 @@ using ::testing::Lt;
 
 
 // Testing for the menu lines that we have configured
-TEST(SensorMenu, Menu_Lines){
-
+TEST(SensorMenu, Menu_Lines) {
   class MockedSensorMenu : public SensorMenu {
    public:
-    MockedSensorMenu(LiquidCrystal_I2C * lcd) : SensorMenu{lcd} {
-		// no special constructor for mocked class
-	}
-	MOCK_METHOD(bool, exit_callback, (), (override));
-	MOCK_METHOD(bool, disp_callback, (SensorSettings *), (override));
-	MOCK_METHOD(bool, file_callback, (SensorState *), (override));
-	MOCK_METHOD(bool, sampling_callback, (SensorSettings *), (override));
-	MOCK_METHOD(bool, lograte_callback, (SensorSettings *), (override));
-	MOCK_METHOD(bool, backlight_callback, (SensorSettings *), (override));
-	MOCK_METHOD(bool, logon_callback, (SensorSettings *), (override));
-	MOCK_METHOD(bool, sensor_settings_callback, (const char *, uint16_t *, SensorSettings *), (override));
-	MOCK_METHOD(bool, sensor_t_callback, (SensorSettings *), (override));
-	MOCK_METHOD(bool, error_callback, (), (override));
+    explicit MockedSensorMenu(LiquidCrystal_I2C * lcd) : SensorMenu{lcd} {
+    // no special constructor for mocked class
+  }
+  MOCK_METHOD(bool, exit_callback, (), (override));
+  MOCK_METHOD(bool, disp_callback, (SensorSettings *), (override));
+  MOCK_METHOD(bool, file_callback, (SensorState *), (override));
+  MOCK_METHOD(bool, sampling_callback, (SensorSettings *), (override));
+  MOCK_METHOD(bool, lograte_callback, (SensorSettings *), (override));
+  MOCK_METHOD(bool, backlight_callback, (SensorSettings *), (override));
+  MOCK_METHOD(bool, logon_callback, (SensorSettings *), (override));
+  MOCK_METHOD(bool, sensor_settings_callback, (const char *, uint16_t *,
+                                          SensorSettings *), (override));
+  MOCK_METHOD(bool, sensor_t_callback, (SensorSettings *), (override));
+  MOCK_METHOD(bool, error_callback, (), (override));
 
-	bool enter_menu_item(uint8_t id, SensorState * state) {
-		return SensorMenu::enter_menu_item(id, state);
-	}
+  bool enter_menu_item(uint8_t id, SensorState * state) {
+    return SensorMenu::enter_menu_item(id, state);
+  }
   };
 
   // menu_length is the same as the number of menu lines
   // this is an array of pointers
   uint16_t num_menu_strings = sizeof(menu_line) / sizeof(menu_line[0]);
   ASSERT_EQ(num_menu_strings, MENU_LENGTH);
-
-  LiquidCrystal_I2C lcd(SANE_LCD_ADDR, SANE_LCD_WIDTH, SANE_LCD_HEIGHT );  // a fake stub, doesn't matter
+  // a fake stub, doesn't matter
+  LiquidCrystal_I2C lcd(SANE_LCD_ADDR, SANE_LCD_WIDTH, SANE_LCD_HEIGHT);
   MockedSensorMenu sensormenu(&lcd);     // params don't matter
 
 
   int num_menu_tests = 0;
-  EXPECT_CALL(sensormenu, exit_callback()); num_menu_tests++;
-  EXPECT_CALL(sensormenu, disp_callback(_)); num_menu_tests++;
-  EXPECT_CALL(sensormenu, file_callback(_)); num_menu_tests++;
-  EXPECT_CALL(sensormenu, sampling_callback(_)); num_menu_tests++;
-  EXPECT_CALL(sensormenu, lograte_callback(_)); num_menu_tests++;
-  EXPECT_CALL(sensormenu, backlight_callback(_)); num_menu_tests++;
-  EXPECT_CALL(sensormenu, logon_callback(_)); num_menu_tests++;
-  EXPECT_CALL(sensormenu, sensor_settings_callback("LPG", _, _)); num_menu_tests++;
-  EXPECT_CALL(sensormenu, sensor_settings_callback("CO", _, _ )); num_menu_tests++;
-  EXPECT_CALL(sensormenu, sensor_settings_callback("O3", _, _ )); num_menu_tests++;
-  EXPECT_CALL(sensormenu, sensor_settings_callback("GAS", _, _ )); num_menu_tests++;
-  EXPECT_CALL(sensormenu, sensor_settings_callback("HAZ", _, _ )); num_menu_tests++;
-  EXPECT_CALL(sensormenu, sensor_settings_callback("PM", _, _ )); num_menu_tests++;
+  EXPECT_CALL(sensormenu, exit_callback());
+  num_menu_tests++;
+  EXPECT_CALL(sensormenu, disp_callback(_));
+  num_menu_tests++;
+  EXPECT_CALL(sensormenu, file_callback(_));
+  num_menu_tests++;
+  EXPECT_CALL(sensormenu, sampling_callback(_));
+  num_menu_tests++;
+  EXPECT_CALL(sensormenu, lograte_callback(_));
+  num_menu_tests++;
+  EXPECT_CALL(sensormenu, backlight_callback(_));
+  num_menu_tests++;
+  EXPECT_CALL(sensormenu, logon_callback(_));
+  num_menu_tests++;
+  EXPECT_CALL(sensormenu, sensor_settings_callback("LPG", _, _));
+  num_menu_tests++;
+  EXPECT_CALL(sensormenu, sensor_settings_callback("CO", _, _));
+  num_menu_tests++;
+  EXPECT_CALL(sensormenu, sensor_settings_callback("O3", _, _));
+  num_menu_tests++;
+  EXPECT_CALL(sensormenu, sensor_settings_callback("GAS", _, _));
+  num_menu_tests++;
+  EXPECT_CALL(sensormenu, sensor_settings_callback("HAZ", _, _));
+  num_menu_tests++;
+  EXPECT_CALL(sensormenu, sensor_settings_callback("PM", _, _));
+  num_menu_tests++;
   EXPECT_CALL(sensormenu, sensor_t_callback(_)); num_menu_tests++;
-  ASSERT_EQ(MENU_LENGTH, num_menu_tests); // here to remind you to add a test case when you add a menu item.
+  // here to remind you to add a test case when you add a menu item.
+  ASSERT_EQ(MENU_LENGTH, num_menu_tests);
 
   EXPECT_CALL(sensormenu, error_callback()).Times(0);
 
   SensorState state = SensorState();
 
-  for (int i = 0; i < MENU_LENGTH; i++ ) {
-	  sensormenu.enter_menu_item(i, &state);
+  for (int i = 0; i < MENU_LENGTH; i++) {
+    sensormenu.enter_menu_item(i, &state);
   }
-
 }

@@ -1,6 +1,7 @@
 // Copyright 2020 Brett M. Leedy
 
 #include "SensorMenu.hh"
+#define MENU_LINE_BUFFER_LEN  25
 
   SensorMenu::SensorMenu(LiquidCrystal_I2C * lcd) {
     init(lcd);
@@ -19,7 +20,8 @@
           }
   }
 
-  bool SensorMenu::display_sensor_setting(const char * name, uint16_t * setting) {
+  bool SensorMenu::display_sensor_setting(const char * name,
+                                          uint16_t * setting) {
     lcd->clear();
     lcd->setCursor(0, 0);
     lcd->print(name);
@@ -219,10 +221,8 @@ bool SensorMenu::disp_callback(SensorSettings * settings) {
 
     while (true) {
         if (digitalRead(MENU_SELECT_BUTTON) == LOW) {
-        // if (dust    != NULL) {dust->set_display_raw(display_raw);}  //fixme
-        // if (sensors != NULL) {sensors->set_display_raw(display_raw);}  //fixme
         wait_for_button_up();
-        settings->commit(); // commit before exiting
+        settings->commit();  // commit before exiting
         return REMAIN_IN_MENU;
         } else if (digitalRead(MENU_UP_BUTTON) == LOW ||
                     digitalRead(MENU_DN_BUTTON) == LOW) {
@@ -242,7 +242,7 @@ bool SensorMenu::disp_callback(SensorSettings * settings) {
 void SensorMenu::render_menu(uint8_t line) {
 lcd->clear();
 for (int d_row=line; d_row < line + 4 && d_row < MENU_LENGTH; d_row++) {
-    char buffer[21];  // make sure this is large enough for the largest string  todo: magic number
+    char buffer[MENU_LINE_BUFFER_LEN];  // make sure this is large enough
     strcpy_P(buffer,
     reinterpret_cast<char *>(pgm_read_word(&(menu_line[d_row]))));
     lcd->setCursor(0, d_row-line);
@@ -311,7 +311,7 @@ switch (id) {
 return rv;
 }
 
-bool SensorMenu::error_callback(){ return false;}
+bool SensorMenu::error_callback() { return false;}
 
 void SensorMenu::enter_menu(SensorState * state) {
 uint8_t menu_pos = 0;

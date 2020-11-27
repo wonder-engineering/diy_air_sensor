@@ -29,10 +29,9 @@ using ::testing::Lt;
 // checksum covers all values
 // once committed, the checsum succeeds
 TEST(SensorSettings, behaviors) {
-
   class InstrumentedSensorSettings : public SensorSettings {
-    public:
-      bool check(){return SensorSettings::check();}
+   public:
+      bool check() {return SensorSettings::check();}
       void store_checksum(){SensorSettings::store_checksum();}
   };
 
@@ -40,7 +39,7 @@ TEST(SensorSettings, behaviors) {
   int settings_overall_size = sizeof(settings.data);
   int settings_tested_size = 0;  // amount of the settings type that's tested
   for (int i = 0; i < SENSORSTATE_MAX_NUM_SENSORS; i++) {
-	  settings.data.sensor_thresholds[i] = 5 * i;
+    settings.data.sensor_thresholds[i] = 5 * i;
   }
   settings_tested_size += sizeof(settings.data.sensor_thresholds);
   settings.data.sampling_period_ms = SANE_SAMPLING_PERIOD_MS;

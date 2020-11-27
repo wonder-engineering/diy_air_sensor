@@ -1,7 +1,7 @@
 // Copyright 2020 Brett M. Leedy
 
-#ifndef GAS_SENSOR_SMOKE_SENSOR_H_
-#define GAS_SENSOR_SMOKE_SENSOR_H_
+#ifndef GP2YSENSOR_HH_
+#define GP2YSENSOR_HH_
 
 #ifdef IN_TESTING
 #define PROGMEM
@@ -30,13 +30,13 @@
 
 class GP2YSensor : public Sensor {
  public:
-   GP2YSensor(const char * short_name, float accum_rate,
+  GP2YSensor(const char * short_name, float accum_rate,
                uint8_t analog_pin, uint16_t zero_adjust,
                float gain, uint8_t led_power_pin);
 
  private:
-   uint8_t led_power;
-   uint16_t read_sensor();  // all sensor read implementation goes here
+  uint8_t led_power;
+  uint16_t read_sensor();  // all sensor read implementation goes here
 };
 
-#endif  // GAS_SENSOR_SMOKE_SENSOR_H_
+#endif  // GP2YSENSOR_HH_

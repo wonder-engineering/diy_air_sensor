@@ -13,8 +13,8 @@
 */
 
 
-#ifndef GAS_SENSOR_SENSORMENU_H_
-#define GAS_SENSOR_SENSORMENU_H_
+#ifndef SENSORMENU_HH_
+#define SENSORMENU_HH_
 
 
 #ifdef IN_TESTING
@@ -80,7 +80,7 @@ const char *const menu_line[] PROGMEM = {
 
 class SensorMenu {
  public:
-  SensorMenu(LiquidCrystal_I2C * lcd);
+  explicit SensorMenu(LiquidCrystal_I2C * lcd);
   void enter_menu(SensorState * state);
 
  protected:
@@ -99,7 +99,7 @@ class SensorMenu {
   void display_lograte_menu(SensorSettings * settings);
   virtual bool lograte_callback(SensorSettings * settings);
   void display_sampling_menu(SensorSettings * settings);
-  virtual bool sampling_callback(SensorSettings * settings) ;
+  virtual bool sampling_callback(SensorSettings * settings);
   void display_file_menu(SensorState * state);
   virtual bool file_callback(SensorState * state);
   virtual bool disp_callback(SensorSettings * settings);
@@ -107,4 +107,4 @@ class SensorMenu {
   LiquidCrystal_I2C * lcd;
   void wait_for_button_up();
 };
-#endif  // GAS_SENSOR_SENSORMENU_H_
+#endif  // SENSORMENU_HH_

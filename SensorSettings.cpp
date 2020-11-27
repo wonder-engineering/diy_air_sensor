@@ -6,7 +6,7 @@
 #include "EEPROM.h"
 #endif
 
- SensorSettings::SensorSettings() {
+  SensorSettings::SensorSettings() {
     // When instantiated, try to load myself from EEPROM.
     load_settings_from_eeprom(0, &data);
     if (this->check()) {
@@ -27,7 +27,8 @@
   }
 
   // light wrapper for better testing - DO NOT ADD LOGIC HERE
-  void SensorSettings::load_settings_from_eeprom(int idx, SettingsType * myconfig) {
+  void SensorSettings::load_settings_from_eeprom(int idx,
+                                                SettingsType * myconfig) {
     EEPROM.get(idx, *myconfig);
   }
 
@@ -40,7 +41,7 @@
     rv += this->data.backlight;
     rv += this->data.alt_sensor_config;
     for (int i = 0; i < SENSORSTATE_MAX_NUM_SENSORS; i++) {
-	    rv += this->data.sensor_thresholds[i];
+      rv += this->data.sensor_thresholds[i];
     }
     rv += this->data.logging;
     rv += this->data.display_raw;

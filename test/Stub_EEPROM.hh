@@ -1,66 +1,33 @@
-/*
-  EEPROM.h - EEPROM library
-  Original Copyright (c) 2006 David A. Mellis.  All right reserved.
-*/
+// Copyright 2020 Brett M Leedy
 
-#ifndef EEPROM_h
-#define EEPROM_h
+#ifndef TEST_STUB_EEPROM_HH_
+#define TEST_STUB_EEPROM_HH_
 
 #include <inttypes.h>
 
 typedef void * EEPtr;
 
-class EEPROMClass{
-  public:
-    //Basic user access methods.
-    //EERef operator[]( const int idx )    { return idx; }
-    uint8_t read( int idx )              { return 0;}
-    void write( int idx, uint8_t val )   {}
-    //void update( int idx, uint8_t val )  {}
+class EEPROMClass {
+ public:
+  // Basic user access methods.
+  uint8_t read(int idx ) {return 0;}
+  void write(int idx, uint8_t val ) {}
 
-    //STL and C++11 iteration capability.
-    EEPtr begin()                        { return 0x00; }
-    // EEPtr end()                          { return length(); } //Standards requires this to be the item after the last valid entry. The returned pointer is invalid.
-    // uint16_t length()                    { return 0; }
+  // STL and C++11 iteration capability.
+  EEPtr begin()                        { return 0x00; }
 
-    //Functionality to 'get' and 'put' objects to and from EEPROM.
-    template< typename T > T &get( int idx, T &t ){
-        // static_assert(std::is_trivially_copyable<T>::value,"You can not use this type with EEPROM.get" ); // the code below only makes sense if you can "memcpy" T
+  //  Functionality to 'get' and 'put' objects to and from EEPROM.
+  template< typename T > T &get(int idx, T &t ) {  // NOLINT
+      return t;
+  }
 
-        // EEPtr e = idx;
-        // uint8_t *ptr = (uint8_t*) &t;
-        // for( int count = sizeof(T) ; count ; --count, ++e )  *ptr++ = *e;
-        // return t;
-        return t;
-    }
+  template< typename T > const T &put(int idx, const T &t ) {
+      return t;
+  }
 
-    template< typename T > const T &put( int idx, const T &t ){
-//         static_assert(std::is_trivially_copyable<T>::value, "You can not use this type with EEPROM.get"); // the code below only makes sense if you can "memcpy" T
-
-//         const uint8_t *ptr = (const uint8_t*) &t;
-// #ifdef __arm__
-//         eeprom_write_block(ptr, (void *)idx, sizeof(T));
-// #else
-//         EEPtr e = idx;
-//         for( int count = sizeof(T) ; count ; --count, ++e )  (*e).update( *ptr++ );
-// #endif
-//         return t;
-        return t;
-    }
-
-    template< typename T > const T &update( int idx, const T &t ){
-//         static_assert(std::is_trivially_copyable<T>::value, "You can not use this type with EEPROM.get"); // the code below only makes sense if you can "memcpy" T
-
-//         const uint8_t *ptr = (const uint8_t*) &t;
-// #ifdef __arm__
-//         eeprom_write_block(ptr, (void *)idx, sizeof(T));
-// #else
-//         EEPtr e = idx;
-//         for( int count = sizeof(T) ; count ; --count, ++e )  (*e).update( *ptr++ );
-// #endif
-//         return t;
-        return t;
-    }
+  template< typename T > const T &update(int idx, const T &t ) {
+      return t;
+  }
 }EEPROM;
 
-#endif
+#endif  // TEST_STUB_EEPROM_HH_

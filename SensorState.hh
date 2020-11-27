@@ -13,8 +13,8 @@
     * AirSensorDisplay reads values out and displays them
 */
 
-#ifndef SENSOR_STATE_HH
-#define SENSOR_STATE_HH
+#ifndef SENSORSTATE_HH_
+#define SENSORSTATE_HH_
 
 #include "Sensor.hh"
 #include "LogFile.h"
@@ -27,7 +27,7 @@ enum SdState {
 
 struct SensorData {
   float value = 0.0;
-  uint16_t raw=0;
+  uint16_t raw = 0;
 };
 
 struct DeviceStatus {
@@ -48,9 +48,9 @@ struct SensorInfo {
 
 // the one "database" class of state info
 struct SensorState {
-  public:
+ public:
   SensorInfo sensor[SENSORSTATE_MAX_NUM_SENSORS];
   DeviceStatus device;
 };
 
-#endif
+#endif  // SENSORSTATE_HH_

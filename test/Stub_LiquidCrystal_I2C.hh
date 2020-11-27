@@ -1,8 +1,9 @@
+// Copyright 2020 Brett M Leedy
 /**
  * LCD stub class
  */
-#ifndef LiquidCrystal_I2C_h
-#define LiquidCrystal_I2C_h
+#ifndef TEST_STUB_LIQUIDCRYSTAL_I2C_HH_
+#define TEST_STUB_LIQUIDCRYSTAL_I2C_HH_
 
 #include <inttypes.h>
 
@@ -53,67 +54,72 @@
 #define Rs B00000001  // Register select bit
 
 class LiquidCrystal_I2C {
-public:
-  LiquidCrystal_I2C(uint8_t lcd_Addr,uint8_t lcd_cols,uint8_t lcd_rows){};
-  virtual void begin(uint8_t cols, uint8_t rows, uint8_t charsize = LCD_5x8DOTS ){};
-  virtual void clear(){};
-  virtual void home(){};
-  virtual void noDisplay(){};
-  virtual void display(){};
-  virtual void noBlink(){};
-  virtual void blink(){};
-  virtual void noCursor(){};
-  virtual void cursor(){};
-  virtual void scrollDisplayLeft(){};
-  virtual void scrollDisplayRight(){};
-  virtual void printLeft(){};
-  virtual void printRight(){};
-  virtual void leftToRight(){};
-  virtual void rightToLeft(){};
-  virtual void shiftIncrement(){};
-  virtual void shiftDecrement(){};
-  virtual void noBacklight(){};
-  virtual void backlight(){};
-  virtual void autoscroll(){};
-  virtual void noAutoscroll(){};
-  virtual void createChar(uint8_t, uint8_t[]){};
-  virtual void createChar(uint8_t location, const char *charmap){};
-  virtual void print(char * toprint){};
-  virtual void print(const char * toprint){};
-  virtual void print(uint16_t toprint){};
-  virtual void print(uint16_t toprint, uint8_t precision){};
-  // Example: 	const char bell[8] PROGMEM = {B00100,B01110,B01110,B01110,B11111,B00000,B00100,B00000};
+ public:
+  LiquidCrystal_I2C(uint8_t lcd_Addr, uint8_t lcd_cols,
+                      uint8_t lcd_rows) {}
+  virtual void begin(uint8_t cols, uint8_t rows,
+                      uint8_t charsize = LCD_5x8DOTS ) {}
+  virtual void clear() {}
+  virtual void home() {}
+  virtual void noDisplay() {}
+  virtual void display() {}
+  virtual void noBlink() {}
+  virtual void blink() {}
+  virtual void noCursor() {}
+  virtual void cursor() {}
+  virtual void scrollDisplayLeft() {}
+  virtual void scrollDisplayRight() {}
+  virtual void printLeft() {}
+  virtual void printRight() {}
+  virtual void leftToRight() {}
+  virtual void rightToLeft() {}
+  virtual void shiftIncrement() {}
+  virtual void shiftDecrement() {}
+  virtual void noBacklight() {}
+  virtual void backlight() {}
+  virtual void autoscroll() {}
+  virtual void noAutoscroll() {}
+  virtual void createChar(uint8_t, uint8_t[]) {}
+  virtual void createChar(uint8_t location, const char *charmap) {}
+  virtual void print(char * toprint) {}
+  virtual void print(const char * toprint) {}
+  virtual void print(uint16_t toprint) {}
+  virtual void print(uint16_t toprint, uint8_t precision) {}
+  // Example: const char bell[8] PROGMEM =
+  //   {B00100,B01110,B01110,B01110,B11111,B00000,B00100,B00000};
 
-  virtual void setCursor(uint8_t, uint8_t){};
+  virtual void setCursor(uint8_t, uint8_t) {}
 #if defined(ARDUINO) && ARDUINO >= 100
-  virtual size_t write(uint8_t){};
+  virtual size_t write(uint8_t) {}
 #else
-  virtual void write(uint8_t){};
+  virtual void write(uint8_t) {}
 #endif
-  virtual void command(uint8_t){};
-  virtual void init(){};
-  virtual void oled_init(){};
+  virtual void command(uint8_t) {}
+  virtual void init() {}
+  virtual void oled_init() {}
 
-////compatibility API function aliases
-virtual void blink_on(){};						// alias for blink()
-virtual void blink_off(){};       					// alias for noBlink()
-virtual void cursor_on(){};      	 					// alias for cursor()
-virtual void cursor_off(){};      					// alias for noCursor()
-virtual void setBacklight(uint8_t new_val){};				// alias for backlight() and nobacklight()
-virtual void load_custom_character(uint8_t char_num, uint8_t *rows){};	// alias for createChar()
-virtual void printstr(const char[]){};
+// compatibility API function aliases
+virtual void blink_on() {}   // alias for blink()
+virtual void blink_off() {}  // alias for noBlink()
+virtual void cursor_on() {}  // alias for cursor()
+virtual void cursor_off() {}  // alias for noCursor()
+virtual void setBacklight(uint8_t new_val) {}  // alias for backlight() a
+                                               // and nobacklight()
+virtual void load_custom_character(uint8_t char_num,
+                                   uint8_t *rows) {}  // alias for createChar()
+virtual void printstr(const char[]) {}
 
-////Unsupported API functions (not implemented in this library)
-uint8_t status(){ return 0;};
-virtual void setContrast(uint8_t new_val){};
-uint8_t keypad(){return 0;};
-virtual void setDelay(int,int){};
-virtual void on(){};
-virtual void off(){};
-uint8_t init_bargraph(uint8_t graphtype){return 0;};
-virtual void draw_horizontal_graph(uint8_t row, uint8_t column, uint8_t len,  uint8_t pixel_col_end){};
-virtual void draw_vertical_graph(uint8_t row, uint8_t column, uint8_t len,  uint8_t pixel_col_end){};
-
-
+// Unsupported API functions (not implemented in this library)
+uint8_t status() { return 0;}
+virtual void setContrast(uint8_t new_val) {}
+uint8_t keypad() {return 0;}
+virtual void setDelay(int, int) {}
+virtual void on() {}
+virtual void off() {}
+uint8_t init_bargraph(uint8_t graphtype) {return 0;}
+virtual void draw_horizontal_graph(uint8_t row, uint8_t column,
+                                    uint8_t len,  uint8_t pixel_col_end) {}
+virtual void draw_vertical_graph(uint8_t row, uint8_t column,
+                                    uint8_t len, uint8_t pixel_col_end) {}
 };
-#endif
+#endif  // TEST_STUB_LIQUIDCRYSTAL_I2C_HH_

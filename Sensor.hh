@@ -1,5 +1,4 @@
 // Copyright 2020 Brett M. Leedy
-
 /*
   Sensor class
 
@@ -11,8 +10,8 @@
      * return the most recent raw sensor reading
 */
 
-#ifndef DIY_AIR_SENSOR_SENSOR_H_
-#define DIY_AIR_SENSOR_SENSOR_H_
+#ifndef SENSOR_HH_
+#define SENSOR_HH_
 // todo: use c++ .hh header conventions
 
 #include <stdio.h>
@@ -61,7 +60,7 @@ class Sensor {
   uint8_t pin;        // used by implementation
   uint16_t last_raw;  // last output from read_sensor
 
-  Sensor() = delete; // require explicit construction
+  Sensor() = delete;  // require explicit construction
 };
 
-#endif
+#endif  // SENSOR_HH_

@@ -21,7 +21,9 @@ bool SensorArray::add_sensor(Sensor * newsens) {
 }
 
 void SensorArray::sense_all(SensorState * state) {
-  for (uint8_t sensor_id = sensors.begin(); sensor_id <= sensors.end(); sensor_id++) {
+  for (uint8_t sensor_id = sensors.begin();
+        sensor_id <= sensors.end();
+        sensor_id++) {
     sensors[sensor_id]->sense();
 
     // for each sensor, store it in the state DB
@@ -31,7 +33,6 @@ void SensorArray::sense_all(SensorState * state) {
 
   // store data to state
   state->device.num_sensors = sensors.size();
-
 }
 
 void SensorArray::log_all_serial_only() {
@@ -44,7 +45,7 @@ void SensorArray::log_serial(uint8_t sensor_id) {
   Serial.print(this->sensors[sensor_id]->get_pin());
   Serial.print(F("| "));
   char buffer[SENSOR_SHORT_NAME_LEN];
- sensors[sensor_id]->get_short_name(buffer, SENSOR_SHORT_NAME_LEN);
+  sensors[sensor_id]->get_short_name(buffer, SENSOR_SHORT_NAME_LEN);
   Serial.print(buffer);
   Serial.print(F("- avg: "));
   Serial.print(this->sensors[sensor_id]->get_sensor_avg(), 1);
@@ -66,11 +67,15 @@ uint16_t SensorArray::get_sensor_value(uint8_t sensor_id) {
   return this->sensors[sensor_id]->get_last_value();
 }
 
-void SensorArray::write_sensor_configs(SensorState * state){
+void SensorArray::write_sensor_configs(SensorState * state) {
   // write all the config values of the sensors
   // used to initialize the sensor configs
-  for (uint8_t sensor_id = sensors.begin(); sensor_id < sensors.end(); sensor_id++) {
-    sensors[sensor_id]->get_short_name(state->sensor[sensor_id].config.shortname, SENSOR_SHORT_NAME_LEN);
+  for (uint8_t sensor_id = sensors.begin();
+        sensor_id < sensors.end();
+        sensor_id++) {
+    sensors[sensor_id]->get_short_name(
+      state->sensor[sensor_id].config.shortname,
+      SENSOR_SHORT_NAME_LEN);
   }
 }
 

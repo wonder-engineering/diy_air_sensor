@@ -12,8 +12,8 @@
  *  display.
 */
 
-#ifndef AIR_SENSOR_DISPLAY_HH
-#define AIR_SENSOR_DISPLAY_HH
+#ifndef AIRSENSORDISPLAY_HH_
+#define AIRSENSORDISPLAY_HH_
 
 #include "SensorState.hh"
 #include "SensorMenu.hh"
@@ -26,7 +26,7 @@
 // Indices of LCD columns
 #define LCD_NUM_ROWS     4
 #define LCD_NUM_COLUMNS 20
-#define LCD_SENSOR_COLUMNS 10 // number of columns reserved for a sensor to display
+#define LCD_SENSOR_COLUMNS 10  // columns reserved for a sensor to display
 
 // LCD Glyph ID's for this class
 #define FILE_OK_GLYPH  0
@@ -57,4 +57,4 @@ class AirSensorDisplay {
   void init_lcd();
 };
 
-#endif
+#endif  // AIRSENSORDISPLAY_HH_

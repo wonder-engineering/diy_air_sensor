@@ -1,3 +1,4 @@
+// Copyright 2020 Brett M Leedy
 /*
  * TestAll.cpp
  */

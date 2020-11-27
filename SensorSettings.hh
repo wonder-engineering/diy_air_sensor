@@ -11,8 +11,8 @@
     to the sensor (often when you add a new menu item).
 */
 
-#ifndef SENSOR_SETTINGS_HH
-#define SENSOR_SETTINGS_HH
+#ifndef SENSORSETTINGS_HH_
+#define SENSORSETTINGS_HH_
 
 #define DEFAULT_LOOP_PERIOD_MILLIS 2000  // every one second
 #define DEFAULT_LOG_EVERY_N_LOOPS    10  // every ten seconds
@@ -52,7 +52,6 @@ class SensorSettings {
   bool check();
   virtual void load_settings_from_eeprom(int idx, SettingsType * myconfig);
   uint32_t calc_checksum();
-
 };
 
-#endif
+#endif  // SENSORSETTINGS_HH_

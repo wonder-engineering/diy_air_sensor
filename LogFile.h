@@ -16,17 +16,17 @@
     that needs to be re-factored and made to do the above ^^^.
 */
 
-#ifndef GAS_SENSOR_LOGFILE_H_
-#define GAS_SENSOR_LOGFILE_H_
+#ifndef LOGFILE_H_
+#define LOGFILE_H_
 
 #ifndef IN_TESTING  // we will mock libs for tesing
   #include <Arduino.h>
   #include <SPI.h>
 #else
+  #include <stdlib.h>
   #include "test/Stub_Arduino.h"
   #include "test/Stub_Serial.h"
   #include "test/File_mock.h"
-  #include <stdlib.h>
 #endif
 #include "Sd_i.hh"
 
@@ -37,7 +37,6 @@ const char log_file_name_base[] = "L";
 
 
 class LogFile{
-
  public:
   LogFile();
   virtual void rotate_file();
@@ -49,17 +48,21 @@ class LogFile{
   virtual bool is_sd_failed();
   virtual File * get_file_ptr();
 
-	bool get_sd_failure(){return this->sd_failure;};
-	virtual bool is_first_run(){bool rv = this->first_run; this->first_run = false; return rv;};
-	virtual uint16_t get_millis(){return millis();};
-	void reset_first_run(){this->first_run=true;}; // for testing
+  bool get_sd_failure() {return this->sd_failure;}
+  virtual bool is_first_run() {
+    bool rv = this->first_run;
+    this->first_run = false;
+    return rv;
+  }
+  virtual uint16_t get_millis() {return millis();}
+  void reset_first_run() {this->first_run = true;}  // for testing
   void replace_sd_interface(Sd_i * interface);
 
  private:
   virtual uint16_t get_highest_used_id();
   virtual void override_file_number(uint16_t new_id);
-	virtual bool begin_sd();
-	virtual void set_pinmode(uint8_t pin, uint8_t flags);
+  virtual bool begin_sd();
+  virtual void set_pinmode(uint8_t pin, uint8_t flags);
 
   char current_name[MAX_FILENAME_LEN];
   uint16_t current_id = 0;
@@ -67,9 +70,9 @@ class LogFile{
   uint16_t file_failure_count = 0;
   uint16_t sd_failure_count = 0;
   uint16_t cooldown_start_millis = 0;
-	bool first_run=true;
+  bool first_run = true;
   File file;  // todo: make not public
-	Sd_i * sd;
+  Sd_i * sd;
 };
 
-#endif  // GAS_SENSOR_LOGFILE_H_
+#endif  // LOGFILE_H_

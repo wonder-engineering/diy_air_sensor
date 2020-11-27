@@ -1,8 +1,9 @@
+// Copyright 2020 Brett M Leedy
 /**
- * Arduino mock header
+ * Stub Arduino
  */
-#ifndef ARDUINO_H
-#define ARDUINO_H
+#ifndef TEST_STUB_ARDUINO_H_
+#define TEST_STUB_ARDUINO_H_
 
 #include <stdint.h>
 #include <stdio.h>
@@ -61,20 +62,21 @@ void digitalWrite(uint8_t, uint8_t);
 int digitalRead(uint8_t);
 int analogRead(uint8_t);
 void analogReference(uint8_t mode);
-void analogWrite(uint8_t, int);
+void analogWrite(uint8_t, int);  // NOLINT
 
-unsigned long millis(void);
+unsigned long millis(void);  // NOLINT
 
-unsigned long micros(void);
-void delay(unsigned long);
-void delayMicroseconds(unsigned int us);
-unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout);
+unsigned long micros(void);  // NOLINT
+void delay(unsigned long);  // NOLINT
+void delayMicroseconds(unsigned int us);  // NOLINT
+unsigned long pulseIn(uint8_t pin, uint8_t state,  // NOLINT
+                        unsigned long timeout);   // NOLINT
 
 void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val);
 uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder);
 
-void attachInterrupt(uint8_t, void (*)(void), int mode);
-void detachInterrupt(uint8_t);
+void attachInterrupt(uint8_t, void (*)(void), int mode);  // NOLINT
+void detachInterrupt(uint8_t);  // NOLINT
 
 void setup(void);
 void loop(void);
@@ -85,12 +87,8 @@ uint16_t pgm_read_word(const char *const *);
 #define F(x) (x)
 #define UNUSED(expr) do { (void)(expr); } while (0)
 
-//typedef uint16_t size_t;
-
-//#define NULL 0
-
 #ifdef __cplusplus
-} // extern "C"
+}  // extern "C"
 #endif
 
-#endif // ARDUINO_H
+#endif  // TEST_STUB_ARDUINO_H_
