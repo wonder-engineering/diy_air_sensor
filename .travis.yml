@@ -24,7 +24,7 @@ notifications:
    email: true
 before_install:
    - eval "${MATRIX_EVAL}"
-   - source $TRAVIS_BUILD_DIR/setup_travis_env.sh
+   # - source $TRAVIS_BUILD_DIR/setup_travis_env.sh
 
 install:
 # # https://github.com/arduino/Arduino/blob/master/build/shared/manpage.adoc
