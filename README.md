@@ -25,7 +25,8 @@ Bit-by-bit, I'm going to build some tests then start refactoring.  I'll remove t
 * link enclosure files here
 * testing/assembly instructions in this project.
 * Calibration instructions
-* Fix logging to card - slow down SPI bus?
+* move files to src/ and include/ directories for more tidy repo
+asj-023yasl;S
 
 
 # Gas sensor info
