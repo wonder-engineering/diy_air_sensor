@@ -4,24 +4,11 @@ This is the project for the DIY Air Quality Sensor.  The code right now is, fran
 Bit-by-bit, I'm going to build some tests then start refactoring.  I'll remove this readme-of-shame when I have something resembling real code.
 
 # TODO List:
-* Refactor sensor classes - full overhaul
- * Remove entanglement with LCD, File Logging
- * Naming
- * Protected / public members
- * Passthrough for space efficiency
- * Testing/testability
-* try SDfat for more modern SD writing
-* Log over serial to SD to eliminate memory pressure
+* Diagnose and fix SD writing problems (possibly hardware)
 * Make unit tests actually run in cmake environment
-* Factor out classes sharing static dependencies
-* Factor out reliance on side effects
-* Use modern STL constructs for lists
-* DRY-ify code
 * use clang-tidy
-* consistent formatting
-* obey the linter
 * linter as automatic tests
-* code coverage in testing infra
+* code coverage in testing infra (https://dr-kino.github.io/2019/12/22/test-coverage-using-gtest-gcov-and-lcov/)
 * Make portable to anywhere but my own personal mac
 * Auto lint with build command
 * Make testig cmake more elegant
