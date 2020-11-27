@@ -1,11 +1,12 @@
+# Copyright 2020 Brett M. Leedy
 #!/bin/bash
 
 echo "run_lint.bash: LINTING START=========================================================="
 
 
-cpplint --recursive --exclude=*.gitignore ./* 2>&1
+cpplint --recursive --exclude=test/googletest/ --exclude=test/build  ./* 2>&1
 
-MESSAGE=`cpplint --recursive --exclude=*.gitignore ./* 2>&1 | grep "Total errors found"`
+MESSAGE=`cpplint --recursive --exclude=*.gitignore --exclude=test/googletest/ --exclude=test/build 2>&1 | grep "Total errors found"`
 
 if [ "${MESSAGE}" = "" ]; then
     echo "run_lint.bash: ======================================================================="

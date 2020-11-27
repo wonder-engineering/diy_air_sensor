@@ -1,8 +1,9 @@
-/**
+// Copyright 2020 Brett M. Leedy
+/*
  * Arduino Serial mock
  */
-#ifndef SERIAL_H
-#define SERIAL_H
+#ifndef TEST_STUB_SERIAL_H_
+#define TEST_STUB_SERIAL_H_
 
 #include <stdint.h>
 #include "Stub_Arduino.h"
@@ -12,48 +13,45 @@
 #define OCT 8
 #define BIN 2
 
-typedef unsigned long size_t;
+typedef unsigned long size_t;  // NOLINT
 
 class Serial_ {
+ private:
+  static bool printToCout;
 
-  private:
-    static bool printToCout;
+ public:
+  static void setPrintToCout(bool flag} {}
 
-  public:
-    static void setPrintToCout(bool flag){};
+  static size_t print(const char[]} {return 0;}
+  static size_t print(char} {return 0;}
+  static size_t print(unsigned char, int = DEC} {return 0;}
+  static size_t print(int, int = DEC} {return 0;} // NOLINT
+  static size_t print(unsigned int, int = DEC} {return 0;} // NOLINT
+  static size_t print(long, int = DEC} {return 0;} // NOLINT
+  static size_t print(unsigned long, int = DEC} {return 0;}  //NOLINT
+  static size_t print(double, int = 2} {return 0;}
 
-  public:
-    static size_t print(const char[]){return 0;};
-    static size_t print(char){return 0;};
-    static size_t print(unsigned char, int = DEC){return 0;};
-    static size_t print(int, int = DEC){return 0;};
-    static size_t print(unsigned int, int = DEC){return 0;};
-    static size_t print(long, int = DEC){return 0;};
-    static size_t print(unsigned long, int = DEC){return 0;};
-    static size_t print(double, int = 2){return 0;};
+  static size_t println(const char[]} {return 0;}
+  static size_t println(char} {return 0;}
+  static size_t println(unsigned char, int = DEC} {return 0;}
+  static size_t println(int, int = DEC} {return 0;}
+  static size_t println(unsigned int, int = DEC} {return 0;}
+  static size_t println(long, int = DEC} {return 0;} // NOLINT
+  static size_t println(unsigned long, int = DEC} {return 0;} // NOLINT
+  static size_t println(double, int = 2} {return 0;}
+  static size_t println(void} {return 0;}
 
-    static size_t println(const char[]){return 0;};
-    static size_t println(char){return 0;};
-    static size_t println(unsigned char, int = DEC){return 0;};
-    static size_t println(int, int = DEC){return 0;};
-    static size_t println(unsigned int, int = DEC){return 0;};
-    static size_t println(long, int = DEC){return 0;};
-    static size_t println(unsigned long, int = DEC){return 0;};
-    static size_t println(double, int = 2){return 0;};
-    static size_t println(void){return 0;};
+  size_t write(uint8_t} {return 0;}
+  size_t write(const char *str} {return 0;}
+  size_t write(const uint8_t *buffer, size_t size} {return 0;}
 
-    size_t write(uint8_t){return 0;};
-    size_t write(const char *str){return 0;};
-    size_t write(const uint8_t *buffer, size_t size){return 0;};
+  virtual uint8_t begin(uint32_t} {return 0;}
 
-    virtual uint8_t begin(uint32_t){return 0;};
+  uint8_t available(} {return 0;}
+  uint8_t read(} {return 0;}
 
-    uint8_t available(){return 0;};
-    uint8_t read(){return 0;};
-
-    static void flush(){};
-};
+  static void flush(} {}
+}
 extern Serial_ Serial;
 
-
-#endif // SERIAL_H
+#endif  // TEST_STUB_SERIAL_H_
