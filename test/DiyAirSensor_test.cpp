@@ -34,7 +34,7 @@ using ::testing::InSequence;
 // init will only run once
 
 TEST(DiyAirSensor, init) {
-    class MockedSerial : public Serial_ {
+    class MockedSerial : public HardwareSerial {
      public:
         MOCK_METHOD(uint8_t, begin, (uint32_t));
     } instrumentedSerial;
@@ -47,7 +47,7 @@ TEST(DiyAirSensor, init) {
     // this instumented class will not call init() in the constructor
     class InstrumentedDiyAirSensor : public DiyAirSensor {
      public:
-        InstrumentedDiyAirSensor(Serial_ * serial, SensorArray * sensors) :
+        InstrumentedDiyAirSensor(HardwareSerial * serial, SensorArray * sensors) :
             DiyAirSensor{serial, false} {
           // override internally-initialized array with mocked version.
           delete this->sensors;
@@ -76,7 +76,7 @@ TEST(DiyAirSensor, init) {
 
 
 TEST(DiyAirSensor, addSensors) {
-    class MockedSerial : public Serial_ {
+    class MockedSerial : public HardwareSerial {
      public:
         MOCK_METHOD(uint8_t, begin, (uint32_t));
     } instrumentedSerial;
@@ -89,7 +89,7 @@ TEST(DiyAirSensor, addSensors) {
     // this instumented class will not call init() in the constructor
     class InstrumentedDiyAirSensor : public DiyAirSensor {
      public:
-        InstrumentedDiyAirSensor(Serial_ * serial, SensorArray * sensors) :
+        InstrumentedDiyAirSensor(HardwareSerial * serial, SensorArray * sensors) :
                 DiyAirSensor{serial} {
             // override internally-initialized array with mocked version.
             delete this->sensors;
@@ -117,7 +117,7 @@ TEST(DiyAirSensor, addSensors) {
 
 
 TEST(DiyAirSensor, loop) {
-    class MockedSerial : public Serial_ {
+    class MockedSerial : public HardwareSerial {
      public:
         MOCK_METHOD(uint8_t, begin, (uint32_t));
     } instrumentedSerial;
@@ -138,7 +138,7 @@ TEST(DiyAirSensor, loop) {
     // this instumented class will not call init() in the constructor
     class InstrumentedDiyAirSensor : public DiyAirSensor {
      public:
-        InstrumentedDiyAirSensor(Serial_ * serial,
+        InstrumentedDiyAirSensor(HardwareSerial * serial,
                                 SensorArray * sensors,
                                 AirSensorDisplay * display) :
                                   DiyAirSensor{serial} {
@@ -148,19 +148,21 @@ TEST(DiyAirSensor, loop) {
             delete this->sensor_display;
             this->sensor_display = display;
         }
-        MOCK_METHOD(uint32_t, getMillis, (), (override));
-        MOCK_METHOD(void, waitForSamplingPeriodEnd, (), (override));
+        MOCK_METHOD(uint32_t, getMillis,
+                        (long unsigned int(&millisFunc)()),
+                        (override));
+        MOCK_METHOD(void, waitForSamplingPeriodEnd, (long unsigned int(&)()), (override));
     } airSensor(&instrumentedSerial, &sensors, &display);
 
 
     // Calls must be in sequence
     InSequence s;
 
-    EXPECT_CALL(airSensor, getMillis());
+    EXPECT_CALL(airSensor, getMillis(_));
     EXPECT_CALL(sensors, sense_all(_));
     EXPECT_CALL(sensors, log_all_serial_only());
     EXPECT_CALL(display, display_data(_));
-    EXPECT_CALL(airSensor, waitForSamplingPeriodEnd());
+    EXPECT_CALL(airSensor, waitForSamplingPeriodEnd(_));
 
-    airSensor.loop(&instrumentedSerial);
+    airSensor.loop(&instrumentedSerial, millis);
 }

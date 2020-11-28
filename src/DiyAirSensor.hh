@@ -28,9 +28,9 @@
 
 class DiyAirSensor {
  public:
-    explicit DiyAirSensor(Serial_ * serial, bool do_init = false);
-    void init(Serial_ *  serial);
-    void loop(Serial_ * serial);  // called continuously forever after start
+    explicit DiyAirSensor(HardwareSerial * serial, bool do_init = false);
+    void init(HardwareSerial *  serial);
+    void loop(HardwareSerial * serial, long unsigned int(&)());  // called continuously forever after start
 
  protected:
     // Classes for main components
@@ -43,8 +43,8 @@ class DiyAirSensor {
     virtual void addSensors(SensorArray * array);
     virtual void initPins();
     virtual void updateConfigsFromSensor();
-    virtual uint32_t getMillis();
-    virtual void waitForSamplingPeriodEnd();
+    virtual uint32_t getMillis(long unsigned int(&millisFunc)());
+    virtual void waitForSamplingPeriodEnd(long unsigned int(&millisFunc)());
     bool initialized = false;
 };
 

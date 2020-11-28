@@ -6,9 +6,6 @@ Bit-by-bit, I'm going to build some tests then start refactoring.  I'll remove t
 # TODO List:
 * Diagnose and fix SD writing problems (possibly hardware)
 * Make unit tests actually run in cmake environment
-* use clang-tidy
-* linter as automatic tests
-* code coverage in testing infra (https://dr-kino.github.io/2019/12/22/test-coverage-using-gtest-gcov-and-lcov/)
 * Make portable to anywhere but my own personal mac
 * Auto lint with build command
 * Make testig cmake more elegant

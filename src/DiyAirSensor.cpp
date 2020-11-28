@@ -17,11 +17,11 @@
 // Instantiates the sensors, config, and LCD
 // Updates the system state with sensor info
 // Calls serial a few times to update us on what's happening
-DiyAirSensor::DiyAirSensor(Serial_ * serial, bool do_init) {
+DiyAirSensor::DiyAirSensor(HardwareSerial * serial, bool do_init) {
   if (do_init)
     this->init(serial);
 }
-void DiyAirSensor::init(Serial_ * serial) {
+void DiyAirSensor::init(HardwareSerial * serial) {
   if (initialized) {
     serial->println(F("WARNING: Initialization will only run once."));
     return;
@@ -95,8 +95,8 @@ void DiyAirSensor::initPins() {
 }
 
 // Called continuously in a loop
-void DiyAirSensor::loop(Serial_ * serial) {
-  loop_start_millis = this->getMillis();
+void DiyAirSensor::loop(HardwareSerial * serial, long unsigned int(& millisFunc)()) {
+  loop_start_millis = this->getMillis(millisFunc);
 
   // Before anything else, collect sensor data for most-precise timing.
   sensors->sense_all(&sensor_state);
@@ -128,20 +128,20 @@ void DiyAirSensor::loop(Serial_ * serial) {
 //  // Set sensor zeros, based on menu adjustments
 //
   // Burn remainder of the loop period
-  this->waitForSamplingPeriodEnd();
+  this->waitForSamplingPeriodEnd(millisFunc);
 }
 
-uint32_t DiyAirSensor::getMillis() {
-  return millis();  // Arduino millis call
+uint32_t DiyAirSensor::getMillis(long unsigned int(&millisFunc)()) {
+  return millisFunc();  // Arduino millis call
 }
 
-void DiyAirSensor::waitForSamplingPeriodEnd() {
-  while (this->getMillis() < loop_start_millis +
+void DiyAirSensor::waitForSamplingPeriodEnd(long unsigned int(&millisFunc)()) {
+  while (this->getMillis(millisFunc) < loop_start_millis +
         sensor_state.device.settings.data.sampling_period_ms) {
     // Check that millis() hasn't wrapped
-    if (loop_start_millis > this->getMillis()) {
+    if (loop_start_millis > this->getMillis(millisFunc)) {
       // millis have wrapped - Should happen every 50 days, give or take
-      loop_start_millis = this->getMillis();  // hacky
+      loop_start_millis = this->getMillis(millisFunc);  // hacky
       break;
     }
   }

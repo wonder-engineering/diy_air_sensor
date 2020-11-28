@@ -15,7 +15,7 @@
 
 typedef unsigned long size_t;  // NOLINT
 
-class Serial_ {
+class HardwareSerial {
  private:
   static bool printToCout;
 
@@ -52,6 +52,6 @@ class Serial_ {
 
   static void flush() {}
 };
-extern Serial_ Serial;
+extern HardwareSerial Serial;
 
 #endif  // TEST_STUB_SERIAL_H_
