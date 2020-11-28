@@ -46,6 +46,10 @@ set(SRC_FILES src/${PROJECT_NAME}.cpp
 				src/SensorSettings.cpp
 				)
 
+add_subdirectory(cmake-modules
+				EXCLUDE_FROM_ALL)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake-modules")
+
 # Get cmake to recognize *.ino files as C++
 # todo: it's not as simple as this. maybe fix up later
 # set_source_files_properties(${PROJECT_NAME}.ino PROPERTIES LANGUAGE CXX)
