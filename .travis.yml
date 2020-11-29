@@ -7,14 +7,14 @@ include:
    addons:
       apt:
          sources:
-         - llvm-toolchain-trusty-5.0
+         - llvm-toolchain-trusty-12.0
          - george-edison55-precise-backports
          packages:
-         - clang-5.0
+         - clang-12.0
          - cmake-data
          - cmake
    env:
-      - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
+      - MATRIX_EVAL="CC=clang-12.0 && CXX=clang++-12.0"
    global:
       - PRETTYNAME="DIY Air Sensor code"
 branches:
