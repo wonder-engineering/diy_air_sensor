@@ -91,7 +91,7 @@ add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
     COMMAND LLVM_PROFILE_FILE=${TARGET_NAME}.profraw $<TARGET_FILE:${TARGET_NAME}>
     COMMAND ${LLVM_PROFDATA} merge -sparse ${TARGET_NAME}.profraw -o ${TARGET_NAME}.profdata
     COMMAND ${LLVM_COV} report $<TARGET_FILE:${TARGET_NAME}> -instr-profile=${TARGET_NAME}.profdata
-    COMMAND ${LLVM_COV} show $<TARGET_FILE:${TARGET_NAME}> -instr-profile=${TARGET_NAME}.profdata -show-line-counts-or-regions
+    COMMAND ${LLVM_COV} show $<TARGET_FILE:${TARGET_NAME}> -instr-profile=${TARGET_NAME}.profdata -show-line-counts-or-regions > /dev/null
     COMMAND ${LLVM_COV} show $<TARGET_FILE:${TARGET_NAME}> -instr-profile=${TARGET_NAME}.profdata -show-line-counts-or-regions -output-dir=../coverage/${TARGET_NAME}-llvm-cov -format="html";
     COMMENT "Open coverage/${TARGET_NAME}-llvm-cov/index.html in your browser to view the coverage report."
 )
