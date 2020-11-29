@@ -29,21 +29,31 @@ target_link_libraries(${TARGET_NAME}
 		gmock_main
 )
 
-set(CMAKE_BUILD_TYPE "coverage")
-set(LLVM_COV_PATH "/Library/Developer/CommandLineTools/usr/bin/llvm-cov")
 # code coverage
+
+set(CMAKE_BUILD_TYPE "coverage")
+
+IF(UNIX)
+    set(LLVM_COV_TOOLS_PATH "/Library/Developer/CommandLineTools/usr/bin")
+    set(LLVM_COV "${LLVM_COV_TOOLS_PATH}/llvm-cov")
+    set(LLVM_PROFDATA "${LLVM_COV_TOOLS_PATH}/llvm-profdata")
+ELSE()
+    set(LLVM_COV "llvm-cov")
+    set(LLVM_PROFDATA "llvm-profdata")
+ENDIF()
+
 if(CMAKE_BUILD_TYPE STREQUAL "coverage" OR CODE_COVERAGE)
     if("${CMAKE_C_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang")
         message("Building with llvm Code Coverage Tools")
 
         # Warning/Error messages
-        if(NOT LLVM_COV_PATH)
-            message(FATAL_ERROR "llvm-cov not found! Aborting.")
+        if(NOT LLVM_COV)
+            message(FATAL_ERROR "llvm-cov not found at ${LLVM_COV_TOOLS_PATH}/llvm-cov! Aborting.")
         endif()
 
         # set Flags
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-instr-generate -fcoverage-mapping")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-instr-generate -fcoverage-mapping")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-arcs -ftest-coverage -fprofile-instr-generate -fcoverage-mapping")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage -fprofile-instr-generate -fcoverage-mapping")
 
     elseif(CMAKE_COMPILER_IS_GNUCXX)
         message("Building with lcov Code Coverage Tools")
@@ -72,13 +82,12 @@ add_custom_target(${TARGET_NAME}-ccov-preprocessing
     COMMAND llvm-profdata merge -sparse ${TARGET_NAME}.profraw -o ${TARGET_NAME}.profdata
     DEPENDS ${TARGET_NAME})
 
-set(LLVM_PROFDATA_PATH "/Library/Developer/CommandLineTools/usr/bin/llvm-profdata")
 add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
     COMMAND LLVM_PROFILE_FILE=${TARGET_NAME}.profraw $<TARGET_FILE:${TARGET_NAME}>
-    COMMAND ${LLVM_PROFDATA_PATH} merge -sparse ${TARGET_NAME}.profraw -o ${TARGET_NAME}.profdata
-    COMMAND ${LLVM_COV_PATH} report $<TARGET_FILE:${TARGET_NAME}> -instr-profile=${TARGET_NAME}.profdata
-    COMMAND ${LLVM_COV_PATH} show $<TARGET_FILE:${TARGET_NAME}> -instr-profile=${TARGET_NAME}.profdata -show-line-counts-or-regions
-    COMMAND ${LLVM_COV_PATH} show $<TARGET_FILE:${TARGET_NAME}> -instr-profile=${TARGET_NAME}.profdata -show-line-counts-or-regions -output-dir=../coverage/${TARGET_NAME}-llvm-cov -format="html";
+    COMMAND ${LLVM_PROFDATA} merge -sparse ${TARGET_NAME}.profraw -o ${TARGET_NAME}.profdata
+    COMMAND ${LLVM_COV} report $<TARGET_FILE:${TARGET_NAME}> -instr-profile=${TARGET_NAME}.profdata
+    COMMAND ${LLVM_COV} show $<TARGET_FILE:${TARGET_NAME}> -instr-profile=${TARGET_NAME}.profdata -show-line-counts-or-regions
+    COMMAND ${LLVM_COV} show $<TARGET_FILE:${TARGET_NAME}> -instr-profile=${TARGET_NAME}.profdata -show-line-counts-or-regions -output-dir=../coverage/${TARGET_NAME}-llvm-cov -format="html";
     COMMENT "Open coverage/${TARGET_NAME}-llvm-cov/index.html in your browser to view the coverage report."
 )
 

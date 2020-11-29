@@ -31,6 +31,7 @@ install:
 #    - arduino --install-library "AltSoftSerial","MemoryUsage","Stepper"
    # Install cpplint for style check
    - /usr/bin/python -m pip install --user cpplint
+   - /usr/bin/python -m pip install --user cpp-coveralls
 
    # first we create a directory for the CMake binaries
    # Install CMAKE
@@ -59,6 +60,7 @@ script:
 # Generate and deploy documentation
 after_success:
    - echo "todo: get automatic documentation generation working"
+   - cpp-coveralls
 #  - echo TRAVIS_BUILD_DIR is ${TRAVIS_BUILD_DIR}
 #  - export DOXYFILE=${TRAVIS_BUILD_DIR}/Doxyfile
 #  - source <(curl -SLs  https://raw.githubusercontent.com/adafruit/travis-ci-arduino/master/library_check.sh)
