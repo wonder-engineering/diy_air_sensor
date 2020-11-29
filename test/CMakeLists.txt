@@ -11,6 +11,9 @@ add_subdirectory(googletest
 
 set(TARGET_NAME test-all)
 
+# List all object files needed to build for test here.
+#  Note: with the GLOB, we may not pick up sources in This
+#  directory automatically without tweaking this file.
 file(GLOB SRCS "*.cpp"
                "../src/Sd_i.cpp"
 			   "../src/LogFile.cpp"
@@ -33,7 +36,9 @@ target_link_libraries(${TARGET_NAME}
 
 set(CMAKE_BUILD_TYPE "coverage")
 
-IF(UNIX)
+# Set tools paths appropriately for mac OSX or Linux builds
+message("System name is ${CMAKE_SYSTEM_NAME}")
+IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(LLVM_COV_TOOLS_PATH "/Library/Developer/CommandLineTools/usr/bin")
     set(LLVM_COV "${LLVM_COV_TOOLS_PATH}/llvm-cov")
     set(LLVM_PROFDATA "${LLVM_COV_TOOLS_PATH}/llvm-profdata")
