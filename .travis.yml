@@ -12,13 +12,13 @@ matrix:
 #         - ubuntu-toolchain-r-test
             - ppa:ubuntu-toolchain-r/test
          packages:
-            - clang-12
+            - clang-7
             - cmake-data
             - cmake
             - gcc-10.2
             - g++-10.2
    env:
-      - MATRIX_EVAL="CC=clang-12 && CXX=clang++-12"
+      - MATRIX_EVAL="CC=clang-7 && CXX=clang++-7"
    global:
       - PRETTYNAME="DIY Air Sensor code"
 
