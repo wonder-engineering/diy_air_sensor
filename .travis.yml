@@ -3,24 +3,25 @@ compiler: clang
 dist: focal
 
 matrix:
-   - os: linux
-   addons:
-      apt:
-         sources:
-#         - llvm-toolchain-trusty-12.0
-#         - george-edison55-precise-backports
-#         - ubuntu-toolchain-r-test
-            - ppa:ubuntu-toolchain-r/test
-         packages:
-            - clang-7
-            - cmake-data
-            - cmake
-            - gcc-10.2
-            - g++-10.2
-   env:
-      - MATRIX_EVAL="CC=clang-7 && CXX=clang++-7"
-   global:
-      - PRETTYNAME="DIY Air Sensor code"
+   include:
+      - os: linux
+      addons:
+         apt:
+            sources:
+   #         - llvm-toolchain-trusty-12.0
+   #         - george-edison55-precise-backports
+   #         - ubuntu-toolchain-r-test
+               - ppa:ubuntu-toolchain-r/test
+            packages:
+               - clang-7
+               - cmake-data
+               - cmake
+               - gcc-10.2
+               - g++-10.2
+      env:
+         - MATRIX_EVAL="CC=clang-7 && CXX=clang++-7"
+      global:
+         - PRETTYNAME="DIY Air Sensor code"
 
 branches:
    only:
