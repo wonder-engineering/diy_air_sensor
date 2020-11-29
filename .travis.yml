@@ -9,10 +9,13 @@ include:
          sources:
          - llvm-toolchain-trusty-12.0
          - george-edison55-precise-backports
+         - ubuntu-toolchain-r-test
          packages:
          - clang-12.0
          - cmake-data
          - cmake
+         - gcc-10.2
+         - g++-10.2
    env:
       - MATRIX_EVAL="CC=clang-12.0 && CXX=clang++-12.0"
    global:
@@ -62,7 +65,10 @@ after_success:
    - cd ${TRAVIS_BUILD_DIR}
    - echo "todo - get automatic documentation generation working"
    - COVERALLS_REPO_TOKEN=CteyznTyrfm3aLBu5XefQ1fU9K5fqFoZ1 cpp-coveralls --exclude cmake-modules --exclude test/googletest  --skip-ssl-verify --dryrun
-#  - echo TRAVIS_BUILD_DIR is ${TRAVIS_BUILD_DIR}
+   - g++ -v
+   - gcc -v
+   - clang -v
+   #  - echo TRAVIS_BUILD_DIR is ${TRAVIS_BUILD_DIR}
 #  - export DOXYFILE=${TRAVIS_BUILD_DIR}/Doxyfile
 #  - source <(curl -SLs  https://raw.githubusercontent.com/adafruit/travis-ci-arduino/master/library_check.sh)
 #  - source $TRAVIS_BUILD_DIR/doxy_gen_and_deploy.sh
