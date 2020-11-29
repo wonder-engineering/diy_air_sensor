@@ -68,6 +68,9 @@ after_success:
    - g++ -v
    - gcc -v
    - clang -v
+   - echo $CC
+   - echo $CXX
+   - clang-12.0 -v
    #  - echo TRAVIS_BUILD_DIR is ${TRAVIS_BUILD_DIR}
 #  - export DOXYFILE=${TRAVIS_BUILD_DIR}/Doxyfile
 #  - source <(curl -SLs  https://raw.githubusercontent.com/adafruit/travis-ci-arduino/master/library_check.sh)
