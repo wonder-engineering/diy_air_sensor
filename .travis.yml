@@ -60,7 +60,7 @@ script:
 # Generate and deploy documentation
 after_success:
    - echo "todo: get automatic documentation generation working"
-   - cpp-coveralls
+   - COVERALLS_REPO_TOKEN=CteyznTyrfm3aLBu5XefQ1fU9K5fqFoZ1 cpp-coveralls
 #  - echo TRAVIS_BUILD_DIR is ${TRAVIS_BUILD_DIR}
 #  - export DOXYFILE=${TRAVIS_BUILD_DIR}/Doxyfile
 #  - source <(curl -SLs  https://raw.githubusercontent.com/adafruit/travis-ci-arduino/master/library_check.sh)
