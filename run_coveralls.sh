@@ -1,5 +1,5 @@
 COVERALLS_REPO_TOKEN=CteyznTyrfm3aLBu5XefQ1fU9K5fqFoZ1 \
-cpp-coveralls -v --skip-ssl-verify\
+cpp-coveralls --verbose --skip-ssl-verify\
     --skip-ssl-verify \
     --exclude test/googletest \
     --exclude test/build \
