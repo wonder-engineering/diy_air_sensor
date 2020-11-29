@@ -11,8 +11,8 @@
     to the sensor (often when you add a new menu item).
 */
 
-#ifndef SENSORSETTINGS_HH_
-#define SENSORSETTINGS_HH_
+#ifndef SRC_SENSORSETTINGS_HH_
+#define SRC_SENSORSETTINGS_HH_
 
 #define DEFAULT_LOOP_PERIOD_MILLIS 2000  // every one second
 #define DEFAULT_LOG_EVERY_N_LOOPS    10  // every ten seconds
@@ -54,4 +54,4 @@ class SensorSettings {
   uint32_t calc_checksum();
 };
 
-#endif  // SENSORSETTINGS_HH_
+#endif  // SRC_SENSORSETTINGS_HH_

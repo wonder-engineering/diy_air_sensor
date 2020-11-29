@@ -9,8 +9,8 @@
   See Sensor.hh for all public methods.
 */
 
-#ifndef MQSENSOR_HH_
-#define MQSENSOR_HH_
+#ifndef SRC_MQSENSOR_HH_
+#define SRC_MQSENSOR_HH_
 
 #include "Sensor.hh"
 
@@ -25,4 +25,4 @@ class MQSensor : public Sensor {
   uint16_t read_sensor();  // sensor read implementation
 };
 
-#endif  // MQSENSOR_HH_
+#endif  // SRC_MQSENSOR_HH_

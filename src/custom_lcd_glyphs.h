@@ -1,7 +1,7 @@
 // Copyright 2020 Brett M. Leedy
 
-#ifndef CUSTOM_LCD_GLYPHS_H_
-#define CUSTOM_LCD_GLYPHS_H_
+#ifndef SRC_CUSTOM_LCD_GLYPHS_H_
+#define SRC_CUSTOM_LCD_GLYPHS_H_
 
 #ifdef IN_TESTING
 #include "../test/Stub_Arduino.h"
@@ -39,4 +39,4 @@ byte skull_glyph[8] = {
 };
 
 
-#endif  // CUSTOM_LCD_GLYPHS_H_
+#endif  // SRC_CUSTOM_LCD_GLYPHS_H_

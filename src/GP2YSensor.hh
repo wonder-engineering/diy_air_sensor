@@ -1,7 +1,7 @@
 // Copyright 2020 Brett M. Leedy
 
-#ifndef GP2YSENSOR_HH_
-#define GP2YSENSOR_HH_
+#ifndef SRC_GP2YSENSOR_HH_
+#define SRC_GP2YSENSOR_HH_
 
 #ifdef IN_TESTING
 #define PROGMEM
@@ -39,4 +39,4 @@ class GP2YSensor : public Sensor {
   uint16_t read_sensor();  // all sensor read implementation goes here
 };
 
-#endif  // GP2YSENSOR_HH_
+#endif  // SRC_GP2YSENSOR_HH_

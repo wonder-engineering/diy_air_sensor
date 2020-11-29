@@ -5,8 +5,8 @@
   This class wraps contains all of the functionality of the DIY Air Sensor
     and is responsible for it's configuration and execution order.
 */
-#ifndef DIYAIRSENSOR_HH_
-#define DIYAIRSENSOR_HH_
+#ifndef SRC_DIYAIRSENSOR_HH_
+#define SRC_DIYAIRSENSOR_HH_
 
 // todo: when IN_TEST is defined put gmock mocked classes in their place
 #ifndef IN_TESTING
@@ -30,7 +30,8 @@ class DiyAirSensor {
  public:
     explicit DiyAirSensor(HardwareSerial * serial, bool do_init = false);
     void init(HardwareSerial *  serial);
-    void loop(HardwareSerial * serial, long unsigned int(&)());  // called continuously forever after start
+    void loop(HardwareSerial * serial,  // called continuously forever
+    long unsigned int(&)());  // NOLINT
 
  protected:
     // Classes for main components
@@ -43,9 +44,10 @@ class DiyAirSensor {
     virtual void addSensors(SensorArray * array);
     virtual void initPins();
     virtual void updateConfigsFromSensor();
-    virtual uint32_t getMillis(long unsigned int(&millisFunc)());
-    virtual void waitForSamplingPeriodEnd(long unsigned int(&millisFunc)());
+    virtual uint32_t getMillis(long unsigned int(&millisFunc)());  // NOLINT
+    virtual void waitForSamplingPeriodEnd(
+       long unsigned int(&millisFunc)());  // NOLINT
     bool initialized = false;
 };
 
-#endif  // DIYAIRSENSOR_HH_
+#endif  // SRC_DIYAIRSENSOR_HH_

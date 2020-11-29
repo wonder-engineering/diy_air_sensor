@@ -16,8 +16,8 @@
     that needs to be re-factored and made to do the above ^^^.
 */
 
-#ifndef LOGFILE_H_
-#define LOGFILE_H_
+#ifndef SRC_LOGFILE_H_
+#define SRC_LOGFILE_H_
 
 #ifndef IN_TESTING  // we will mock libs for tesing
   #include <Arduino.h>
@@ -75,4 +75,4 @@ class LogFile{
   Sd_i * sd;
 };
 
-#endif  // LOGFILE_H_
+#endif  // SRC_LOGFILE_H_

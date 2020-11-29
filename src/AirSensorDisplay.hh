@@ -12,8 +12,8 @@
  *  display.
 */
 
-#ifndef AIRSENSORDISPLAY_HH_
-#define AIRSENSORDISPLAY_HH_
+#ifndef SRC_AIRSENSORDISPLAY_HH_
+#define SRC_AIRSENSORDISPLAY_HH_
 
 #include "SensorState.hh"
 #include "SensorMenu.hh"
@@ -57,4 +57,4 @@ class AirSensorDisplay {
   void init_lcd();
 };
 
-#endif  // AIRSENSORDISPLAY_HH_
+#endif  // SRC_AIRSENSORDISPLAY_HH_

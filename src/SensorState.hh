@@ -13,8 +13,8 @@
     * AirSensorDisplay reads values out and displays them
 */
 
-#ifndef SENSORSTATE_HH_
-#define SENSORSTATE_HH_
+#ifndef SRC_SENSORSTATE_HH_
+#define SRC_SENSORSTATE_HH_
 
 #include "Sensor.hh"
 #include "LogFile.h"
@@ -53,4 +53,4 @@ struct SensorState {
   DeviceStatus device;
 };
 
-#endif  // SENSORSTATE_HH_
+#endif  // SRC_SENSORSTATE_HH_

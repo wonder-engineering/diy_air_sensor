@@ -14,8 +14,8 @@
     read or otherwise change the way sensors are handled.
 */
 
-#ifndef SENSORARRAY_HH_
-#define SENSORARRAY_HH_
+#ifndef SRC_SENSORARRAY_HH_
+#define SRC_SENSORARRAY_HH_
 
 #ifdef IN_TESTING
 // just skip progmem macro for test builds
@@ -79,4 +79,4 @@ class SensorArray {
     sensors[i]->get_short_name(buffer, buffer_size);
   }
 };
-#endif  // SENSORARRAY_HH_
+#endif  // SRC_SENSORARRAY_HH_

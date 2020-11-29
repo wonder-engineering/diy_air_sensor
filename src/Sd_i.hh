@@ -4,8 +4,8 @@
 
   Wrapper for SD interface.
 */
-#ifndef SD_I_HH_
-#define SD_I_HH_
+#ifndef SRC_SD_I_HH_
+#define SRC_SD_I_HH_
 
 #ifdef IN_TESTING
 #include "../test/File_mock.h"
@@ -21,4 +21,4 @@ class Sd_i{
   virtual File open(const char *filename, uint8_t mode);
   virtual void end();
 };
-#endif  // SD_I_HH_
+#endif  // SRC_SD_I_HH_

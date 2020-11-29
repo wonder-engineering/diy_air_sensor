@@ -13,8 +13,8 @@
 */
 
 
-#ifndef SENSORMENU_HH_
-#define SENSORMENU_HH_
+#ifndef SRC_SENSORMENU_HH_
+#define SRC_SENSORMENU_HH_
 
 
 #ifdef IN_TESTING
@@ -107,4 +107,4 @@ class SensorMenu {
   LiquidCrystal_I2C * lcd;
   void wait_for_button_up();
 };
-#endif  // SENSORMENU_HH_
+#endif  // SRC_SENSORMENU_HH_

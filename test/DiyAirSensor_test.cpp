@@ -47,7 +47,8 @@ TEST(DiyAirSensor, init) {
     // this instumented class will not call init() in the constructor
     class InstrumentedDiyAirSensor : public DiyAirSensor {
      public:
-        InstrumentedDiyAirSensor(HardwareSerial * serial, SensorArray * sensors) :
+        InstrumentedDiyAirSensor(HardwareSerial * serial,
+                                 SensorArray * sensors) :
             DiyAirSensor{serial, false} {
           // override internally-initialized array with mocked version.
           delete this->sensors;
@@ -89,7 +90,8 @@ TEST(DiyAirSensor, addSensors) {
     // this instumented class will not call init() in the constructor
     class InstrumentedDiyAirSensor : public DiyAirSensor {
      public:
-        InstrumentedDiyAirSensor(HardwareSerial * serial, SensorArray * sensors) :
+        InstrumentedDiyAirSensor(HardwareSerial * serial,
+                                 SensorArray * sensors) :
                 DiyAirSensor{serial} {
             // override internally-initialized array with mocked version.
             delete this->sensors;
@@ -149,9 +151,12 @@ TEST(DiyAirSensor, loop) {
             this->sensor_display = display;
         }
         MOCK_METHOD(uint32_t, getMillis,
-                        (long unsigned int(&millisFunc)()),
+                        (long unsigned int(&millisFunc)()),  // NOLINT
                         (override));
-        MOCK_METHOD(void, waitForSamplingPeriodEnd, (long unsigned int(&)()), (override));
+        MOCK_METHOD(void,
+                    waitForSamplingPeriodEnd,
+                    (long unsigned int(&)()),  // NOLINT
+                    (override));
     } airSensor(&instrumentedSerial, &sensors, &display);
 
 

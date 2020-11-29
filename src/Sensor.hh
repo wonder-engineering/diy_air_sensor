@@ -10,8 +10,8 @@
      * return the most recent raw sensor reading
 */
 
-#ifndef SENSOR_HH_
-#define SENSOR_HH_
+#ifndef SRC_SENSOR_HH_
+#define SRC_SENSOR_HH_
 // todo: use c++ .hh header conventions
 
 #include <stdio.h>
@@ -63,4 +63,4 @@ class Sensor {
   Sensor() = delete;  // require explicit construction
 };
 
-#endif  // SENSOR_HH_
+#endif  // SRC_SENSOR_HH_

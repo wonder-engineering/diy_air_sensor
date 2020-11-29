@@ -95,7 +95,8 @@ void DiyAirSensor::initPins() {
 }
 
 // Called continuously in a loop
-void DiyAirSensor::loop(HardwareSerial * serial, long unsigned int(& millisFunc)()) {
+void DiyAirSensor::loop(HardwareSerial * serial,
+  long unsigned int(& millisFunc)()) {  // NOLINT
   loop_start_millis = this->getMillis(millisFunc);
 
   // Before anything else, collect sensor data for most-precise timing.
@@ -131,11 +132,13 @@ void DiyAirSensor::loop(HardwareSerial * serial, long unsigned int(& millisFunc)
   this->waitForSamplingPeriodEnd(millisFunc);
 }
 
-uint32_t DiyAirSensor::getMillis(long unsigned int(&millisFunc)()) {
+uint32_t DiyAirSensor::getMillis(
+  long unsigned int(&millisFunc)()) {  // NOLINT
   return millisFunc();  // Arduino millis call
 }
 
-void DiyAirSensor::waitForSamplingPeriodEnd(long unsigned int(&millisFunc)()) {
+void DiyAirSensor::waitForSamplingPeriodEnd(
+  long unsigned int(&millisFunc)()) {  // NOLINT
   while (this->getMillis(millisFunc) < loop_start_millis +
         sensor_state.device.settings.data.sampling_period_ms) {
     // Check that millis() hasn't wrapped
