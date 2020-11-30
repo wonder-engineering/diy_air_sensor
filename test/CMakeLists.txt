@@ -24,7 +24,8 @@ file(GLOB SRCS "*.cpp"
 			   "../src/SensorSettings.cpp"
 			   "../src/DiyAirSensor.cpp"
 			   "../src/GP2YSensor.cpp"
-			   "../src/AirSensorDisplay.cpp")
+			   "../src/AirSensorDisplay.cpp"
+               "Stub_Serial.h")  # because it has no cpp file
 add_executable(${TARGET_NAME} ${SRCS})
 
 target_link_libraries(${TARGET_NAME}

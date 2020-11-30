@@ -14,9 +14,9 @@
 DiyAirSensor * diy_air_sensor;
 
 void setup() {
-  diy_air_sensor = new DiyAirSensor(&Serial);
+  diy_air_sensor = new DiyAirSensor();
 }
 
 void loop() {
-  diy_air_sensor->loop(&Serial, millis);
+  diy_air_sensor->loop();
 }

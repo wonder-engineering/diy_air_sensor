@@ -17,38 +17,35 @@
 // Instantiates the sensors, config, and LCD
 // Updates the system state with sensor info
 // Calls serial a few times to update us on what's happening
-DiyAirSensor::DiyAirSensor(HardwareSerial * serial, bool do_init) {
+DiyAirSensor::DiyAirSensor(bool do_init) {
   if (do_init)
-    this->init(serial);
+    this->initializeSensor();
 }
-void DiyAirSensor::init(HardwareSerial * serial) {
+void DiyAirSensor::initializeSensor() {
   if (initialized) {
-    serial->println(F("WARNING: Initialization will only run once."));
+    Serial.println(F("WARNING: Initialization will only run once."));
     return;
   }
 
   this->loop_number = 0;        // state for loop control
   this->loop_start_millis = 0;
 
-  // Init Serial port
-  serial->begin(115200);
-
-  serial->println(F("Init Button Pins..."));
+  Serial.println(F("Init Button Pins..."));
   this->initPins();
 
-  // serial->println(F("Init Logfile..."));
+  // Serial.println(F("Init Logfile..."));
   // logfile = new LogFile();
-  serial->println(F("Init Sensors..."));
+  Serial.println(F("Init Sensors..."));
   sensors = new SensorArray();
   this->addSensors(sensors);
 
-  serial->println(F("Init Configs..."));
+  Serial.println(F("Init Configs..."));
   this->updateConfigsFromSensor();
 
-  serial->println(F("Init LCD..."));
+  Serial.println(F("Init LCD..."));
   sensor_display = new AirSensorDisplay();
 
-  serial->println(F("Init done."));
+  Serial.println(F("Init done."));
   this->initialized = true;
 }
 
@@ -95,17 +92,16 @@ void DiyAirSensor::initPins() {
 }
 
 // Called continuously in a loop
-void DiyAirSensor::loop(HardwareSerial * serial,
-  long unsigned int(& millisFunc)()) {  // NOLINT
-  loop_start_millis = this->getMillis(millisFunc);
+void DiyAirSensor::loop() {
+  loop_start_millis = this->getMillis();
 
   // Before anything else, collect sensor data for most-precise timing.
   sensors->sense_all(&sensor_state);
 
   // Serial log loop start and sensor data
-  serial->print(loop_number++);
-  serial->print(F(" ----------- "));
-  serial->println(loop_start_millis);
+  Serial.print(loop_number++);
+  Serial.print(F(" ----------- "));
+  Serial.println(loop_start_millis);
   sensors->log_all_serial_only();
 
   // Output to the display
@@ -114,7 +110,7 @@ void DiyAirSensor::loop(HardwareSerial * serial,
 //  // Wrap the file every day
 //  if(loop_number % (SECONDS_PER_DAY /
 //        (sensor_state.device.sampling_period_ms / 1000)) == 0){
-//    serial->println(F("Wrapping the log File"));
+//    Serial.println(F("Wrapping the log File"));
 //  }
 //
 //  // Log to file every N loops, if file logging is configured on
@@ -129,22 +125,20 @@ void DiyAirSensor::loop(HardwareSerial * serial,
 //  // Set sensor zeros, based on menu adjustments
 //
   // Burn remainder of the loop period
-  this->waitForSamplingPeriodEnd(millisFunc);
+  this->waitForSamplingPeriodEnd();
 }
 
-uint32_t DiyAirSensor::getMillis(
-  long unsigned int(&millisFunc)()) {  // NOLINT
-  return millisFunc();  // Arduino millis call
+uint32_t DiyAirSensor::getMillis() {
+  return millis();  // Arduino millis call
 }
 
-void DiyAirSensor::waitForSamplingPeriodEnd(
-  long unsigned int(&millisFunc)()) {  // NOLINT
-  while (this->getMillis(millisFunc) < loop_start_millis +
+void DiyAirSensor::waitForSamplingPeriodEnd() {
+  while (this->getMillis() < loop_start_millis +
         sensor_state.device.settings.data.sampling_period_ms) {
     // Check that millis() hasn't wrapped
-    if (loop_start_millis > this->getMillis(millisFunc)) {
+    if (loop_start_millis > this->getMillis()) {
       // millis have wrapped - Should happen every 50 days, give or take
-      loop_start_millis = this->getMillis(millisFunc);  // hacky
+      loop_start_millis = this->getMillis();  // hacky
       break;
     }
   }

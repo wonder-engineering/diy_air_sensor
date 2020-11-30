@@ -47,9 +47,8 @@ TEST(DiyAirSensor, init) {
     // this instumented class will not call init() in the constructor
     class InstrumentedDiyAirSensor : public DiyAirSensor {
      public:
-        InstrumentedDiyAirSensor(HardwareSerial * serial,
-                                 SensorArray * sensors) :
-            DiyAirSensor{serial, false} {
+        explicit InstrumentedDiyAirSensor(SensorArray * sensors) :
+            DiyAirSensor{false} {
           // override internally-initialized array with mocked version.
           delete this->sensors;
           this->sensors = sensors;
@@ -57,22 +56,20 @@ TEST(DiyAirSensor, init) {
         MOCK_METHOD(void, initPins, (), (override));
         MOCK_METHOD(void, addSensors, (SensorArray * array), (override));
         MOCK_METHOD(void, updateConfigsFromSensor, (), (override));
-    } airSensor(&instrumentedSerial, &sensors);
+    } airSensor(&sensors);
 
     // Expect all initializations to happen as expected
     EXPECT_CALL(airSensor, initPins());
     EXPECT_CALL(airSensor, addSensors(_));
     EXPECT_CALL(airSensor, updateConfigsFromSensor());
-    EXPECT_CALL(instrumentedSerial, begin(115200));
 
-    airSensor.init(&instrumentedSerial);
+    airSensor.initializeSensor();
 
     // Test that nothing runs when called a second time
     EXPECT_CALL(airSensor, initPins()).Times(0);
     EXPECT_CALL(airSensor, addSensors(_)).Times(0);
     EXPECT_CALL(airSensor, updateConfigsFromSensor()).Times(0);
-    EXPECT_CALL(instrumentedSerial, begin(115200)).Times(0);
-    airSensor.init(&instrumentedSerial);
+    airSensor.initializeSensor();
 }
 
 
@@ -119,11 +116,6 @@ TEST(DiyAirSensor, addSensors) {
 
 
 TEST(DiyAirSensor, loop) {
-    class MockedSerial : public HardwareSerial {
-     public:
-        MOCK_METHOD(uint8_t, begin, (uint32_t));
-    } instrumentedSerial;
-
     class MockedSensorArray : public SensorArray {
      public:
         MOCK_METHOD(void, sense_all, (SensorState *), (override) );
@@ -140,10 +132,9 @@ TEST(DiyAirSensor, loop) {
     // this instumented class will not call init() in the constructor
     class InstrumentedDiyAirSensor : public DiyAirSensor {
      public:
-        InstrumentedDiyAirSensor(HardwareSerial * serial,
-                                SensorArray * sensors,
+        InstrumentedDiyAirSensor(SensorArray * sensors,
                                 AirSensorDisplay * display) :
-                                  DiyAirSensor{serial} {
+                                  DiyAirSensor{} {
             // override internally-initialized array
             delete this->sensors;
             this->sensors = sensors;
@@ -151,23 +142,23 @@ TEST(DiyAirSensor, loop) {
             this->sensor_display = display;
         }
         MOCK_METHOD(uint32_t, getMillis,
-                        (long unsigned int(&millisFunc)()),  // NOLINT
+                        (),  // NOLINT
                         (override));
         MOCK_METHOD(void,
                     waitForSamplingPeriodEnd,
-                    (long unsigned int(&)()),  // NOLINT
+                    (),  // NOLINT
                     (override));
-    } airSensor(&instrumentedSerial, &sensors, &display);
+    } airSensor(&sensors, &display);
 
 
     // Calls must be in sequence
     InSequence s;
 
-    EXPECT_CALL(airSensor, getMillis(_));
+    EXPECT_CALL(airSensor, getMillis());
     EXPECT_CALL(sensors, sense_all(_));
     EXPECT_CALL(sensors, log_all_serial_only());
     EXPECT_CALL(display, display_data(_));
-    EXPECT_CALL(airSensor, waitForSamplingPeriodEnd(_));
+    EXPECT_CALL(airSensor, waitForSamplingPeriodEnd());
 
-    airSensor.loop(&instrumentedSerial, millis);
+    airSensor.loop();
 }
