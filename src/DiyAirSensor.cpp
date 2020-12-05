@@ -34,7 +34,7 @@ void DiyAirSensor::initializeSensor() {
   this->initPins();
 
   // Serial.println(F("Init Logfile..."));
-  // logfile = new LogFile();
+  logfile = new LogFileSender();
   Serial.println(F("Init Sensors..."));
   sensors = new SensorArray();
   this->addSensors(sensors);
@@ -91,9 +91,22 @@ void DiyAirSensor::initPins() {
   pinMode(MENU_DN_BUTTON,     INPUT_PULLUP);
 }
 
+// log all data to SD
+void DiyAirSensor::log_sd(uint32_t id, uint32_t timestamp){
+  this->logfile->open_line(id, timestamp);
+  this->logfile->write_field(this->sensor_state.device.num_sensors);
+  for (int i = 0; i < this->sensor_state.device.num_sensors; i++) {
+    this->logfile->write_field(this->sensor_state.sensor[i].data.value);
+    this->logfile->write_field(this->sensor_state.sensor[i].data.raw);
+  }
+  this->logfile->write_field("|");
+  this->logfile->close_line();
+}
+
 // Called continuously in a loop
 void DiyAirSensor::loop() {
   loop_start_millis = this->getMillis();
+  this->loop_number++;
 
   // Before anything else, collect sensor data for most-precise timing.
   sensors->sense_all(&sensor_state);
@@ -106,6 +119,9 @@ void DiyAirSensor::loop() {
 
   // Output to the display
   sensor_display->display_data(&sensor_state);
+
+  // Log to file
+  this->log_sd(this->loop_number, loop_start_millis);
 //
 //  // Wrap the file every day
 //  if(loop_number % (SECONDS_PER_DAY /

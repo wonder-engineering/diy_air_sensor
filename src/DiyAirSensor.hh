@@ -20,6 +20,7 @@
 #include "GP2YSensor.hh"
 #include "MQSensor.hh"
 #include "AirSensorDisplay.hh"
+#include "LogFileSender.hh"
 
 #define SECONDS_PER_DAY      86400
 #define SENSOR_ACCUM_RATE    0.1
@@ -31,11 +32,12 @@ class DiyAirSensor {
     explicit DiyAirSensor(bool do_init = true);
     void initializeSensor();
     void loop();  // called continuously forever
+    void log_sd(uint32_t id, uint32_t timestamp);
 
  protected:
     // Classes for main components
     SensorState       sensor_state;  // one "database" for stateful data
-    // LogFile           * logfile     = NULL;
+    LogFileSender     * logfile     = NULL;
     SensorArray       * sensors        = NULL;
     AirSensorDisplay  * sensor_display = NULL;
     uint32_t loop_number;

@@ -1,87 +1,106 @@
 // Copyright 2020 Brett M. Leedy
 
-#include "LogFile.h"
+// #define PARSING_VERBOSE
+#ifdef PARSING_VERBOSE
+  #define DEBUG(debug_text) Serial.println(F(debug_text));
+  #define DEBUG_VAL(debug_text, debug_value) Serial.print(F(debug_text)); Serial.println(debug_value);
+#else
+  #define DEBUG(debug_text)
+  #define DEBUG_VAL(debug_text, debug_value)
+#endif
 
-#define HEADER_START  0x01   // ASCII Start Of Header
-#define START_TEXT    0x02   // ASCII Start of Text
-#define END_TEXT      0x03   // ASCII End of Text
-#define ASCII_BODY_MAX 126
-#define ASCII_BODY_MIN  32
+#include "LogFileWriter.hh"
 
 LogFileWriter::LogFileWriter() {
   this->sd = new Sd_i();
   this->re_init_sd();
   // init softwareserial
-  this->serialPort = new SoftwareSerial(2, 3); // RX, TX
+  pinMode(SOFTWARESERIAL_RX_PIN, INPUT);
+  pinMode(SOFTWARESERIAL_TX_PIN, OUTPUT);
+  this->serialPort = new SoftwareSerial(SOFTWARESERIAL_RX_PIN,
+                                        SOFTWARESERIAL_TX_PIN);
+  this->serialPort->begin(SOFTWARESERIAL_BAUD);
 }
 
-LogFileWriter::listen_for_line() {
-  while(this->serialPort.available() > 0) {
-    uint8_t byte = serialPort.read();
-    switch (this->update_state(byte, this->parserState)){
+void LogFileWriter::listen_for_line() {
+  while(this->serialPort->available() > 0) {
+    uint8_t newbyte = serialPort->read();
+    DEBUG_VAL("LogFileWriter: Received byte ", newbyte);
+    DEBUG_VAL("LogFileWriter: in state ", this->parserState);
+    this->parserState = this->update_state(newbyte, this->parserState);
+    switch (this->parserState) {
       case initState:
       case headerReceivedState:
-      case delimiterRecievedState:
+      case delimiterReceivedState:
         // do not write anything
         break;
       case fileIdReceivedState:
         // check that this file id is the same as before
-        if(byte = this->host_file_id) {
+        if(newbyte == this->host_file_id) {
           // nothing to do
         } else {
           // increment the file number we're writing (if needed)
+          DEBUG_VAL("Found new host id:", newbyte);
+          DEBUG_VAL("previous:", this->host_file_id);
           this->highest_used_id++;
           set_new_filename(this->highest_used_id);
+          this->host_file_id = newbyte;
         }
         // open the file
         this->open_line(this->highest_used_id, millis());
         break;
       case writingBodyState:
         // write the byte to the file
-        this->file->write(byte);
+        this->file.write(newbyte);
+        Serial.write(newbyte);
         break;
       case protocolFailureState:
         // write a warning message to hardwareserial and the file
         if(this->file){
-          this->file->print(F("PROTOCOL FAILURE"));
+          this->file.print(F("PROTOCOL FAILURE"));
         }
       case endlineReceivedState:
-        // write '\n' to the file
-        this->file->println("");
-        // close the file
-        this->file->close();
+        // write '\n' and close the file
+        this->close_line();
         break;
     }
-    state_machine(byte;);
   }
 }
 
 
 // State machine for the parser
-LogFileWriter::update_state(uint8_t byte, ParsingState oldstate) {
+ParsingState LogFileWriter::update_state(uint8_t byte, ParsingState oldState) {
   ParsingState newState = protocolFailureState;
 
-  switch (oldstate) {
+  switch (oldState) {
     case initState:
       // uninitialized can only transition to headerReceived state
       // requires an "0xFF" to switch state
       if (byte == HEADER_START) {
         newState = headerReceivedState;
+        DEBUG("InitState: Switching to headerReceivedState");
       }  // else just skip to next byte
+      else {
+        newState = oldState;
+      }
       break;
     case headerReceivedState:
       // at least one 0xFF has been received.  Stay in this state until
       // anything but 0xFF is received
       if (byte != HEADER_START) {
         newState = fileIdReceivedState;
-      }  // else just skip to next byte
+        DEBUG("Switching to fileIdReceivedState");
+      } else {
+        newState = oldState;
+      }
       break;
     case fileIdReceivedState:
       // expect a delimiter as the only byte we should receive in this state.
       if (byte == START_TEXT) {  // success
         newState = delimiterReceivedState;
+        DEBUG("Switching to delimiterReceivedState");
       } else { // failure
-        Serial.println(F{"Protocol failure! Delimiter not found!"});
+        Serial.println(F("Protocol failure! Delimiter not found!"));
         newState = protocolFailureState;
       }
       break;
@@ -90,40 +109,46 @@ LogFileWriter::update_state(uint8_t byte, ParsingState oldstate) {
       // and begin writting body bytes
       this->parserRowBytes=0;
       newState = writingBodyState;
+      DEBUG("Switching to writingBodyState");
       break;
     case writingBodyState:
       // if we receive a newline, go to new state
       if(byte == END_TEXT) {
-        newState = endlineRecievedState;
+        newState = endlineReceivedState;
+        DEBUG("Switching to endlineReceivedState");
       } else if (byte < ASCII_BODY_MIN || byte > ASCII_BODY_MAX) { // out of legal range
-        Serial.println(F{"Protocol failure! Body text outside of ASCII range!"});
+        Serial.println(F("Protocol failure! Body text outside of ASCII range!"));
         newState = protocolFailureState;
       } else if(++this->parserRowBytes > MAX_BYTES_PER_ROW) {
-        Serial.println(F{"Protocol failure! row too long!"});
+        Serial.println(F("Protocol failure! row too long!"));
         newState = protocolFailureState;
       } else {
         // just keep writing (bytes written is captured above)
+        DEBUG("Just keep writing body");
+        newState = oldState;
       }
       break;
-    case endlineRecievedState:  // start afresh if we failed or succeeded
     case protocolFailureState:
+    case endlineReceivedState:  // start afresh if we failed or succeeded
     default:
       // move on to the next state, either straight to header, or init
       if (byte == HEADER_START) {
         newState = headerReceivedState;
+        DEBUG("default: Switching to headerReceivedState");
       } else {
         newState = initState;
+        DEBUG("Switching to initState");
       }
       break;
   }
   return newState;
 }
 
-void logFileWriter::set_new_filename(uint16_t file_number) {
-    snprintf(current_name, MAX_FILENAME_LEN, "%s-%d.%s",
+void LogFileWriter::set_new_filename(uint16_t file_number) {
+    snprintf(this->current_name, MAX_FILENAME_LEN, "%s-%d.%s",
               log_file_name_base, file_number, LOGFILE_EXTENSION);
     Serial.print(F("Logfile: File name is "));
-    Serial.print(current_name); Serial.println("|");
+    Serial.print(this->current_name); Serial.println("|");
 }
 
 bool LogFileWriter::re_init_sd() {
@@ -140,7 +165,8 @@ bool LogFileWriter::re_init_sd() {
   }
 
   if(this->sd_failure) {
-    this->sd->end();  // needed to de-allocate any memory todo: may need nullcheck to not crash
+    if (this->sd != NULL)
+      this->sd->end();  // needed to de-allocate any memory
     // todo: consider state machine for this, since it's getting messy:
     // https://forum.arduino.cc/index.php?topic=565437.0
   }
@@ -173,10 +199,6 @@ void LogFileWriter::get_file_name(char * buffer, uint8_t max_size) {
   strncpy(buffer, this->current_name, max_size);
 }
 
-char * LogFileWriter::get_file_name_ptr() {
-  return this->current_name;
-}
-
 bool LogFileWriter::is_sd_failed() {
   if (sd_failure)      // check whether we're marked for failure
     if (re_init_sd())  // attempt to re-init
@@ -185,7 +207,7 @@ bool LogFileWriter::is_sd_failed() {
   return false;  // otherwise, return false
 }
 
-void LogFileWriter::open_line(uint16_t id, uint16_t timestamp) {
+void LogFileWriter::open_line(uint32_t id, uint32_t timestamp) {
   if (is_sd_failed())
     return;
   this->file.close();
@@ -262,6 +284,7 @@ void LogFileWriter::close_line() {
     return;
   this->file.println("");
   this->file.close();
+  Serial.println("");
 }
 
 void LogFileWriter::rotate_file() {
@@ -271,16 +294,11 @@ void LogFileWriter::rotate_file() {
 void LogFileWriter::override_file_number(uint16_t new_id) {
   this->highest_used_id = new_id;
 
-  snprintf(current_name, MAX_FILENAME_LEN, "%s-%d.%s",
+  snprintf(this->current_name, MAX_FILENAME_LEN, "%s-%d.%s",
            log_file_name_base, highest_used_id,
            LOGFILE_EXTENSION);
 
-  Serial.print(F("Logfile: File name is now")); Serial.println(current_name);
-}
-
-File * LogFileWriter::get_file_ptr() {
-  // todo: make this safer
-  return &this->file;
+  Serial.print(F("Logfile: File name is now")); Serial.println(this->current_name);
 }
 
 void LogFileWriter::set_pinmode(uint8_t pin, uint8_t flags) {

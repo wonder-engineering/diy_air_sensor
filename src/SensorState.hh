@@ -17,7 +17,6 @@
 #define SRC_SENSORSTATE_HH_
 
 #include "Sensor.hh"
-#include "LogFile.h"
 #include "SensorSettings.hh"
 
 enum SdState {
@@ -31,7 +30,6 @@ struct SensorData {
 };
 
 struct DeviceStatus {
-  char current_file_name[MAX_FILENAME_LEN];
   SdState file_status = kFileFail;
   uint8_t num_sensors = 0;
   SensorSettings settings;  // EEPROM Settings
@@ -43,7 +41,7 @@ struct SensorConfig {
 
 struct SensorInfo {
   SensorData data;      // initialized at first read
-  SensorConfig config;  // read and written to EEPROM
+  SensorConfig config;
 };
 
 // the one "database" class of state info

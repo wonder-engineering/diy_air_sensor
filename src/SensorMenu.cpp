@@ -179,7 +179,8 @@ void SensorMenu::display_file_menu(SensorState * state) {
     lcd->print(F("Current File: "));
     lcd->setCursor(0, 1);
     lcd->print(F("   "));
-    lcd->print(state->device.current_file_name);
+    //lcd->print(state->device.current_file_name);
+    // todo: use file index instead
     lcd->setCursor(0, 2);
     lcd->print(F("Use arrows to set."));
     lcd->setCursor(0, 3);
