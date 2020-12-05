@@ -14,6 +14,8 @@
 DiyAirSensor * diy_air_sensor;
 
 void setup() {
+  Serial.begin(115200);
+  Serial.println(F("BEGIN----------------------"));
   diy_air_sensor = new DiyAirSensor();
 }
 
