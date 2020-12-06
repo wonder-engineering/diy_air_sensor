@@ -27,7 +27,7 @@ file(GLOB SRCS "*.cpp"
 			   "../src/AirSensorDisplay.cpp"
                "../src/LogFileSender.cpp"
                "../log_file_writer/LogFileWriter.cpp"
-               "../log_file_writer/SD_i.cpp"
+               "../log_file_writer/Sd_i.cpp"
                "Stub_Serial.h")  # because it has no cpp file
 add_executable(${TARGET_NAME} ${SRCS})
 
