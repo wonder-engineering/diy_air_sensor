@@ -207,8 +207,8 @@ void LogFileWriter::get_file_name(char * buffer, uint8_t max_size) {
 
 bool LogFileWriter::is_sd_failed() {
   if (sd_failure)      // check whether we're marked for failure
-    if (re_init_sd())  // attempt to re-init
-      return true;    // return true of re-init fails
+    // if (re_init_sd())  // attempt to re-init
+    //   return true;    // return true of re-init fails
 
   return false;  // otherwise, return false
 }
@@ -286,8 +286,6 @@ uint16_t LogFileWriter::get_highest_used_id() {
 }
 
 void LogFileWriter::close_line() {
-  if (is_sd_failed())
-    return;
   this->file.println("");
   this->file.close();
   Serial.println("");
