@@ -92,7 +92,7 @@ void DiyAirSensor::initPins() {
 }
 
 // log all data to SD
-void DiyAirSensor::log_sd(uint32_t id, uint32_t timestamp){
+void DiyAirSensor::log_sd(uint32_t id, uint32_t timestamp) {
   this->logfile->open_line(id, timestamp);
   this->logfile->write_field(this->sensor_state.device.num_sensors);
   for (int i = 0; i < this->sensor_state.device.num_sensors; i++) {

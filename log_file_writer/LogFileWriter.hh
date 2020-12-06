@@ -15,8 +15,8 @@
 
 // todo: rx indicator with LED_BUILTIN
 
-#ifndef SRC_LOGFILEWRITER_H_
-#define SRC_LOGFILEWRITER_H_
+#ifndef LOG_FILE_WRITER_LOGFILEWRITER_HH_
+#define LOG_FILE_WRITER_LOGFILEWRITER_HH_
 
 #ifndef IN_TESTING  // we will mock libs for tesing
   #include <Arduino.h>
@@ -104,4 +104,4 @@ class LogFileWriter {
   uint16_t parserRowBytes = 0;
 };
 
-#endif  // SRC_LOGFILE_H_
+#endif  // LOG_FILE_WRITER_LOGFILEWRITER_HH_

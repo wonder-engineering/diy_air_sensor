@@ -16,8 +16,8 @@
     that needs to be re-factored and made to do the above ^^^.
 */
 
-#ifndef SRC_LOGFILE_H_
-#define SRC_LOGFILE_H_
+#ifndef SRC_LOGFILESENDER_HH_
+#define SRC_LOGFILESENDER_HH_
 
 
 // todo: de-dupe this
@@ -48,8 +48,8 @@ class LogFileSender {
   LogFileSender();
   void rotate_file();
   void open_line(uint32_t id, uint32_t timestamp);
-  void write_field(uint8_t field){write_field((uint32_t)field);};
-  void write_field(uint16_t field){write_field((uint32_t)field);};
+  void write_field(uint8_t field) {write_field((uint32_t)field);}
+  void write_field(uint16_t field) {write_field((uint32_t)field);}
   void write_field(uint32_t field);
   void write_field(float field);
   void write_field(const char * field);
@@ -64,4 +64,4 @@ class LogFileSender {
   SoftwareSerial * serialPort;
 };
 
-#endif  // SRC_LOGFILE_H_
+#endif  // SRC_LOGFILESENDER_HH_

@@ -12,7 +12,6 @@ LogFileSender::LogFileSender() {
 }
 
 void LogFileSender::open_line(uint32_t id, uint32_t timestamp) {
-
   // Transmit the start character 3 times
   for (int index = 0; index < 3; index++) {
     this->serialPort->write(HEADER_START);
