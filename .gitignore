@@ -12,3 +12,4 @@ _deps
 build
 *.swp
 test/coverage
+.DS_Store
