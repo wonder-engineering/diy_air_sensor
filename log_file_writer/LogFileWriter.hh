@@ -65,9 +65,12 @@ class LogFileWriter {
   virtual void get_file_name(char * buffer, uint8_t max_size);
   virtual bool re_init_sd();
   virtual bool is_sd_failed();
-  ParsingState update_state(uint8_t byte, ParsingState oldstate);
-  void set_new_filename(uint16_t file_number);
+  virtual ParsingState update_state(uint8_t byte,
+                                    ParsingState oldstate);
+  virtual void set_new_filename(uint16_t file_number);
   bool is_valid_body_character(uint8_t character);
+  virtual bool serial_bytes_available();
+  virtual uint8_t read_serial_byte();
 
   bool get_sd_failure() {return this->sd_failure;}
   virtual bool is_first_run() {
@@ -84,10 +87,10 @@ class LogFileWriter {
   uint16_t sd_failure_count = 0;
   uint16_t cooldown_start_millis = 0;
   bool first_run = true;
-  File file;
+  File * file;
   Sd_i * sd = NULL;
   SoftwareSerial * serialPort;
-  ParsingState parserState;  // stateful side-effect for parsing
+  ParsingState parserState = initState;  // stateful side-effect for parsing
   uint16_t parserRowBytes = 0;
 };
 

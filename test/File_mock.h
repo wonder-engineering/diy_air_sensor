@@ -19,11 +19,11 @@ class File {
     File openNextFile() {return File();}
     int open() {return 0;}
     int close() {return 0;}
-    void print(int t) {}
-    void print(const char[]) {}
+    virtual void print(int t) {}
+    virtual void print(const char[]) {}
     void println(const char[]) {}
     bool isDirectory() {return false;}
-    void write(uint8_t writeByte) {}
+    virtual void write(uint8_t writeByte) {}
     operator int() const {return 0;}
 };
 

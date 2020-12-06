@@ -19,6 +19,7 @@ HardwareSerial Serial;
 LogFileWriter::LogFileWriter() {
   this->sd = new Sd_i();
   this->re_init_sd();
+  this->file = new File();
   // init softwareserial
   pinMode(SOFTWARESERIAL_RX_PIN, INPUT);
   pinMode(SOFTWARESERIAL_TX_PIN, OUTPUT);
@@ -28,8 +29,10 @@ LogFileWriter::LogFileWriter() {
 }
 
 void LogFileWriter::listen_for_line() {
-  while (this->serialPort->available() > 0) {
-    uint8_t newbyte = serialPort->read();
+  uint8_t newbyte = 0xFF;  // init to out of range value
+  while (this->serial_bytes_available()) {
+    printf("RUNNING\n");
+    newbyte = read_serial_byte();
     DEBUG_VAL("LogFileWriter: Received byte ", newbyte);
     DEBUG_VAL("LogFileWriter: in state ", this->parserState);
     this->parserState = this->update_state(newbyte, this->parserState);
@@ -56,14 +59,12 @@ void LogFileWriter::listen_for_line() {
         break;
       case writingBodyState:
         // write the byte to the file
-        this->file.write(newbyte);
+        this->file->write(newbyte);
         Serial.write(newbyte);
         break;
       case protocolFailureState:
         // write a warning message to hardwareserial and the file
-        if (this->file) {
-          this->file.print(F("PROTOCOL FAILURE"));
-        }
+        this->file->print(F("PROTOCOL FAILURE"));
       case endlineReceivedState:
         // write '\n' and close the file
         this->close_line();
@@ -206,9 +207,10 @@ void LogFileWriter::get_file_name(char * buffer, uint8_t max_size) {
 }
 
 bool LogFileWriter::is_sd_failed() {
-  if (sd_failure)      // check whether we're marked for failure
+  // todo: fixme
+  // if (sd_failure)      // check whether we're marked for failure
     // if (re_init_sd())  // attempt to re-init
-    return true;    // return true of re-init fails
+  //   return true;    // return true of re-init fails
 
   return false;  // otherwise, return false
 }
@@ -216,21 +218,21 @@ bool LogFileWriter::is_sd_failed() {
 void LogFileWriter::open_line(uint32_t id, uint32_t timestamp) {
   if (is_sd_failed())
     return;
-  this->file.close();
-  this->file = this->sd->open(this->current_name, FILE_WRITE);
+  this->file->close();
+  *this->file = this->sd->open(this->current_name, FILE_WRITE);
   if (this->file) {
     // success
   } else {
     Serial.println(F("error opening log file:"));
     Serial.println(this->current_name);
-    Serial.println(this->file);
+    Serial.println(*this->file);
     this->sd_failure = true;
   }
 
-  this->file.print(id);
-  this->file.print(F(","));
-  this->file.print(timestamp);
-  this->file.print(F(","));
+  this->file->print(id);
+  this->file->print(F(","));
+  this->file->print(timestamp);
+  this->file->print(F(","));
 }
 
 uint16_t LogFileWriter::get_highest_used_id() {
@@ -286,8 +288,8 @@ uint16_t LogFileWriter::get_highest_used_id() {
 }
 
 void LogFileWriter::close_line() {
-  this->file.println("");
-  this->file.close();
+  this->file->println("");
+  this->file->close();
   Serial.println("");
 }
 
@@ -308,4 +310,12 @@ void LogFileWriter::override_file_number(uint16_t new_id) {
 
 void LogFileWriter::set_pinmode(uint8_t pin, uint8_t flags) {
         pinMode(pin, flags);  // just set pinmode
+}
+
+bool LogFileWriter::serial_bytes_available() {
+  return (this->serialPort->available() > 0);
+}
+
+uint8_t LogFileWriter::read_serial_byte() {
+    return serialPort->read();
 }

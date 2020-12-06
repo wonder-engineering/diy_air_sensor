@@ -16,6 +16,7 @@ using ::testing::AtLeast;
 using ::testing::Return;
 using ::testing::_;
 using ::testing::Mock;
+using ::testing::NotNull;
 
 TEST(LogFileWriter, File_Names_comply) {
   class InstrumentedLogFileWriter : public LogFileWriter {
@@ -165,15 +166,17 @@ TEST(LogFileWriter, Happy_initialization_works) {
     void reset_first_run() {this->first_run = true;}  // for testing
     bool re_init_sd() override {return LogFileWriter::re_init_sd();}
     bool is_sd_failed() override {return LogFileWriter::is_sd_failed();}
-    void open_line(uint32_t x, uint32_t y) override {LogFileWriter::open_line(x, y);}
+    void open_line(uint32_t x, uint32_t y) override {
+      LogFileWriter::open_line(x, y);
+    }
    public:
       MOCK_METHOD(void, set_pinmode, (uint8_t pin, uint8_t flags), (override));
       MOCK_METHOD(uint16_t, get_highest_used_id, (), (override));
       MOCK_METHOD(bool, is_first_run, (), (override));
   };
 
-    //// Instantiate mocked classes
-    MockLogFileWriter logfile;
+  //// Instantiate mocked classes
+  MockLogFileWriter logfile;
   MockSd_i mock_sd;
 
   ///// Override any mocked methods as needed
@@ -238,7 +241,9 @@ TEST(LogFileWriter, re_init_behaviors) {
     void reset_first_run() {this->first_run = true;}  // for testing
     bool re_init_sd() override {return LogFileWriter::re_init_sd();}
     bool is_sd_failed() override {return LogFileWriter::is_sd_failed();}
-    void open_line(uint32_t x, uint32_t y) override {LogFileWriter::open_line(x, y);}
+    void open_line(uint32_t x, uint32_t y) override {
+      LogFileWriter::open_line(x, y);
+    }
 
    public:
     MOCK_METHOD(void, set_pinmode, (uint8_t pin, uint8_t flags),
@@ -322,4 +327,476 @@ TEST(LogFileWriter, re_init_behaviors) {
   EXPECT_CALL(logfile, get_highest_used_id()).Times(1);
 
   ASSERT_FALSE(logfile.re_init_sd());
+}
+
+
+TEST(LogFileWriter, get_sd_failure) {
+  //// Mock Classes that need mocking
+  // Mock LogFileWriter methods we want to assert/manipulate
+  class MockLogFileWriter : public LogFileWriter {
+   public:
+    void set_sd_failure(bool override_value) {
+      this->sd_failure = override_value;
+    }
+    bool get_sd_failure() {return LogFileWriter::get_sd_failure();}
+  };
+
+  //// Instantiate mocked classes
+  MockLogFileWriter logfile;
+
+  logfile.set_sd_failure(true);
+  ASSERT_TRUE(logfile.get_sd_failure());
+
+  logfile.set_sd_failure(false);
+  ASSERT_FALSE(logfile.get_sd_failure());
+}
+
+  class ListenForLineMockLogFileWriter : public LogFileWriter {
+   public:
+    MOCK_METHOD(ParsingState,
+                update_state,
+                (uint8_t, ParsingState),
+                (override));
+    MOCK_METHOD(bool,
+                serial_bytes_available,
+                (),
+                (override));
+    MOCK_METHOD(uint8_t,
+                read_serial_byte,
+                (),
+                (override));
+    MOCK_METHOD(void,
+                open_line,
+                (uint32_t, uint32_t),
+                (override));
+    MOCK_METHOD(void,
+                close_line,
+                (),
+                (override));
+    MOCK_METHOD(void,
+                set_new_filename,
+                (uint16_t file_number),
+                (override));
+    ParsingState fortest_get_parser_state() {
+      return this->parserState;
+    }
+    void override_host_file_number(uint16_t new_id) {
+      this->host_file_id = new_id;
+    }
+    void override_file(File * oFile) {this->file = oFile;}
+  };
+
+
+
+// actions we espect when we're in init state
+TEST(LogFileWriter, listen_for_line_initState) {
+  // Instantiate mocked classes
+  ListenForLineMockLogFileWriter logfile;
+
+  // Set exepectations
+  // always call read byte, then update state
+  {
+    testing::InSequence s;
+    EXPECT_CALL(logfile,
+      serial_bytes_available()).Times(1).WillOnce(
+        Return(true));
+    EXPECT_CALL(logfile,
+      read_serial_byte()).Times(1).WillOnce(
+        Return(HEADER_START));
+    EXPECT_CALL(logfile,
+      update_state(_, _)).Times(1).WillOnce(
+        Return(initState));
+    // signal no more bytes or we'll loop forever
+    EXPECT_CALL(logfile,
+      serial_bytes_available()).Times(1).WillOnce(
+        Return(false));
+  }
+  EXPECT_CALL(logfile, open_line(_, _)).Times(0);
+  EXPECT_CALL(logfile, close_line()).Times(0);
+
+  logfile.listen_for_line();
+  ASSERT_EQ(logfile.fortest_get_parser_state(), initState);
+}
+
+// actions we expect when we're in header received state
+TEST(LogFileWriter, listen_for_line_headerReceivedState) {
+  // Instantiate mocked classes
+  ListenForLineMockLogFileWriter logfile;
+
+  // Set exepectations
+  // always call read byte, then update state
+  {
+    testing::InSequence s;
+    EXPECT_CALL(logfile,
+      serial_bytes_available()).Times(1).WillOnce(
+        Return(true));
+    EXPECT_CALL(logfile,
+      read_serial_byte()).Times(1).WillOnce(
+        Return(HEADER_START));
+    EXPECT_CALL(logfile,
+      update_state(_, _)).Times(1).WillOnce(
+        Return(headerReceivedState));
+    // signal no more bytes or we'll loop forever
+    EXPECT_CALL(logfile,
+      serial_bytes_available()).Times(1).WillOnce(
+        Return(false));
+  }
+  EXPECT_CALL(logfile, open_line(_, _)).Times(0);
+  EXPECT_CALL(logfile, close_line()).Times(0);
+
+  logfile.listen_for_line();
+  ASSERT_EQ(logfile.fortest_get_parser_state(), headerReceivedState);
+}
+
+// actions we expect when we're in delimiterReceivedState
+TEST(LogFileWriter, listen_for_line_delimiterReceivedState) {
+  // Instantiate mocked classes
+  ListenForLineMockLogFileWriter logfile;
+
+  // Set exepectations
+  // always call read byte, then update state
+  {
+    testing::InSequence s;
+    EXPECT_CALL(logfile,
+      serial_bytes_available()).Times(1).WillOnce(
+        Return(true));
+    EXPECT_CALL(logfile,
+      read_serial_byte()).Times(1).WillOnce(
+        Return(HEADER_START));
+    EXPECT_CALL(logfile,
+      update_state(_, _)).Times(1).WillOnce(
+        Return(delimiterReceivedState));
+    // signal no more bytes or we'll loop forever
+    EXPECT_CALL(logfile,
+      serial_bytes_available()).Times(1).WillOnce(
+        Return(false));
+  }
+  EXPECT_CALL(logfile, open_line(_, _)).Times(0);
+  EXPECT_CALL(logfile, close_line()).Times(0);
+
+  logfile.listen_for_line();
+  ASSERT_EQ(logfile.fortest_get_parser_state(), delimiterReceivedState);
+}
+
+// actions we expect when we're in delimiterReceivedState
+TEST(LogFileWriter, listen_for_line_fileIdReceivedState_notNew) {
+  // Instantiate mocked classes
+  ListenForLineMockLogFileWriter logfile;
+
+  // set file number
+  const uint8_t fake_file_number = 2;
+  logfile.override_host_file_number(fake_file_number);
+
+  // Set exepectations
+  // always call read byte, then update state
+  {
+    testing::InSequence s;
+    EXPECT_CALL(logfile,
+      serial_bytes_available()).Times(1).WillOnce(
+        Return(true));
+    // byte is the same as existing file number
+    EXPECT_CALL(logfile,
+      read_serial_byte()).Times(1).WillOnce(
+        Return(fake_file_number));
+    EXPECT_CALL(logfile,
+      update_state(_, _)).Times(1).WillOnce(
+        Return(fileIdReceivedState));
+    // signal no more bytes or we'll loop forever
+    EXPECT_CALL(logfile,
+      serial_bytes_available()).Times(1).WillOnce(
+        Return(false));
+  }
+  // Should open the line at this point
+  EXPECT_CALL(logfile, open_line(_, _)).Times(1);
+  EXPECT_CALL(logfile, close_line()).Times(0);
+  EXPECT_CALL(logfile, set_new_filename(_)).Times(0);
+
+  logfile.listen_for_line();
+  ASSERT_EQ(logfile.fortest_get_parser_state(), fileIdReceivedState);
+}
+
+// actions we expect when we're in ileIdReceivedState and get a new
+//   file ID
+TEST(LogFileWriter, listen_for_line_fileIdReceivedState_newFile) {
+  // Instantiate mocked classes
+  ListenForLineMockLogFileWriter logfile;
+
+  // set file number
+  const uint8_t fake_file_number = 2;
+  logfile.override_host_file_number(fake_file_number);
+
+  // Set exepectations
+  // always call read byte, then update state
+  {
+    testing::InSequence s;
+    EXPECT_CALL(logfile,
+      serial_bytes_available()).Times(1).WillOnce(
+        Return(true));
+    // byte is the same as existing file number
+    EXPECT_CALL(logfile,
+      read_serial_byte()).Times(1).WillOnce(
+        Return(fake_file_number+1));
+    EXPECT_CALL(logfile,
+      update_state(_, _)).Times(1).WillOnce(
+        Return(fileIdReceivedState));
+    // signal no more bytes or we'll loop forever
+    EXPECT_CALL(logfile,
+      serial_bytes_available()).Times(1).WillOnce(
+        Return(false));
+  }
+  // Should open the line at this point
+  EXPECT_CALL(logfile, open_line(_, _)).Times(1);
+  EXPECT_CALL(logfile, close_line()).Times(0);
+  EXPECT_CALL(logfile, set_new_filename(_)).Times(1);
+
+  logfile.listen_for_line();
+  ASSERT_EQ(logfile.fortest_get_parser_state(), fileIdReceivedState);
+}
+
+// actions we expect when we're in writingBodyState
+TEST(LogFileWriter, listen_for_line_writingBodyState) {
+  class MockFile : public File {
+   public:
+    MOCK_METHOD(void, write, (uint8_t), (override));
+  } mock_file;
+
+  // Instantiate mocked classes
+  ListenForLineMockLogFileWriter logfile;
+  logfile.override_file(&mock_file);
+
+  // set file number
+  const uint8_t fake_byte = 'B';
+
+  // Set exepectations
+  // always call read byte, then update state
+  {
+    testing::InSequence s;
+    EXPECT_CALL(logfile,
+      serial_bytes_available()).Times(1).WillOnce(
+        Return(true));
+    // byte is the same as existing file number
+    EXPECT_CALL(logfile,
+      read_serial_byte()).Times(1).WillOnce(
+        Return(fake_byte));
+    EXPECT_CALL(logfile,
+      update_state(_, _)).Times(1).WillOnce(
+        Return(writingBodyState));
+    // signal no more bytes or we'll loop forever
+    EXPECT_CALL(logfile,
+      serial_bytes_available()).Times(1).WillOnce(
+        Return(false));
+  }
+  // Should open the line at this point
+  EXPECT_CALL(logfile, open_line(_, _)).Times(0);
+  EXPECT_CALL(logfile, close_line()).Times(0);
+  EXPECT_CALL(logfile, set_new_filename(_)).Times(0);
+  EXPECT_CALL(mock_file, write(fake_byte)).Times(1);
+
+  logfile.listen_for_line();
+  ASSERT_EQ(logfile.fortest_get_parser_state(), writingBodyState);
+}
+
+// actions we expect when we're in protocolFailureState
+TEST(LogFileWriter, listen_for_line_protocolFailureState) {
+  class MockFile : public File {
+   public:
+    MOCK_METHOD(void, write, (uint8_t), (override));
+    MOCK_METHOD(void, print, (const char[]), (override));
+  } mock_file;
+
+  // Instantiate mocked classes
+  ListenForLineMockLogFileWriter logfile;
+  logfile.override_file(&mock_file);
+
+  // set file number
+  const uint8_t fake_byte = 'B';
+
+  // Set exepectations
+  // always call read byte, then update state
+  {
+    testing::InSequence s;
+    EXPECT_CALL(logfile,
+      serial_bytes_available()).Times(1).WillOnce(
+        Return(true));
+    // byte is the same as existing file number
+    EXPECT_CALL(logfile,
+      read_serial_byte()).Times(1).WillOnce(
+        Return(fake_byte));
+    EXPECT_CALL(logfile,
+      update_state(_, _)).Times(1).WillOnce(
+        Return(protocolFailureState));
+    // signal no more bytes or we'll loop forever
+    EXPECT_CALL(logfile,
+      serial_bytes_available()).Times(1).WillOnce(
+        Return(false));
+  }
+
+  // Should open the line at this point
+  EXPECT_CALL(logfile, open_line(_, _)).Times(0);
+  EXPECT_CALL(logfile, close_line()).Times(1);
+  EXPECT_CALL(logfile, set_new_filename(_)).Times(0);
+  EXPECT_CALL(mock_file, write(_)).Times(0);
+  EXPECT_CALL(mock_file, print(_)).Times(1);
+
+  logfile.listen_for_line();
+  ASSERT_EQ(logfile.fortest_get_parser_state(), protocolFailureState);
+}
+
+// actions we expect when we're in endlineReceivedState
+TEST(LogFileWriter, listen_for_line_endlineReceivedState) {
+  class MockFile : public File {
+   public:
+    MOCK_METHOD(void, write, (uint8_t), (override));
+    MOCK_METHOD(void, print, (const char[]), (override));
+  } mock_file;
+
+  // Instantiate mocked classes
+  ListenForLineMockLogFileWriter logfile;
+  logfile.override_file(&mock_file);
+
+  // set file number
+  const uint8_t fake_byte = 'B';
+
+  // Set exepectations
+  // always call read byte, then update state
+  {
+    testing::InSequence s;
+    EXPECT_CALL(logfile,
+      serial_bytes_available()).Times(1).WillOnce(
+        Return(true));
+    // byte is the same as existing file number
+    EXPECT_CALL(logfile,
+      read_serial_byte()).Times(1).WillOnce(
+        Return(fake_byte));
+    EXPECT_CALL(logfile,
+      update_state(_, _)).Times(1).WillOnce(
+        Return(endlineReceivedState));
+    // signal no more bytes or we'll loop forever
+    EXPECT_CALL(logfile,
+      serial_bytes_available()).Times(1).WillOnce(
+        Return(false));
+  }
+
+  // Should open the line at this point
+  EXPECT_CALL(logfile, open_line(_, _)).Times(0);
+  EXPECT_CALL(logfile, close_line()).Times(1);
+  EXPECT_CALL(logfile, set_new_filename(_)).Times(0);
+  EXPECT_CALL(mock_file, write(_)).Times(0);
+  EXPECT_CALL(mock_file, print(_)).Times(0);
+
+  logfile.listen_for_line();
+  ASSERT_EQ(logfile.fortest_get_parser_state(), endlineReceivedState);
+}
+
+
+// Test for the state machine
+TEST(LogFileWriter, update_state) {
+  class MockLogFileWriter : public LogFileWriter {
+   public:
+    ParsingState test_update_state(uint8_t byte, ParsingState oldState) {
+      return LogFileWriter::update_state(byte, oldState);
+    }
+    uint16_t get_parser_row_bytes() {return this->parserRowBytes;}
+  } logfile;
+
+  ParsingState current_state = initState;
+
+  // Stay in init state even if other random characters happen
+  for (uint8_t ascii = 0;
+        ascii < 255;
+        ascii++) {
+    if (ascii == HEADER_START)
+      continue;
+    current_state = logfile.test_update_state(ascii, current_state);
+    ASSERT_EQ(current_state, initState);
+  }
+
+  // move to header received state and stay there no matter how many
+  // times you receive the header char
+  for (uint8_t i = 0; i < 5; i++) {
+    current_state = logfile.test_update_state(HEADER_START, current_state);
+    ASSERT_EQ(current_state, headerReceivedState);
+  }
+
+  // send a non-header byte - should transition to fileIdReceivedState
+  current_state = logfile.test_update_state(2, current_state);
+  ASSERT_EQ(current_state, fileIdReceivedState);
+
+  // now send everything but START_TEXT and should signal a failure
+  // Stay in init state even if other random characters happen
+  for (uint8_t ascii = 0;
+        ascii < 255;
+        ascii++) {
+    if (ascii == START_TEXT)
+      continue;
+    current_state = logfile.test_update_state(ascii, fileIdReceivedState);
+    ASSERT_EQ(current_state, protocolFailureState);
+  }
+
+  // while in fileIdReceivedState, move to delimiterReceivedState
+  //  when delimiter is received
+  current_state = fileIdReceivedState;
+  current_state = logfile.test_update_state(START_TEXT, current_state);
+  ASSERT_EQ(current_state, delimiterReceivedState);
+
+
+  // in delimiter received state, we already have the first byte of the body
+  // should reset bytes in row at this point
+  // todo: check for bad characters here like we check in writing body
+  current_state = delimiterReceivedState;
+  current_state = logfile.test_update_state('A', current_state);
+  ASSERT_EQ(current_state, writingBodyState);
+  ASSERT_EQ(logfile.get_parser_row_bytes(), 0);
+
+  // test writing the body.
+  // stays in writing body state for valid characters
+  current_state = writingBodyState;
+  const char valid_test_body[] =  "12345678910,"
+                                  "ABCDEFGHIGKLMNOPQRSTUVWXYZ,"
+                                  "abcdefghijklmnopqrstuvwxyz,"
+                                  " _!@#$%^&*()_+,8,|{}-=<>?,./,"
+                                  "345,success";
+  uint16_t test_body_len = strlen(valid_test_body);
+  for (int i=0; i < test_body_len; i++) {
+    current_state = logfile.test_update_state(valid_test_body[i],
+                                              current_state);
+    ASSERT_EQ(current_state, writingBodyState);
+    // counts all of the characters written to the body
+    ASSERT_EQ(logfile.get_parser_row_bytes(), i+1);
+  }
+
+  // test that we fail for out-of-range characters
+  current_state = writingBodyState;
+  current_state = logfile.test_update_state(0xFF, current_state);
+  ASSERT_EQ(current_state, protocolFailureState);
+
+  // test that we transiton to endline when we get the end char
+  current_state = writingBodyState;
+  current_state = logfile.test_update_state(END_TEXT, current_state);
+  ASSERT_EQ(current_state, endlineReceivedState);
+
+  // run up the body size (as many as the max bytes+1) and make sure we signal
+  //  protocol failure
+  current_state = writingBodyState;
+  for (int i = 0; i <= MAX_BYTES_PER_ROW; i++) {
+    current_state = logfile.test_update_state('G', current_state);
+    if (current_state == protocolFailureState)
+      break;  // this is success, no need to continue
+  }
+  ASSERT_EQ(current_state, protocolFailureState);
+  ASSERT_EQ(logfile.get_parser_row_bytes(), MAX_BYTES_PER_ROW+1);
+
+  // test that we automatically switch out of protocol failure state
+  //   in every case.
+  for (uint8_t ascii = 0;
+        ascii < 255;
+        ascii++) {
+    current_state = logfile.test_update_state(ascii, protocolFailureState);
+    ASSERT_NE(current_state, protocolFailureState);
+
+    // in one special case, check that it transitions straight to
+    //   header received
+    if (ascii == HEADER_START)
+      ASSERT_EQ(current_state, headerReceivedState);
+  }
 }
