@@ -12,6 +12,10 @@
 
 #include "LogFileWriter.hh"
 
+#ifdef IN_TESTING
+HardwareSerial Serial;
+#endif
+
 LogFileWriter::LogFileWriter() {
   this->sd = new Sd_i();
   this->re_init_sd();
@@ -306,8 +310,4 @@ void LogFileWriter::override_file_number(uint16_t new_id) {
 
 void LogFileWriter::set_pinmode(uint8_t pin, uint8_t flags) {
         pinMode(pin, flags);  // just set pinmode
-}
-
-void LogFileWriter::replace_sd_interface(Sd_i * interface) {
-        this->sd = interface;
 }

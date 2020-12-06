@@ -25,8 +25,9 @@
 #else
   #include <stdlib.h>
   #include "../test/Stub_Arduino.h"
-  #include "../test/Stub_Serial.h"
   #include "../test/File_mock.h"
+  #include "../test/Stub_Serial.h"
+  typedef HardwareSerial SoftwareSerial;
 #endif
 #include "Sd_i.hh"
 #include "LogSerialInterface.hh"
@@ -35,18 +36,6 @@
 const char log_file_name_base[] = "L";
 #define LOGFILE_EXTENSION "CSV"
 #define SD_COOLDOWN_LENGTH 5000  // milliseconds
-
-#define HEADER_START  0x01   // ASCII Start Of Header
-#define START_TEXT    0x02   // ASCII Start of Text
-#define END_TEXT      0x03   // ASCII End of Text
-#define SOFTWARESERIAL_BAUD  9600
-#define SOFTWARESERIAL_RX_PIN  2
-#define SOFTWARESERIAL_TX_PIN  3
-
-// todo: for test
-#define ASCII_BODY_MAX 126
-#define ASCII_BODY_MIN  32
-#define MAX_BYTES_PER_ROW 200
 
 
 
@@ -65,7 +54,7 @@ class LogFileWriter {
   LogFileWriter();
   void listen_for_line();
 
- private:
+ protected:
   virtual uint16_t get_highest_used_id();
   virtual void override_file_number(uint16_t new_id);
   virtual bool begin_sd();
@@ -87,8 +76,6 @@ class LogFileWriter {
     return rv;
   }
   virtual uint16_t get_millis() {return millis();}
-  void reset_first_run() {this->first_run = true;}  // for testing
-  void replace_sd_interface(Sd_i * interface);
   char current_name[MAX_FILENAME_LEN];
   uint16_t highest_used_id = 0;
   uint16_t host_file_id = 0;

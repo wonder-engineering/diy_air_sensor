@@ -21,6 +21,8 @@ class HardwareSerial {
 
  public:
   static void setPrintToCout(bool flag) {}
+  HardwareSerial() {}
+  HardwareSerial(uint8_t x, uint8_t y) {}
 
   static size_t print(const char[]) {return 0;}
   static size_t print(char) {return 0;}
@@ -52,6 +54,6 @@ class HardwareSerial {
 
   static void flush() {}
 };
-extern HardwareSerial Serial;
+extern "C" HardwareSerial Serial;
 
 #endif  // TEST_STUB_SERIAL_H_

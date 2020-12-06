@@ -32,12 +32,13 @@
   #include <Arduino.h>
   #include <SPI.h>
   #include <SoftwareSerial.h>
-
 #else
   #include <stdlib.h>
   #include "../test/Stub_Arduino.h"
   #include "../test/Stub_Serial.h"
   #include "../test/File_mock.h"
+  // Stub serial interfaces are equivalent API's
+  typedef HardwareSerial SoftwareSerial;
 #endif
 
 #include "../include/LogSerialInterface.hh"

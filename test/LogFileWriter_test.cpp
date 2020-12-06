@@ -1,7 +1,7 @@
 // Copyright 2020 Brett M Leedy
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
-#include "../src/LogFile.h"
+#include "../log_file_writer/LogFileWriter.hh"
 
 // SD interface mock
 class MockSd_i : public Sd_i {
@@ -9,6 +9,7 @@ class MockSd_i : public Sd_i {
     MOCK_METHOD(bool, begin, (uint8_t csPin), (override));
     MOCK_METHOD(File, open, (const char * name, uint8_t mode), (override));
     MOCK_METHOD(void, end, (), (override));
+    void rotate_file() {}
 };
 
 using ::testing::AtLeast;
@@ -16,43 +17,64 @@ using ::testing::Return;
 using ::testing::_;
 using ::testing::Mock;
 
-TEST(LogFile, File_Names_comply) {
-  LogFile logfile;
+TEST(LogFileWriter, File_Names_comply) {
+  class InstrumentedLogFileWriter : public LogFileWriter {
+   public:
+    void rotate_file() {LogFileWriter::rotate_file();}
+    char * get_file_name_ptr() {return current_name;}
+    void replace_sd_interface(Sd_i * interface) {
+      this->sd = interface;
+    }
+    void reset_first_run() {this->first_run = true;}  // for testing
+    bool re_init_sd() {return LogFileWriter::re_init_sd();}
+  };
+  InstrumentedLogFileWriter logfile;
 
   for (int i = 0; i<= 50000; i++) {
-      logfile.rotate_file();
-        int overall_string_length = strlen(logfile.get_file_name_ptr());
-        // filename is less than 12 characters total (8.3 convention)
-        // ASSERT_LT(overall_string_length, 13);
-        int period_pos = 0;
-        int num_periods = 0;
-        for (int pp = 0; pp < overall_string_length; pp++) {
-          if (logfile.get_file_name_ptr()[pp] == '.') {
-                num_periods++;
-                period_pos = pp;
-            }
+    logfile.rotate_file();
+    int overall_string_length = strlen(logfile.get_file_name_ptr());
+    // filename is less than 12 characters total (8.3 convention)
+    // ASSERT_LT(overall_string_length, 13);
+    int period_pos = 0;
+    int num_periods = 0;
+    for (int pp = 0; pp < overall_string_length; pp++) {
+      if (logfile.get_file_name_ptr()[pp] == '.') {
+            num_periods++;
+            period_pos = pp;
         }
-        // before extension should be 8 or less characters
-        ASSERT_LT(period_pos, 8);
-        // extension should be 3 or less characters long to meet the standard
-        ASSERT_LT((overall_string_length - period_pos), 5);
-        // should only have one period
-        ASSERT_LT(num_periods, 2);
-        // extension should be exactly ".CSV"
-        ASSERT_STREQ(logfile.get_file_name_ptr()+period_pos, ".CSV");
     }
+    // before extension should be 8 or less characters
+    ASSERT_LT(period_pos, 8);
+    // extension should be 3 or less characters long to meet the standard
+    ASSERT_LT((overall_string_length - period_pos), 5);
+    // should only have one period
+    ASSERT_LT(num_periods, 2);
+    // extension should be exactly ".CSV"
+    ASSERT_STREQ(logfile.get_file_name_ptr()+period_pos, ".CSV");
+  }
 }
+
+
 //   Test whether SD init failures are handled correctly
-TEST(LogFile, SD_init_Failure_Handling) {
+TEST(LogFileWriter, SD_init_Failure_Handling) {
   //// Mock Classes that need mocking
-  // Mock LogFile methods we want to assert/manipulate
-  class MockLogFile : public LogFile {
+  // Mock LogFileWriter methods we want to assert/manipulate
+  class MockLogFileWriter : public LogFileWriter {
    public:
-     MOCK_METHOD(uint16_t, get_highest_used_id, (), (override));
+    void rotate_file() {LogFileWriter::rotate_file();}
+    char * get_file_name_ptr() {return current_name;}
+    void replace_sd_interface(Sd_i * interface) {
+      this->sd = interface;
+    }
+    void reset_first_run() {this->first_run = true;}  // for testing
+    bool re_init_sd() {return LogFileWriter::re_init_sd();}
+    bool is_sd_failed() {return LogFileWriter::is_sd_failed();}
+
+    MOCK_METHOD(uint16_t, get_highest_used_id, (), (override));
   };
 
   //// Instantiate mocked classes
-  MockLogFile logfile;
+  MockLogFileWriter logfile;
   MockSd_i mock_sd;
 
   ///// Override any mocked methods as needed
@@ -84,15 +106,24 @@ TEST(LogFile, SD_init_Failure_Handling) {
 }
 
 //   Test whether SD failures cause re-init
-TEST(LogFile, SD_heal_after_failure) {
+TEST(LogFileWriter, SD_heal_after_failure) {
   //// Mock Classes that need mocking
-  // Mock LogFile methods we want to assert/manipulate
-  class MockLogFile : public LogFile {
+  // Mock LogFileWriter methods we want to assert/manipulate
+  class MockLogFileWriter : public LogFileWriter {
    public:
+    void rotate_file() {LogFileWriter::rotate_file();}
+    char * get_file_name_ptr() {return current_name;}
+    void replace_sd_interface(Sd_i * interface) {
+      this->sd = interface;
+    }
+    void reset_first_run() {this->first_run = true;}  // for testing
+    bool re_init_sd() {return LogFileWriter::re_init_sd();}
+    bool is_sd_failed() {return LogFileWriter::is_sd_failed();}
+    void open_line(uint32_t x, uint32_t y) {LogFileWriter::open_line(x, y);}
   };
 
   //// Instantiate mocked classes
-  MockLogFile logfile;
+  MockLogFileWriter logfile;
   MockSd_i mock_sd;
 
   ///// Override any mocked methods as needed
@@ -119,10 +150,20 @@ TEST(LogFile, SD_heal_after_failure) {
   ASSERT_TRUE(logfile.is_sd_failed());
 }
 
-TEST(LogFile, Happy_initialization_works) {
+TEST(LogFileWriter, Happy_initialization_works) {
   //// Mock Classes that need mocking
-  // Mock LogFile methods we want to assert/manipulate
-  class MockLogFile : public LogFile {
+  // Mock LogFileWriter methods we want to assert/manipulate
+  class MockLogFileWriter : public LogFileWriter {
+   public:
+    void rotate_file() {LogFileWriter::rotate_file();}
+    char * get_file_name_ptr() {return current_name;}
+    void replace_sd_interface(Sd_i * interface) {
+      this->sd = interface;
+    }
+    void reset_first_run() {this->first_run = true;}  // for testing
+    bool re_init_sd() {return LogFileWriter::re_init_sd();}
+    bool is_sd_failed() {return LogFileWriter::is_sd_failed();}
+    void open_line(uint32_t x, uint32_t y) {LogFileWriter::open_line(x, y);}
    public:
       MOCK_METHOD(void, set_pinmode, (uint8_t pin, uint8_t flags), (override));
       MOCK_METHOD(uint16_t, get_highest_used_id, (), (override));
@@ -130,7 +171,7 @@ TEST(LogFile, Happy_initialization_works) {
   };
 
     //// Instantiate mocked classes
-    MockLogFile logfile;
+    MockLogFileWriter logfile;
   MockSd_i mock_sd;
 
   ///// Override any mocked methods as needed
@@ -160,7 +201,7 @@ TEST(LogFile, Happy_initialization_works) {
   ASSERT_STREQ("L-1.CSV", logfile.get_file_name_ptr());
   // no init error flagged
   ASSERT_FALSE(init_error);
-  bool sd_failure = logfile.get_sd_failure();
+  bool sd_failure = logfile.is_sd_failed();
   // no sd failure flagge
   ASSERT_FALSE(sd_failure);
 }
@@ -182,10 +223,21 @@ TEST(LogFile, Happy_initialization_works) {
 // 6         123       no              123     // wrapped, so run
 //
 
-TEST(LogFile, re_init_behaviors) {
+TEST(LogFileWriter, re_init_behaviors) {
     //// Mock Classes that need mocking
-    // Mock LogFile methods we want to assert/manipulate
-  class MockLogFile : public LogFile {
+    // Mock LogFileWriter methods we want to assert/manipulate
+  class MockLogFileWriter : public LogFileWriter {
+   public:
+    void rotate_file() {LogFileWriter::rotate_file();}
+    char * get_file_name_ptr() {return current_name;}
+    void replace_sd_interface(Sd_i * interface) {
+      this->sd = interface;
+    }
+    void reset_first_run() {this->first_run = true;}  // for testing
+    bool re_init_sd() {return LogFileWriter::re_init_sd();}
+    bool is_sd_failed() {return LogFileWriter::is_sd_failed();}
+    void open_line(uint32_t x, uint32_t y) {LogFileWriter::open_line(x, y);}
+
    public:
     MOCK_METHOD(void, set_pinmode, (uint8_t pin, uint8_t flags),
                 (override));
@@ -194,7 +246,7 @@ TEST(LogFile, re_init_behaviors) {
   };
 
   //// Instantiate mocked classes
-  MockLogFile logfile;
+  MockLogFileWriter logfile;
   MockSd_i mock_sd;
 
     ///// Override any mocked methods as needed
