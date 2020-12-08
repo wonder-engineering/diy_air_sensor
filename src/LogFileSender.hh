@@ -20,14 +20,6 @@
 #define SRC_LOGFILESENDER_HH_
 
 
-// todo: de-dupe this
-#define HEADER_START  0x01   // ASCII Start Of Header
-#define START_TEXT    0x02   // ASCII Start of Text
-#define END_TEXT      0x03   // ASCII End of Text
-#define SOFTWARESERIAL_BAUD  9600
-#define SOFTWARESERIAL_RX_PIN  2
-#define SOFTWARESERIAL_TX_PIN  3
-
 #ifndef IN_TESTING  // we will mock libs for tesing
   #include <Arduino.h>
   #include <SPI.h>
