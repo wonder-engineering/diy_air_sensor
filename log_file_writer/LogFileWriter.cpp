@@ -242,6 +242,19 @@ void LogFileWriter::open_line(uint32_t id, uint32_t timestamp) {
   this->file->print(F(","));
 }
 
+bool LogFileWriter::fileIsDirectory(File * file) {
+  return file->isDirectory();
+}
+
+bool LogFileWriter::fileIsValid(File * file) {
+  return (bool)*file;  // NOLINT
+}
+
+void LogFileWriter::getNameFromFile(char buffer[], File * file) {
+  strncpy(buffer, file->name(), MAX_FILENAME_LEN);
+}
+
+
 uint16_t LogFileWriter::get_highest_used_id() {
   if (is_sd_failed())
     return 0;
@@ -250,11 +263,11 @@ uint16_t LogFileWriter::get_highest_used_id() {
   File dir;
   dir = this->sd->open("/", FILE_READ);
   // check that it opened and is a directory
-  if (!dir) {
+  if (!fileIsValid(&dir)) {
     // could not open directory
     Serial.println(F("Could not open directory"));
     return 0;
-  } else if (!dir.isDirectory()) {
+  } else if (!fileIsDirectory(&dir)) {
     // not a directory
     Serial.println(F("Not a directory"));
     return 0;
@@ -264,13 +277,14 @@ uint16_t LogFileWriter::get_highest_used_id() {
   char temp_filename[MAX_FILENAME_LEN];
   while (true) {
     File entry =  dir.openNextFile();
-    if (entry == 0)
+    if (!fileIsValid(&entry))
       break;  // no more files
 
     // if entry.name() matches our file prefix, check the highest number
     // copy the string to tokenize
     char * token;
-    strncpy(temp_filename, entry.name(), MAX_FILENAME_LEN);
+    getNameFromFile(temp_filename, &entry);
+
     // string is of the format "LOGFILE_NAME_BASE.number.csv"
     token = strtok(temp_filename, "-");  // NOLINT
 

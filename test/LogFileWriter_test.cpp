@@ -821,3 +821,55 @@ TEST(LogFileWriter, get_file_name) {
   logfile.test_get_file_name(newbuffer, 3);
   ASSERT_STREQ(newbuffer, "L-1");
 }
+
+
+// Test for getting the highest used file
+//  but the name we give it is not a directory
+TEST(LogFileWriter, get_highest_used_id_NotDirectory) {
+  class FakeLogFileWriter : public LogFileWriter {
+   public:
+    uint16_t test_get_highest_used_id() {
+      return LogFileWriter::get_highest_used_id();
+    }
+    // the file is valid
+    bool fileIsValid(File * file) {return true;}
+    // but it is not a directory
+    bool fileIsDirectory(File * file) {return false;}
+  } logfile;
+
+  // should just return zero
+  ASSERT_EQ(0, logfile.test_get_highest_used_id());
+}
+
+#define FILE_NAME_STRINGS_LEN 6
+const char * file_name_strings[FILE_NAME_STRINGS_LEN] = { "100.txt",
+                "five.csv", "L-15.CSV", "L-10.CSV", "L-9.CSV", "L-2.arm"};
+
+// Test for getting the highest used file.
+// Will recognize anything "dash" number dot something
+TEST(LogFileWriter, get_highest_used_id_running) {
+  class FakeLogFileWriter : public LogFileWriter {
+   public:
+    uint16_t test_get_highest_used_id() {
+      return LogFileWriter::get_highest_used_id();
+    }
+    // the file is valid
+    uint16_t file_valid_iteration = 0;
+    bool fileIsValid(File * file) {
+      return file_valid_iteration++ < 10;
+    }
+    // and it is a directory
+    bool fileIsDirectory(File * file) {return true;}
+    uint16_t name_to_get_from_file = 0;
+    void getNameFromFile(char buffer[], File * file) {
+      strncpy(buffer,
+              file_name_strings[name_to_get_from_file],
+              MAX_FILENAME_LEN);
+      if (name_to_get_from_file < (FILE_NAME_STRINGS_LEN - 1) )
+        name_to_get_from_file++;
+    }
+  } logfile;
+
+  // should return 15, even if it's not the last file returned.
+  ASSERT_EQ(15, logfile.test_get_highest_used_id());
+}

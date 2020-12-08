@@ -79,6 +79,9 @@ class LogFileWriter {
     return rv;
   }
   virtual uint16_t get_millis() {return millis();}
+  virtual bool fileIsDirectory(File * file);
+  virtual bool fileIsValid(File * file);
+  virtual void getNameFromFile(char buffer[], File * file);
   char current_name[MAX_FILENAME_LEN];
   uint16_t highest_used_id = 0;
   uint16_t host_file_id = 0;

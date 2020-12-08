@@ -14,7 +14,7 @@
 #include "SD.h"
 #endif
 
-class Sd_i{
+class Sd_i {
  public:
   Sd_i();
   virtual bool begin(uint8_t csPin);

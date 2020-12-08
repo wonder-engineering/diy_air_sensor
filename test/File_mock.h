@@ -16,15 +16,15 @@ class File {
  public:
   File() {}
   char * name() {return NULL;}
-    File openNextFile() {return File();}
-    int open() {return 0;}
-    int close() {return 0;}
-    virtual void print(int t) {}
-    virtual void print(const char[]) {}
-    void println(const char[]) {}
-    bool isDirectory() {return false;}
-    virtual void write(uint8_t writeByte) {}
-    operator int() const {return 0;}
+  File openNextFile() {return File();}
+  int open() {return 0;}
+  int close() {return 0;}
+  virtual void print(int t) {}
+  virtual void print(const char[]) {}
+  void println(const char[]) {}
+  virtual bool isDirectory() {return false;}
+  virtual void write(uint8_t writeByte) {}
+  virtual operator bool() {return false;}
 };
 
 
@@ -32,6 +32,6 @@ class File {
 class SDClass {
  public:
   bool begin(uint8_t csPin) {return true;}
-    File open(char * name, int mode) {return File();}  // todo: make not broken
+  File open(char * name, uint8_t mode) {return File();}
 };
 #endif  // TEST_FILE_MOCK_H_
