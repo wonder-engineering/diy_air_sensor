@@ -29,6 +29,7 @@ void SensorArray::sense_all(SensorState * state) {
     // for each sensor, store it in the state DB
     state->sensor[sensor_id].data.value = sensors[sensor_id]->get_last_value();
     state->sensor[sensor_id].data.raw = sensors[sensor_id]->get_last_raw();
+    state->sensor[sensor_id].data.avg = sensors[sensor_id]->get_sensor_avg();
   }
 
   // store data to state

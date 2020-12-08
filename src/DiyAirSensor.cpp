@@ -98,7 +98,9 @@ void DiyAirSensor::log_sd(uint32_t id, uint32_t timestamp) {
   for (int i = 0; i < this->sensor_state.device.num_sensors; i++) {
     this->logfile->write_field(this->sensor_state.sensor[i].data.value);
     this->logfile->write_field(this->sensor_state.sensor[i].data.raw);
+    this->logfile->write_field(this->sensor_state.sensor[i].data.avg);
   }
+  this->logfile->write_field((uint16_t)SD_FORMAT_VERSION);
   this->logfile->write_field("|");
   this->logfile->close_line();
 }

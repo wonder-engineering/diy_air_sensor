@@ -26,6 +26,7 @@
 #define SENSOR_ACCUM_RATE    0.1
 #define DEFAULT_ZERO_ADJUST  0
 #define DEFAULT_GAIN         1.0
+#define SD_FORMAT_VERSION    1
 
 class DiyAirSensor {
  public:

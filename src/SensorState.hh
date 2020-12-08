@@ -26,6 +26,7 @@ enum SdState {
 
 struct SensorData {
   float value = 0.0;
+  float avg = 0.0;
   uint16_t raw = 0;
 };
 
