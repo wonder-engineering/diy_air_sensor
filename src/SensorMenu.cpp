@@ -68,6 +68,12 @@
   bool SensorMenu::backlight_callback(SensorSettings * settings) {
     settings->data.backlight = !settings->data.backlight;
     settings->commit();
+    // Change the state of the backlight
+    if (settings->data.backlight) {
+      lcd->backlight();
+    } else {
+      lcd->noBacklight();
+    }
     return EXIT_FROM_MENU;  // exit back out to main display
   }
 
@@ -317,25 +323,26 @@ bool SensorMenu::error_callback() { return false;}
 void SensorMenu::enter_menu(SensorState * state) {
 uint8_t menu_pos = 0;
 render_menu(menu_pos);  // render the menu at the start
+lcd->backlight();
 // now
 while (true) {
     // look for the up, down, or select buttons
     if (digitalRead(MENU_UP_BUTTON) == LOW && menu_pos > 0) {
-    menu_pos--;
-    render_menu(menu_pos);
-    wait_for_button_up();
+      menu_pos--;
+      render_menu(menu_pos);
+      wait_for_button_up();
     } else if (digitalRead(MENU_DN_BUTTON) == LOW &&
                 menu_pos < MENU_LENGTH-1) {
-    menu_pos++;
-    render_menu(menu_pos);
-    wait_for_button_up();
+      menu_pos++;
+      render_menu(menu_pos);
+      wait_for_button_up();
     } else if (digitalRead(MENU_SELECT_BUTTON) == LOW) {
-    if (enter_menu_item(menu_pos, state) == EXIT_FROM_MENU) {
-        break;
-    } else {  // remain in menu
-        lcd->clear();
-        render_menu(menu_pos);
-    }
+      if (enter_menu_item(menu_pos, state) == EXIT_FROM_MENU) {
+          break;
+      } else {  // remain in menu
+          lcd->clear();
+          render_menu(menu_pos);
+      }
     }
 }
 lcd->clear();
