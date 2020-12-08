@@ -800,3 +800,24 @@ TEST(LogFileWriter, update_state) {
       ASSERT_EQ(current_state, headerReceivedState);
   }
 }
+
+
+// Test for the state machine
+TEST(LogFileWriter, get_file_name) {
+  class MockLogFileWriter : public LogFileWriter {
+   public:
+    void test_get_file_name(char * buffer, uint8_t max_size) {
+      LogFileWriter::get_file_name(buffer, max_size);
+    }
+  } logfile;
+
+  // should copy the filename (default filename assumed)
+  char buffer[MAX_FILENAME_LEN];
+  logfile.test_get_file_name(buffer, MAX_FILENAME_LEN);
+  ASSERT_STREQ(buffer, "L-1.CSV");
+
+  // should crop the file name if the max size is too small
+  char newbuffer[MAX_FILENAME_LEN];
+  logfile.test_get_file_name(newbuffer, 3);
+  ASSERT_STREQ(newbuffer, "L-1");
+}

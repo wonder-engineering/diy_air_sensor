@@ -203,7 +203,14 @@ void LogFileWriter::get_file_name(char * buffer, uint8_t max_size) {
   if (max_size < maxlen)
     maxlen = max_size;   // take the smallest max size
 
-  strncpy(buffer, this->current_name, max_size);
+  strncpy(buffer, this->current_name, maxlen);
+
+  // null terminate the string, since strncpy doesn't always do
+  //   that for me
+  uint8_t string_end = strlen(this->current_name);
+  if (maxlen < string_end)
+    string_end = maxlen;
+  buffer[string_end] = '\0';
 }
 
 bool LogFileWriter::is_sd_failed() {
