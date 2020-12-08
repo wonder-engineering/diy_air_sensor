@@ -227,7 +227,7 @@ void LogFileWriter::open_line(uint32_t id, uint32_t timestamp) {
     return;
   this->file->close();
   *this->file = this->sd->open(this->current_name, FILE_WRITE);
-  if (this->file) {
+  if (fileIsValid(this->file)) {
     // success
   } else {
     Serial.println(F("error opening log file:"));
