@@ -19,24 +19,27 @@ AirSensorDisplay::AirSensorDisplay() {
   this->menu = new SensorMenu(lcd);
 }
 
-void AirSensorDisplay::display_data(SensorState * sensor_state) {
-  // Clear the LCD to ensure clean slate
-  lcd->clear();
+bool AirSensorDisplay::checkButton(uint8_t button) {
+  return digitalRead(button);
+}
 
+void AirSensorDisplay::checkForMenuButtons(SensorState * sensor_state) {
   // check whether I need to enter the menu
-  if (digitalRead(MENU_SELECT_BUTTON) == LOW ||
-     digitalRead(MENU_UP_BUTTON) == LOW ||
-     digitalRead(MENU_DN_BUTTON) == LOW) {
+  if (checkButton(MENU_SELECT_BUTTON) == LOW ||
+      checkButton(MENU_UP_BUTTON) == LOW ||
+      checkButton(MENU_DN_BUTTON) == LOW) {
     Serial.println(F("Enter Menu"));
     // wait for button to be released
-    while (digitalRead(MENU_SELECT_BUTTON) == LOW ||
-          digitalRead(MENU_UP_BUTTON) == LOW ||
-          digitalRead(MENU_DN_BUTTON) == LOW) {
+    while (checkButton(MENU_SELECT_BUTTON) == LOW ||
+            checkButton(MENU_UP_BUTTON) == LOW ||
+            checkButton(MENU_DN_BUTTON) == LOW) {
       delay(10);
     }
     menu->enter_menu(sensor_state);
   }
+}
 
+void AirSensorDisplay::displaySensorColumns(SensorState * sensor_state) {
   // print sensor states, rotating them if there are more sensors than
   //   space to display them.
   // todo: support rotating rows if not enough to display all at once
@@ -65,12 +68,13 @@ void AirSensorDisplay::display_data(SensorState * sensor_state) {
         }
       }
   }  // for (sensor_number)
+}
 
-  // print a warning on the last line if a threshold is exceeded
-  // Display sensor threshod warnings
+void AirSensorDisplay::displaySensorThresholdWarnings(
+  SensorState * sensor_state) {
   for (uint8_t sensor_number = 0;
-      sensor_number < sensor_state->device.num_sensors;
-      sensor_number++) {
+    sensor_number < sensor_state->device.num_sensors;
+    sensor_number++) {
     if (sensor_state->sensor[sensor_number].data.value >
         sensor_state->device.settings.data.sensor_thresholds[sensor_number] ) {
       lcd->setCursor(0, (LCD_NUM_ROWS-1));
@@ -89,4 +93,22 @@ void AirSensorDisplay::display_data(SensorState * sensor_state) {
   } else {
     lcd->write(byte(FILE_OK_GLYPH));  // OK File
   }
+}
+
+void AirSensorDisplay::display_data(SensorState * sensor_state) {
+  // Clear the LCD to ensure clean slate
+  lcd->clear();
+
+  // if a button is pressed, drop into the menu
+  checkForMenuButtons(sensor_state);
+
+  // print sensor states, rotating them if there are more sensors than
+  //   space to display them.
+  // todo: support rotating rows if not enough to display all at once
+  // Reserve the last row for other display items
+  displaySensorColumns(sensor_state);
+
+  // print a warning on the last line if a threshold is exceeded
+  // Display sensor threshod warnings
+  displaySensorThresholdWarnings(sensor_state);
 }
