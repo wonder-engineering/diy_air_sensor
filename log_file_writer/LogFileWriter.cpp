@@ -31,7 +31,6 @@ LogFileWriter::LogFileWriter() {
 void LogFileWriter::listen_for_line() {
   uint8_t newbyte = 0xFF;  // init to out of range value
   while (this->serial_bytes_available()) {
-    printf("RUNNING\n");
     newbyte = read_serial_byte();
     DEBUG_VAL("LogFileWriter: Received byte ", newbyte);
     DEBUG_VAL("LogFileWriter: in state ", this->parserState);
