@@ -20,19 +20,19 @@ AirSensorDisplay::AirSensorDisplay() {
 }
 
 bool AirSensorDisplay::checkButton(uint8_t button) {
-  return digitalRead(button);
+  return digitalRead(button) == LOW;
 }
 
 void AirSensorDisplay::checkForMenuButtons(SensorState * sensor_state) {
   // check whether I need to enter the menu
-  if (checkButton(MENU_SELECT_BUTTON) == LOW ||
-      checkButton(MENU_UP_BUTTON) == LOW ||
-      checkButton(MENU_DN_BUTTON) == LOW) {
+  if (checkButton(MENU_SELECT_BUTTON) ||
+      checkButton(MENU_UP_BUTTON) ||
+      checkButton(MENU_DN_BUTTON) ) {
     Serial.println(F("Enter Menu"));
     // wait for button to be released
-    while (checkButton(MENU_SELECT_BUTTON) == LOW ||
-            checkButton(MENU_UP_BUTTON) == LOW ||
-            checkButton(MENU_DN_BUTTON) == LOW) {
+    while (checkButton(MENU_SELECT_BUTTON) ||
+            checkButton(MENU_UP_BUTTON) ||
+            checkButton(MENU_DN_BUTTON) ) {
       delay(10);
     }
     menu->enter_menu(sensor_state);

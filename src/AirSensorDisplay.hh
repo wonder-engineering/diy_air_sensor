@@ -52,10 +52,10 @@ class AirSensorDisplay {
   AirSensorDisplay();
 
  protected:
-  LiquidCrystal_I2C * lcd;
-  SensorMenu * menu;
+  LiquidCrystal_I2C * lcd = NULL;
+  SensorMenu * menu = NULL;
   void init_lcd();
-  bool checkButton(uint8_t button);
+  virtual bool checkButton(uint8_t button);
   virtual void checkForMenuButtons(SensorState * sensor_state);
   virtual void displaySensorColumns(SensorState * sensor_state);
   virtual void displaySensorThresholdWarnings(SensorState * sensor_state);

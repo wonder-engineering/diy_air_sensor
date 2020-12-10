@@ -81,7 +81,7 @@ const char *const menu_line[] PROGMEM = {
 class SensorMenu {
  public:
   explicit SensorMenu(LiquidCrystal_I2C * lcd);
-  void enter_menu(SensorState * state);
+  virtual void enter_menu(SensorState * state);
 
  protected:
   void render_menu(uint8_t line);
