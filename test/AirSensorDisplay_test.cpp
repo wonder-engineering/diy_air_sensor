@@ -7,6 +7,10 @@
 using ::testing::AtLeast;
 using ::testing::Return;
 using ::testing::_;
+using ::testing::Le;
+using ::testing::AllOf;
+using ::testing::An;
+using ::testing::Ge;
 using ::testing::Mock;
 using ::testing::NotNull;
 using ::testing::InSequence;
@@ -75,29 +79,48 @@ TEST(AirSensorDisplay, display_data) {
   }
   display.display_data(&fake_sensor_state);
 
+}
 
-  // InstrumentedAirSensorDisplay logfile;
 
-  // for (int i = 0; i<= 50000; i++) {
-  //   logfile.rotate_file();
-  //   int overall_string_length = strlen(logfile.get_file_name_ptr());
-  //   // filename is less than 12 characters total (8.3 convention)
-  //   // ASSERT_LT(overall_string_length, 13);
-  //   int period_pos = 0;
-  //   int num_periods = 0;
-  //   for (int pp = 0; pp < overall_string_length; pp++) {
-  //     if (logfile.get_file_name_ptr()[pp] == '.') {
-  //           num_periods++;
-  //           period_pos = pp;
-  //       }
-  //   }
-  //   // before extension should be 8 or less characters
-  //   ASSERT_LT(period_pos, 8);
-  //   // extension should be 3 or less characters long to meet the standard
-  //   ASSERT_LT((overall_string_length - period_pos), 5);
-  //   // should only have one period
-  //   ASSERT_LT(num_periods, 2);
-  //   // extension should be exactly ".CSV"
-  //   ASSERT_STREQ(logfile.get_file_name_ptr()+period_pos, ".CSV");
-  // }
+
+// Should write the sensor info in the top 3 rows
+TEST(AirSensorDisplay, displaySensorColumns) {
+  class MockLcd : public LiquidCrystal_I2C {
+   public:
+    MockLcd(uint8_t lcd_Addr, uint8_t lcd_cols,
+            uint8_t lcd_rows) : LiquidCrystal_I2C
+              {lcd_Addr, lcd_cols, lcd_rows} {}
+    MOCK_METHOD(void, clear, (), (override));
+    MOCK_METHOD(void, print, (char * toprint));
+    MOCK_METHOD(void, print, (const char * toprint));
+    MOCK_METHOD(void, print, (uint16_t toprint));
+    MOCK_METHOD(void, print, (uint16_t toprint, uint8_t precision));
+    MOCK_METHOD(void, setCursor, (uint8_t, uint8_t));
+  } mockLcd(1,3,4);
+
+  class InstrumentedAirSensorDisplay : public AirSensorDisplay {
+   public:
+    void replace_lcd(MockLcd * lcd) {this->lcd = lcd;}
+    void displaySensorColumns(SensorState * sensor_state) {
+      AirSensorDisplay::displaySensorColumns(sensor_state);
+    }
+  } display;
+
+  display.replace_lcd(&mockLcd);
+
+  // with this model display, we expect columns to be in the
+  //   exact same place
+  EXPECT_CALL(mockLcd, setCursor(0, AllOf(Ge(0),Le(2)))).Times(3);
+  EXPECT_CALL(mockLcd,
+              setCursor(LCD_SENSOR_COLUMNS,
+              AllOf(Ge(0),Le(2)))).Times(3);
+
+  // Should print 6 labels
+  EXPECT_CALL(mockLcd, print(testing::An<char *>())).Times(6);
+  EXPECT_CALL(mockLcd, print(_, _)).Times(6);
+  // Should print 6 values
+
+
+  display.displaySensorColumns(&fake_sensor_state);
+
 }

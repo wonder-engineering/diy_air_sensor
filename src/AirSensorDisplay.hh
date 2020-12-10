@@ -51,7 +51,7 @@ class AirSensorDisplay {
   // Initializes the LCD and menu
   AirSensorDisplay();
 
- private:
+ protected:
   LiquidCrystal_I2C * lcd;
   SensorMenu * menu;
   void init_lcd();
