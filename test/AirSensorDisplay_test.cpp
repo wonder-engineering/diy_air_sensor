@@ -9,18 +9,73 @@ using ::testing::Return;
 using ::testing::_;
 using ::testing::Mock;
 using ::testing::NotNull;
+using ::testing::InSequence;
+
+
+SensorState fake_sensor_state = {
+  .sensor[0].data.value=0.0,
+  .sensor[0].data.avg=0.0,
+  .sensor[0].data.raw=0,
+  .sensor[0].config.shortname="GAS0",
+  .sensor[1].data.value=10.0,
+  .sensor[1].data.avg=10.0,
+  .sensor[1].data.raw=10,
+  .sensor[1].config.shortname="GAS1",
+  .sensor[2].data.value=100.0,
+  .sensor[2].data.avg=100.0,
+  .sensor[2].data.raw=100,
+  .sensor[2].config.shortname="GAS2",
+  .sensor[3].data.value=1000.0,
+  .sensor[3].data.avg=1000.0,
+  .sensor[3].data.raw=1000,
+  .sensor[3].config.shortname="GAS3",
+  .sensor[4].data.value=888.0,
+  .sensor[4].data.avg=888.0,
+  .sensor[4].data.raw=888,
+  .sensor[4].config.shortname="GAS4",
+  .sensor[5].data.value=0.0,
+  .sensor[5].data.avg=500.0,
+  .sensor[5].data.raw=0,
+  .sensor[5].config.shortname="GAS5",
+  .device.file_status=kFileOk,
+  .device.num_sensors=6,
+  .device.settings.data.sensor_thresholds[0]=100,
+  .device.settings.data.sensor_thresholds[1]=100,
+  .device.settings.data.sensor_thresholds[2]=100,
+  .device.settings.data.sensor_thresholds[3]=100,
+  .device.settings.data.sensor_thresholds[4]=100,
+  .device.settings.data.sensor_thresholds[5]=100
+  // other settings left as defaults
+};
+
 
 TEST(AirSensorDisplay, display_data) {
   class InstrumentedAirSensorDisplay : public AirSensorDisplay {
    public:
-    // void rotate_file() {AirSensorDisplay::rotate_file();}
-    // char * get_file_name_ptr() {return current_name;}
-    // void replace_lcd_interface(Sd_i * interface) {
-    //   this->sd = interface;
-    // }
-    // void reset_first_run() {this->first_run = true;}  // for testing
-    // bool re_init_sd() {return AirSensorDisplay::re_init_sd();}
-  };
+    MOCK_METHOD(void,
+                checkForMenuButtons,
+                (SensorState * sensor_state),
+                (override));
+    MOCK_METHOD(void,
+                displaySensorColumns,
+                (SensorState * sensor_state),
+                (override));
+    MOCK_METHOD(void,
+                displaySensorThresholdWarnings,
+                (SensorState * sensor_state),
+                (override));
+  } display;
+
+  {
+    InSequence s;
+    // Expect these methods to be called in sequence
+    EXPECT_CALL(display, checkForMenuButtons(_));
+    EXPECT_CALL(display, displaySensorColumns(_));
+    EXPECT_CALL(display, displaySensorThresholdWarnings(_));
+  }
+  display.display_data(&fake_sensor_state);
+
+
   // InstrumentedAirSensorDisplay logfile;
 
   // for (int i = 0; i<= 50000; i++) {

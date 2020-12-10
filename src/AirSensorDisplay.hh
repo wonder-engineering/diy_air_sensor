@@ -56,9 +56,9 @@ class AirSensorDisplay {
   SensorMenu * menu;
   void init_lcd();
   bool checkButton(uint8_t button);
-  void checkForMenuButtons(SensorState * sensor_state);
-  void displaySensorColumns(SensorState * sensor_state);
-  void displaySensorThresholdWarnings(SensorState * sensor_state);
+  virtual void checkForMenuButtons(SensorState * sensor_state);
+  virtual void displaySensorColumns(SensorState * sensor_state);
+  virtual void displaySensorThresholdWarnings(SensorState * sensor_state);
 };
 
 #endif  // SRC_AIRSENSORDISPLAY_HH_
