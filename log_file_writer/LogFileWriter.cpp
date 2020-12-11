@@ -111,9 +111,16 @@ ParsingState LogFileWriter::update_state(uint8_t byte, ParsingState oldState) {
     case delimiterReceivedState:
       // now that the delimiter was received, init row bytes written
       // and begin writting body bytes
-      this->parserRowBytes = 0;
-      newState = writingBodyState;
-      DEBUG("Switching to writingBodyState");
+      if (byte < ASCII_BODY_MIN ||
+          byte > ASCII_BODY_MAX) {  // out of legal range
+        Serial.println(
+          F("Protocol failure! Body text outside of ASCII range!"));
+        newState = protocolFailureState;
+      } else {
+        this->parserRowBytes = 0;
+        newState = writingBodyState;
+        DEBUG("Switching to writingBodyState");
+      }
       break;
     case writingBodyState:
       // if we receive a newline, go to new state

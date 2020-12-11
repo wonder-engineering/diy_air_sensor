@@ -718,7 +718,6 @@ TEST(LogFileWriter, update_state) {
 
   // in delimiter received state, we already have the first byte of the body
   // should reset bytes in row at this point
-  // todo: check for bad characters here like we check in writing body
   current_state = delimiterReceivedState;
   current_state = logfile.test_update_state('A', current_state);
   ASSERT_EQ(current_state, writingBodyState);

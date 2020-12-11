@@ -203,7 +203,6 @@ bool SensorMenu::file_callback(SensorState * state) {
     }
 }
 
-
 bool SensorMenu::disp_callback(SensorSettings * settings) {
     Serial.println(F("Entered Display Callback"));
     lcd->clear();
