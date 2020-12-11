@@ -79,7 +79,6 @@ TEST(SensorArray, add_sensor) {
 }
 
 
-// todo: sense_all
 TEST(SensorArray, sense_all) {
     class MockMQSensor : public MQSensor {
      public:
