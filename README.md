@@ -4,7 +4,6 @@ This is the project for the DIY Air Quality Sensor.  The code right now is, fran
 Bit-by-bit, I'm going to build some tests then start refactoring.  I'll remove this readme-of-shame when I have something resembling real code.
 
 # TODO List:
-* Diagnose and fix SD writing problems (possibly hardware)
 * Move Arduino library build dependencies to git submodules
 * Clang fuzz tests
 * Clang tidy integration
@@ -34,7 +33,7 @@ Bit-by-bit, I'm going to build some tests then start refactoring.  I'll remove t
 | 4    |  MQ9        |    1     |      |   Gas leaks               |   $2     |
 | 5    |  MQ135      |    1     |      |   Poison Gasses (organic) |   $2     |
 | 6    |GP2Y1010AU0F |    1     |      |   PM2.5 sensor            |  $18     |
-| 7    |  Nano       |    1     |      |   Arduino Nano            |   $5     |
+| 7    |  Nano       |    2     |      |   Arduino Nano            |   $10     |
 | 8    |   ---       |    1     |      |   F-F Breadboard cables   |   $6     |
 | 9    |  ENCL       |    1     |      |   3d printed enclosure    |   $3     |
 | 10   |  LK51-CA    |    1     |      |   4-line I2C LCD module   |   $12    |
