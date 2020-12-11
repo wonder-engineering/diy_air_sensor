@@ -123,8 +123,6 @@ void DiyAirSensor::loop() {
   // Output to the display
   sensor_display->display_data(&sensor_state);
 
-  // todo: figure out why we rotate the file so often
-
   // Wrap the file every day
   if (this->getMillis() < this->day_start_millis ||  // millis wraps every 49.7d
     (this->getMillis() - this->day_start_millis)/1000 > SECONDS_PER_DAY) {

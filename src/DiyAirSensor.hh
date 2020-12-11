@@ -8,7 +8,6 @@
 #ifndef SRC_DIYAIRSENSOR_HH_
 #define SRC_DIYAIRSENSOR_HH_
 
-// todo: when IN_TEST is defined put gmock mocked classes in their place
 #ifndef IN_TESTING
 #include "Arduino.h"
 #else
@@ -16,7 +15,6 @@
 #endif
 
 #include "SensorArray.hh"
-// #include "LogFile.h"  todo: fix up and restore
 #include "GP2YSensor.hh"
 #include "MQSensor.hh"
 #include "AirSensorDisplay.hh"

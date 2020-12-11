@@ -42,7 +42,6 @@ void AirSensorDisplay::checkForMenuButtons(SensorState * sensor_state) {
 void AirSensorDisplay::displaySensorColumns(SensorState * sensor_state) {
   // print sensor states, rotating them if there are more sensors than
   //   space to display them.
-  // todo: support rotating rows if not enough to display all at once
   // Reserve the last row for other display items
   uint8_t row = 0, column = 0;
   for (uint8_t sensor_number = 0;
@@ -102,9 +101,7 @@ void AirSensorDisplay::display_data(SensorState * sensor_state) {
   // if a button is pressed, drop into the menu
   checkForMenuButtons(sensor_state);
 
-  // print sensor states, rotating them if there are more sensors than
-  //   space to display them.
-  // todo: support rotating rows if not enough to display all at once
+  // Print sensor states
   // Reserve the last row for other display items
   displaySensorColumns(sensor_state);
 

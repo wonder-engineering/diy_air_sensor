@@ -33,18 +33,19 @@ void LogFileSender::open_line(uint32_t id, uint32_t timestamp) {
 }
 
 void LogFileSender::write_field(uint32_t field) {
-  delay(5);  // todo: temporary
+  delay(2);  // slow down transmission so receiver keeps up
   this->serialPort->print(field);
   this->serialPort->print(F(","));
 }
 
 void LogFileSender::write_field(float field) {
-  delay(5);  // todo: temporary
+  delay(2);  // slow down transmission so receiver keeps up
   this->serialPort->print(field, 2);
   this->serialPort->print(F(","));
 }
 
 void LogFileSender::write_field(const char * field) {
+  delay(2);  // slow down transmission so receiver keeps up
   this->serialPort->print(F(","));
 }
 
