@@ -12,7 +12,6 @@
 
 #ifndef SRC_SENSOR_HH_
 #define SRC_SENSOR_HH_
-// todo: use c++ .hh header conventions
 
 #include <stdio.h>
 #include <string.h>
@@ -48,7 +47,6 @@ class Sensor {
   virtual uint16_t read_sensor() = 0;
 
   // data - config
-  // todo: I could save space here if I make the sensors stateless
   char short_name[SENSOR_SHORT_NAME_LEN];
   float accum_rate;
   uint16_t zero_adjust;

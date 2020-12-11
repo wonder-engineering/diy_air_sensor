@@ -171,7 +171,7 @@ bool SensorMenu::sampling_callback(SensorSettings * settings) {
         wait_for_button_up();
     } else if (digitalRead(MENU_DN_BUTTON) == LOW) {
         if (settings->data.sampling_period_ms >= 1000)
-        settings->data.sampling_period_ms -= 500;
+          settings->data.sampling_period_ms -= 500;
         this->display_sampling_menu(settings);
         wait_for_button_up();
     }
@@ -185,10 +185,9 @@ void SensorMenu::display_file_menu(SensorState * state) {
     lcd->print(F("Current File: "));
     lcd->setCursor(0, 1);
     lcd->print(F("   "));
-    // lcd->print(state->device.current_file_name);
-    // todo: use file index instead
+    lcd->print(state->device.current_file);
     lcd->setCursor(0, 2);
-    lcd->print(F("Use arrows to set."));
+    lcd->print(F("For Information Only"));
     lcd->setCursor(0, 3);
     lcd->print(F("Blue to exit."));
 }
@@ -197,16 +196,10 @@ bool SensorMenu::file_callback(SensorState * state) {
     display_file_menu(state);
     wait_for_button_up();
     while (true) {
-        if (digitalRead(MENU_SELECT_BUTTON) == LOW) {
-        state->device.settings.commit();  // write to EEPROM before exiting
+      if (digitalRead(MENU_SELECT_BUTTON) == LOW) {
         wait_for_button_up();
         return REMAIN_IN_MENU;
-        } else if (digitalRead(MENU_UP_BUTTON) == LOW ||
-                    digitalRead(MENU_DN_BUTTON) == LOW) {
-        // todo: add this functionality
-        display_file_menu(state);
-        wait_for_button_up();
-        }
+      }
     }
 }
 

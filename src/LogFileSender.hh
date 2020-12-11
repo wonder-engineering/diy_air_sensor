@@ -47,6 +47,7 @@ class LogFileSender {
   void write_field(float field);
   void write_field(const char * field);
   void close_line();
+  uint8_t get_current_id() {return current_id;}
 
  private:
   virtual void override_file_number(uint8_t new_id);

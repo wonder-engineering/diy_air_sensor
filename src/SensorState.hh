@@ -34,6 +34,7 @@ struct DeviceStatus {
   SdState file_status = kFileFail;
   uint8_t num_sensors = 0;
   SensorSettings settings;  // EEPROM Settings
+  uint8_t current_file = 0;
 };
 
 struct SensorConfig {

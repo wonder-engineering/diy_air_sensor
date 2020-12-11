@@ -104,6 +104,7 @@ void DiyAirSensor::log_sd(uint32_t id, uint32_t timestamp) {
   this->logfile->write_field((uint16_t)SD_FORMAT_VERSION);
   this->logfile->write_field("|");
   this->logfile->close_line();
+  this->sensor_state.device.current_file = this->logfile->get_current_id();
 }
 
 // Called continuously in a loop
