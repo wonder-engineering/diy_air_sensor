@@ -88,10 +88,10 @@ void AirSensorDisplay::displaySensorThresholdWarnings(
 
   // Print glyph overlay on right side of last line for file status
   lcd->setCursor((LCD_NUM_COLUMNS-1), (LCD_NUM_ROWS-1));
-  if (sensor_state->device.file_status == kFileFail) {
-    lcd->write(byte(FILE_BAD_GLYPH));  // Dead File
+  if (sensor_state->device.settings.data.logging == false) {
+    lcd->write(byte(FILE_BAD_GLYPH));  // Not Writing
   } else {
-    lcd->write(byte(FILE_OK_GLYPH));  // OK File
+    lcd->write(byte(FILE_OK_GLYPH));  // Writing
   }
 }
 

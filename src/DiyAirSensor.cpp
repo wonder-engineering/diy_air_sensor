@@ -115,7 +115,7 @@ void DiyAirSensor::loop() {
   sensors->sense_all(&sensor_state);
 
   // Serial log loop start and sensor data
-  Serial.print(loop_number++);
+  Serial.print(loop_number);
   Serial.print(F(" ----------- "));
   Serial.println(loop_start_millis);
   sensors->log_all_serial_only();
@@ -133,8 +133,10 @@ void DiyAirSensor::loop() {
   }
 
   // Log to file every N loops, if file logging is configured on
-  if (sensor_state.device.logging_enabled) {
-    if (loop_number % sensor_state.device.log_every_n_loops == 0) {
+  if (sensor_state.device.settings.data.logging) {
+    if (loop_number %
+        sensor_state.device.settings.data.log_every_n_loops == 0) {
+      Serial.println(F("Logging to File."));
       this->log_sd(this->loop_number, loop_start_millis);
     }
   }

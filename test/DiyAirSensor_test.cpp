@@ -13,6 +13,7 @@ using ::testing::_;
 using ::testing::Mock;
 using ::testing::A;
 using ::testing::Gt;
+using ::testing::Ge;
 using ::testing::Lt;
 using ::testing::InSequence;
 
@@ -152,13 +153,16 @@ TEST(DiyAirSensor, loop) {
 
 
     // Calls must be in sequence
-    InSequence s;
+    {
+      InSequence s;
 
-    EXPECT_CALL(airSensor, getMillis());
-    EXPECT_CALL(sensors, sense_all(_));
-    EXPECT_CALL(sensors, log_all_serial_only());
-    EXPECT_CALL(display, display_data(_));
-    EXPECT_CALL(airSensor, waitForSamplingPeriodEnd());
+      EXPECT_CALL(airSensor, getMillis());
+      EXPECT_CALL(sensors, sense_all(_));
+      EXPECT_CALL(sensors, log_all_serial_only());
+      EXPECT_CALL(display, display_data(_));
+      EXPECT_CALL(airSensor, getMillis()).Times(2);
+      EXPECT_CALL(airSensor, waitForSamplingPeriodEnd());
+    }
 
     airSensor.loop();
 }
