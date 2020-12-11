@@ -4,11 +4,28 @@ This is the project for the DIY Air Quality Sensor.  The code right now is, fran
 Bit-by-bit, I'm going to build some tests then start refactoring.  I'll remove this readme-of-shame when I have something resembling real code.
 
 # TODO List:
-* Diagnose and fix SD writing problems (possibly hardware)
 * Move Arduino library build dependencies to git submodules
 * Clang fuzz tests
 * Clang tidy integration
 * Clang static analysis
+
+# Code Structure
+## diy_air_sensor
+This top-level directory is can be used with the Arduino IDE to build diy_air_sensor.ino. The project builds files in the src and include directories.  The CMakeLists.txt in this directory can also be used to cross-compile arduino project from the commandline.  You will find the .gitignore, .travis.yml, and all other files related to integrating with external tools (like coveralls) at this level.
+
+This also contains run_lint.bash, which will run the linter on all relevant files.  If you check in un-linted files, travis will yell at you.
+
+### src
+Contains the source code for the diy_air_sensor project.  Look at DiyAirSensor.hh / .cpp to find the top-level init and loop logic.
+
+### include
+Contains headers shared between projects.
+
+### log_file_sender
+This is the second Arduino project and is built separately from the diy_air_sensor project.  diy_air_sensor sends data via a serial port to the log_file sender, which writes the data to a file on an SD card.  We do this because the ATMega328 does not have enough RAM to run the SD stack and anything else at the same time.
+
+### test
+This directory contains test files.  Tests build on Linux or Mac platforms and cover both diy_air_sensor and log_file_sender projects.  They also produce code coverage reports.  Run the ./build.sh file in this directory to build and run the tests.
 
 
 # Gas sensor info
@@ -34,7 +51,7 @@ Bit-by-bit, I'm going to build some tests then start refactoring.  I'll remove t
 | 4    |  MQ9        |    1     |      |   Gas leaks               |   $2     |
 | 5    |  MQ135      |    1     |      |   Poison Gasses (organic) |   $2     |
 | 6    |GP2Y1010AU0F |    1     |      |   PM2.5 sensor            |  $18     |
-| 7    |  Nano       |    1     |      |   Arduino Nano            |   $5     |
+| 7    |  Nano       |    2     |      |   Arduino Nano            |   $10     |
 | 8    |   ---       |    1     |      |   F-F Breadboard cables   |   $6     |
 | 9    |  ENCL       |    1     |      |   3d printed enclosure    |   $3     |
 | 10   |  LK51-CA    |    1     |      |   4-line I2C LCD module   |   $12    |
