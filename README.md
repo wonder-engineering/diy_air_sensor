@@ -9,6 +9,24 @@ Bit-by-bit, I'm going to build some tests then start refactoring.  I'll remove t
 * Clang tidy integration
 * Clang static analysis
 
+# Code Structure
+## diy_air_sensor
+This top-level directory is can be used with the Arduino IDE to build diy_air_sensor.ino. The project builds files in the src and include directories.  The CMakeLists.txt in this directory can also be used to cross-compile arduino project from the commandline.  You will find the .gitignore, .travis.yml, and all other files related to integrating with external tools (like coveralls) at this level.
+
+This also contains run_lint.bash, which will run the linter on all relevant files.  If you check in un-linted files, travis will yell at you.
+
+### src
+Contains the source code for the diy_air_sensor project.  Look at DiyAirSensor.hh / .cpp to find the top-level init and loop logic.
+
+### include
+Contains headers shared between projects.
+
+### log_file_sender
+This is the second Arduino project and is built separately from the diy_air_sensor project.  diy_air_sensor sends data via a serial port to the log_file sender, which writes the data to a file on an SD card.  We do this because the ATMega328 does not have enough RAM to run the SD stack and anything else at the same time.
+
+### test
+This directory contains test files.  Tests build on Linux or Mac platforms and cover both diy_air_sensor and log_file_sender projects.  They also produce code coverage reports.  Run the ./build.sh file in this directory to build and run the tests.
+
 
 # Gas sensor info
  * MQ-2 - Smoke
