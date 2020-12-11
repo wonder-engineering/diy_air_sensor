@@ -29,6 +29,7 @@ void DiyAirSensor::initializeSensor() {
 
   this->loop_number = 0;        // state for loop control
   this->loop_start_millis = 0;
+  this->day_start_millis = this->getMillis();
 
   Serial.println(F("Init Button Pins..."));
   this->initPins();
@@ -122,26 +123,22 @@ void DiyAirSensor::loop() {
   // Output to the display
   sensor_display->display_data(&sensor_state);
 
-  // Log to file
-  this->log_sd(this->loop_number, loop_start_millis);
-//
-//  // Wrap the file every day
-//  if(loop_number % (SECONDS_PER_DAY /
-//        (sensor_state.device.sampling_period_ms / 1000)) == 0){
-//    Serial.println(F("Wrapping the log File"));
-//  }
-//
-//  // Log to file every N loops, if file logging is configured on
-//  if(sensor_state.device.logging_enabled){
-//    if(loop_number % sensor_state.device.log_every_n_loops == 0) {
-//      logfile->open_line(loop_number, loop_start_millis);
-//      // fixme sensors->log_all(logfile->get_file_ptr());
-//      logfile->close_line();
-//    }
-//  }
-//
-//  // Set sensor zeros, based on menu adjustments
-//
+  // todo: figure out why we rotate the file so often
+
+  // Wrap the file every day
+  if (this->getMillis() < this->day_start_millis ||  // millis wraps every 49.7d
+    (this->getMillis() - this->day_start_millis)/1000 > SECONDS_PER_DAY) {
+    this->logfile->rotate_file();
+    this->day_start_millis = this->getMillis();
+  }
+
+  // Log to file every N loops, if file logging is configured on
+  if (sensor_state.device.logging_enabled) {
+    if (loop_number % sensor_state.device.log_every_n_loops == 0) {
+      this->log_sd(this->loop_number, loop_start_millis);
+    }
+  }
+
   // Burn remainder of the loop period
   this->waitForSamplingPeriodEnd();
 }

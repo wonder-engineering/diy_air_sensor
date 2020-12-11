@@ -42,6 +42,7 @@ class DiyAirSensor {
     SensorArray       * sensors        = NULL;
     AirSensorDisplay  * sensor_display = NULL;
     uint32_t loop_number;
+    uint32_t day_start_millis;
     uint32_t loop_start_millis;
     virtual void addSensors(SensorArray * array);
     virtual void initPins();
