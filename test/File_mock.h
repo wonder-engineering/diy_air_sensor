@@ -28,10 +28,10 @@ class File {
 };
 
 
-// https://github.com/arduino-libraries/SD/blob/master/src/SD.h
-class SDClass {
- public:
-  bool begin(uint8_t csPin) {return true;}
-  File open(char * name, uint8_t mode) {return File();}
-};
+// // https://github.com/arduino-libraries/SD/blob/master/src/SD.h
+// class SDClass {
+//  public:
+//   bool begin(uint8_t csPin) {return true;}
+//   File open(char * name, uint8_t mode) {return File();}
+// };
 #endif  // TEST_FILE_MOCK_H_

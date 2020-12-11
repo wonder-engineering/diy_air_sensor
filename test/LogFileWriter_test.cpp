@@ -9,7 +9,6 @@ class MockSd_i : public Sd_i {
     MOCK_METHOD(bool, begin, (uint8_t csPin), (override));
     MOCK_METHOD(File, open, (const char * name, uint8_t mode), (override));
     MOCK_METHOD(void, end, (), (override));
-    void rotate_file() {}
 };
 
 using ::testing::AtLeast;
@@ -23,11 +22,6 @@ TEST(LogFileWriter, File_Names_comply) {
    public:
     void rotate_file() {LogFileWriter::rotate_file();}
     char * get_file_name_ptr() {return current_name;}
-    void replace_sd_interface(Sd_i * interface) {
-      this->sd = interface;
-    }
-    void reset_first_run() {this->first_run = true;}  // for testing
-    bool re_init_sd() {return LogFileWriter::re_init_sd();}
   };
   InstrumentedLogFileWriter logfile;
 
@@ -62,14 +56,11 @@ TEST(LogFileWriter, SD_init_Failure_Handling) {
   // Mock LogFileWriter methods we want to assert/manipulate
   class MockLogFileWriter : public LogFileWriter {
    public:
-    void rotate_file() override {LogFileWriter::rotate_file();}
-    char * get_file_name_ptr() {return current_name;}
     void replace_sd_interface(Sd_i * interface) {
       this->sd = interface;
     }
     void reset_first_run() {this->first_run = true;}  // for testing
     bool re_init_sd() override {return LogFileWriter::re_init_sd();}
-    bool is_sd_failed() override {return LogFileWriter::is_sd_failed();}
 
     MOCK_METHOD(uint16_t, get_highest_used_id, (), (override));
   };
@@ -113,13 +104,9 @@ TEST(LogFileWriter, SD_heal_after_failure) {
   // Mock LogFileWriter methods we want to assert/manipulate
   class MockLogFileWriter : public LogFileWriter {
    public:
-    void rotate_file() {LogFileWriter::rotate_file();}
-    char * get_file_name_ptr() {return current_name;}
     void replace_sd_interface(Sd_i * interface) {
       this->sd = interface;
     }
-    void reset_first_run() {this->first_run = true;}  // for testing
-    bool re_init_sd() {return LogFileWriter::re_init_sd();}
     bool is_sd_failed() {return LogFileWriter::is_sd_failed();}
     void open_line(uint32_t x, uint32_t y) {LogFileWriter::open_line(x, y);}
   };
@@ -158,17 +145,13 @@ TEST(LogFileWriter, Happy_initialization_works) {
   // Mock LogFileWriter methods we want to assert/manipulate
   class MockLogFileWriter : public LogFileWriter {
    public:
-    void rotate_file() override {LogFileWriter::rotate_file();}
     char * get_file_name_ptr() {return current_name;}
     void replace_sd_interface(Sd_i * interface) {
       this->sd = interface;
     }
-    void reset_first_run() {this->first_run = true;}  // for testing
     bool re_init_sd() override {return LogFileWriter::re_init_sd();}
     bool is_sd_failed() override {return LogFileWriter::is_sd_failed();}
-    void open_line(uint32_t x, uint32_t y) override {
-      LogFileWriter::open_line(x, y);
-    }
+
    public:
       MOCK_METHOD(void, set_pinmode, (uint8_t pin, uint8_t flags), (override));
       MOCK_METHOD(uint16_t, get_highest_used_id, (), (override));
@@ -233,17 +216,10 @@ TEST(LogFileWriter, re_init_behaviors) {
     // Mock LogFileWriter methods we want to assert/manipulate
   class MockLogFileWriter : public LogFileWriter {
    public:
-    void rotate_file() override {LogFileWriter::rotate_file();}
-    char * get_file_name_ptr() {return current_name;}
     void replace_sd_interface(Sd_i * interface) {
       this->sd = interface;
     }
-    void reset_first_run() {this->first_run = true;}  // for testing
-    bool re_init_sd() override {return LogFileWriter::re_init_sd();}
-    bool is_sd_failed() override {return LogFileWriter::is_sd_failed();}
-    void open_line(uint32_t x, uint32_t y) override {
-      LogFileWriter::open_line(x, y);
-    }
+        bool re_init_sd() override {return LogFileWriter::re_init_sd();}
 
    public:
     MOCK_METHOD(void, set_pinmode, (uint8_t pin, uint8_t flags),

@@ -80,7 +80,7 @@ class LiquidCrystal_I2C {
   virtual void autoscroll() {}
   virtual void noAutoscroll() {}
   virtual void createChar(uint8_t, uint8_t[]) {}
-  virtual void createChar(uint8_t location, const char *charmap) {}
+  // virtual void createChar(uint8_t location, const char *charmap) {}
   virtual void print(char * toprint) {}
   virtual void print(const char * toprint) {}
   virtual void print(uint16_t toprint) {}
@@ -89,11 +89,7 @@ class LiquidCrystal_I2C {
   //   {B00100,B01110,B01110,B01110,B11111,B00000,B00100,B00000};
 
   virtual void setCursor(uint8_t, uint8_t) {}
-#if defined(ARDUINO) && ARDUINO >= 100
-  virtual size_t write(uint8_t) {}
-#else
   virtual void write(uint8_t) {}
-#endif
   virtual void command(uint8_t) {}
   virtual void init() {}
   virtual void oled_init() {}
@@ -110,16 +106,16 @@ virtual void load_custom_character(uint8_t char_num,
 virtual void printstr(const char[]) {}
 
 // Unsupported API functions (not implemented in this library)
-uint8_t status() { return 0;}
-virtual void setContrast(uint8_t new_val) {}
-uint8_t keypad() {return 0;}
-virtual void setDelay(int, int) {}
-virtual void on() {}
-virtual void off() {}
-uint8_t init_bargraph(uint8_t graphtype) {return 0;}
-virtual void draw_horizontal_graph(uint8_t row, uint8_t column,
-                                    uint8_t len,  uint8_t pixel_col_end) {}
-virtual void draw_vertical_graph(uint8_t row, uint8_t column,
-                                    uint8_t len, uint8_t pixel_col_end) {}
+// uint8_t status() { return 0;}
+// virtual void setContrast(uint8_t new_val) {}
+// uint8_t keypad() {return 0;}
+// virtual void setDelay(int, int) {}
+// virtual void on() {}
+// virtual void off() {}
+// uint8_t init_bargraph(uint8_t graphtype) {return 0;}
+// virtual void draw_horizontal_graph(uint8_t row, uint8_t column,
+//                                     uint8_t len,  uint8_t pixel_col_end) {}
+// virtual void draw_vertical_graph(uint8_t row, uint8_t column,
+//                                     uint8_t len, uint8_t pixel_col_end) {}
 };
 #endif  // TEST_STUB_LIQUIDCRYSTAL_I2C_HH_

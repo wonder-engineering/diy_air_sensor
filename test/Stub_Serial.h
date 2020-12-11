@@ -45,7 +45,7 @@ class HardwareSerial {
 
   size_t write(uint8_t) {return 0;}
   size_t write(const char *str) {return 0;}
-  size_t write(const uint8_t *buffer, size_t size) {return 0;}
+  // size_t write(const uint8_t *buffer, size_t size) {return 0;}
 
   virtual uint8_t begin(uint32_t) {return 0;}
 
